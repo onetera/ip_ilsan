@@ -1,0 +1,82 @@
+global proc DI_geoBake(int $startFrame, int $endFrame, string $cacheDir)
+{
+    if(`namespace -exists "mrgo"`)
+    {
+        string $refFileName = `referenceQuery -f -shn mrgo:mrgo_worldz_CON`;
+        if($refFileName != "mrgo_facial_v05.mb" && $refFileName !="mrgo_facial_v06.mb")
+        {
+            error "Please replace rig to facial version!";
+        }
+        select -cl;
+        select -r
+                  mrgo:mrgo_thumb_L_nail_PLY
+                  mrgo:mrgo_index_L_nail_PLY
+                  mrgo:mrgo_mid_L_nail_PLY
+                  mrgo:mrgo_ring_L_nail_PLY
+                  mrgo:mrgo_pinky_L_nail_PLY
+                  mrgo:mrgo_thumb_R_nail_PLY
+                  mrgo:mrgo_index_R_nail_PRY
+                  mrgo:mrgo_mid_R_nail_PRY
+                  mrgo:mrgo_ring_R_nail_PRY
+                  mrgo:mrgo_pinky_R_nail_PRY
+                  mrgo:mrgo_thumb_L_toenail_PLY
+                  mrgo:mrgo_index_L_toenail_PLY
+                  mrgo:mrgo_mid_L_toenail_PLY
+                  mrgo:mrgo_ring_L_toenail_PLY
+                  mrgo:mrgo_pinky_L_toenail_PLY
+                  mrgo:mrgo_thumb_R_toenail_PRY
+                  mrgo:mrgo_index_R_toenail_PRY
+                  mrgo:mrgo_mid_R_toenail_PRY
+                  mrgo:mrgo_ring_R_toenail_PRY
+                  mrgo:mrgo_pinky_R_toenail_PRY
+                  mrgo:mrgo_upper_tooth1_PLY
+                  mrgo:mrgo_upper_tooth2_PLY
+                  mrgo:mrgo_upper_tooth3_PLY
+                  mrgo:mrgo_upper_tooth4_PLY
+                  mrgo:mrgo_upper_tooth5_PLY
+                  mrgo:mrgo_upper_tooth6_PLY
+                  mrgo:mrgo_upper_tooth7_PLY
+                  mrgo:mrgo_upper_tooth8_PLY
+                  mrgo:mrgo_upper_tooth9_PLY
+                  mrgo:mrgo_upper_tooth10_PLY
+                  mrgo:mrgo_upper_tooth11_PLY
+                  mrgo:mrgo_upper_tooth12_PLY
+                  mrgo:mrgo_upper_tooth13_PLY
+                  mrgo:mrgo_upper_tooth14_PLY
+                  mrgo:mrgo_upper_tooth15_PLY
+                  mrgo:mrgo_upper_tooth16_PLY
+                  mrgo:mrgo_lower_tooth1_PLY
+                  mrgo:mrgo_lower_tooth2_PLY
+                  mrgo:mrgo_lower_tooth3_PLY
+                  mrgo:mrgo_lower_tooth4_PLY
+                  mrgo:mrgo_lower_tooth5_PLY
+                  mrgo:mrgo_lower_tooth6_PLY
+                  mrgo:mrgo_lower_tooth7_PLY
+                  mrgo:mrgo_lower_tooth8_PLY
+                  mrgo:mrgo_lower_tooth9_PLY
+                  mrgo:mrgo_lower_tooth10_PLY
+                  mrgo:mrgo_lower_tooth11_PLY
+                  mrgo:mrgo_lower_tooth12_PLY
+                  mrgo:mrgo_lower_tooth13_PLY
+                  mrgo:mrgo_lower_tooth14_PLY
+                  mrgo:mrgo_lower_tooth15_PLY
+                  mrgo:mrgo_lower_tooth16_PLY
+                  mrgo:mrgo_eye_L_part3_PLY
+                  mrgo:mrgo_eye_L_glands_PLY
+                  mrgo:mrgo_eye_R_glands_PLY
+                  mrgo:mrgo_eye_R_part3_PLY
+                  mrgo:mrgo_fullBody_PLY;
+        select -tgl -visible
+                  mrgo:mrgo_bet_PLY
+                  mrgo:mrgo_helmet0_PLY
+                  mrgo:mrgo_helmet1_PLY
+                  mrgo:mrgo_helmet2_PLY
+                  mrgo:mrgo_helmet3_PLY;
+    
+        doCreateGeometryCache 5 { "3", $startFrame, $endFrame, "OneFile", "1", $cacheDir,"1","","0", "add", "0", "1", "1","0","1","mcc" } ;
+    }else{
+        error("There is no namespace named \"mrgo\"");
+    }
+}
+
+//DI_geoBake(1, 24, "/home/utd/test")

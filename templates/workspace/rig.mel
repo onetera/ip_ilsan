@@ -1,0 +1,68 @@
+// Digital IDEa Maya Project Definition for rig
+// Written by wondermc, Fri Jun 10, 2011
+// Modified by utd, Wed Sep 28, 2011
+
+
+// data
+workspace -fr "animImport" "data/anim";
+workspace -fr "animExport" "data/anim";
+workspace -fr "FBX" "data/fbx";
+workspace -fr "FBX export" "data/fbx";
+workspace -fr "diskCache" "data/geoCache";
+workspace -fr "OBJ" "data/obj";
+workspace -fr "OBJexport" "data/obj";
+
+// preview
+workspace -fr "movie" "preview";
+workspace -fr "images" "preview";
+
+// scenes
+workspace -fr "scene" "scenes";
+workspace -fr "mayaAscii" "scenes";
+workspace -fr "mayaBinary" "scenes";
+
+// script
+workspace -fr "mel" "script";
+
+// sourceimages
+workspace -fr "sourceImages" "sourceimages";
+workspace -fr "textures" "sourceimages";
+
+// tmp
+workspace -fr "autoSave" "tmp/autosave";
+workspace -fr "templates" "tmp/assets";
+workspace -fr "offlineEdit" "tmp/edits";
+workspace -fr "furFiles" "tmp/furFiles";
+workspace -fr "furShadowMap" "tmp/furShadowMap";
+workspace -fr "furAttrMap" "tmp/furAttrMap";
+workspace -fr "furEqualMap" "tmp/furEqualMap";
+workspace -fr "furImages" "tmp/furImages";
+workspace -fr "3dPaintTextures" "tmp/3dPaintTextures";
+workspace -fr "DXFexport" "tmp/data";
+workspace -fr "mentalRay" "tmp/mentalRay";
+workspace -fr "lights" "tmp/renderData/shaders";
+workspace -fr "particles" "tmp/particles";
+workspace -fr "DXF_FBX export" "tmp/DXF_FBX export";
+workspace -fr "depth" "tmp/renderData/depth";
+workspace -fr "DAE_FBX export" "tmp/DAE_FBX export";
+workspace -fr "DAE_FBX" "tmp/DAE_FBX";
+workspace -fr "iprImages" "tmp/renderData/iprImages";
+workspace -fr "DXF_FBX" "tmp/DXF_FBX";
+workspace -fr "move" "tmp/data";
+workspace -fr "clips" "tmp/clips";
+workspace -fr "HIKCharacter" "tmp/HIKCharacter";
+workspace -fr "IGES" "tmp/data";
+workspace -fr "mentalray" "tmp/renderData/mentalray";
+workspace -fr "audio" "tmp/sound";
+workspace -fr "RIBexport" "tmp/data";
+workspace -fr "RIB" "tmp/data";
+workspace -fr "HIKState" "tmp/HIKState";
+workspace -fr "HIKEffectorSet" "tmp/HIKEffectorSet";
+workspace -fr "Adobe(R) Illustrator(R)" "tmp/data";
+workspace -fr "aliasWire" "tmp/data";
+workspace -fr "renderScenes" "tmp/renderScenes";
+workspace -fr "DXF" "tmp/data";
+workspace -fr "EPS" "tmp/data";
+workspace -fr "HIKPropertySet" "tmp/HIKPropertySet";
+workspace -fr "IGESexport" "tmp/data";
+

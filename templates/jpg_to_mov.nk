@@ -1,0 +1,74 @@
+#! /Applications/Nuke6.2v2/Nuke6.2v2.app/Contents/MacOS/Nuke6.2v2 -nx
+version 6.2 v2
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="3" y="22" w="974" h="924" screen="0">
+        <splitter orientation="1">
+            <split size="614"/>
+            <splitter orientation="1">
+                <split size="81"/>
+                <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                    <page id="Toolbar.1"/>
+                </dock>
+                <split size="529"/>
+                <splitter orientation="2">
+                    <split size="449"/>
+                    <dock id="" activePageId="Viewer.1">
+                        <page id="Viewer.1"/>
+                    </dock>
+                    <split size="449"/>
+                    <dock id="" activePageId="DAG.1">
+                        <page id="DAG.1"/>
+                        <page id="Curve Editor.1"/>
+                    </dock>
+                </splitter>
+            </splitter>
+            <split size="356"/>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name /Users/higgsdecay/Documents/workspace/ibrowser/template/jpg_to_mov.nk
+ last_frame 17
+ lock_range true
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+}
+Read {
+ inputs 0
+ file /show/wuxia/seq/AA/AA01/roto/dev/tmp/0813.#####.jpg
+ format "2048 872 0 0 2048 872 1 "
+ last 17
+ origlast 17
+ origset true
+ name SOURCE
+ xpos -128
+ ypos -155
+}
+set N182dfe50 [stack 0]
+Viewer {
+ input_process false
+ name Viewer1
+ xpos 4
+ ypos -126
+}
+push $N182dfe50
+Write {
+ file test.mov
+ colorspace sRGB
+ file_type mov
+ codec jpeg
+ quality Normal
+ keyframerate 0
+ settings 0000000000000000000000000000019a7365616e0000000100000001000000000000018676696465000000010000000e00000000000000227370746c0000000100000000000000006a70656700000000001800000200000000207470726c000000010000000000000000000000000018000000000000000000246472617400000001000000000000000000000000000000530000010000000100000000156d70736f00000001000000000000000000000000186d66726100000001000000000000000000000000000000187073667200000001000000000000000000000000000000156266726100000001000000000000000000000000166d70657300000001000000000000000000000000002868617264000000010000000000000000000000000000000000000000000000000000000000000016656e647300000001000000000000000000000000001663666c67000000010000000000000000004400000018636d66720000000100000000000000006170706c00000014636c75740000000100000000000000000000001c766572730000000100000000000000000003001c00010000
+ checkHashOnRead false
+ name MOV
+ xpos -128
+ ypos -47
+}

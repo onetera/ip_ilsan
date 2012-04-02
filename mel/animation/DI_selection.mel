@@ -1,0 +1,39 @@
+global proc DI_selection(int $namespace, string $each_sel1)
+{
+    //string $each_sel1 = "/show/myWay/assets/char/mustang/rig/pub/script/mustang_rig_v01.txt";
+    
+    // append strings to string array (this is temporary)
+    $selectedAssets[0] = $each_sel1;
+    
+    string $asset_sel;
+    string $outSelection;
+    
+    for($asset_sel in $selectedAssets)
+    {
+        // selection clear
+        select -clear;
+        
+        // open the file for reading
+        $fileId = `fopen $asset_sel "r"`;
+        
+        // get the first line of text
+        string $firstLine = `fgetline $fileId`;
+        string $selectionList[];
+        tokenize ($firstLine, $selectionList); // = stringToStringArray($firstLine, " ");
+        
+        for($each in $selectionList)
+        {
+            if($namespace) // asset
+            {
+                select -toggle ("*:" + $each);
+                //print $namespace;
+                //select -toggle $each;
+            }
+            else // shot
+            {
+                select -toggle $each;
+                //print $namespace;
+            }
+        }
+    }
+}

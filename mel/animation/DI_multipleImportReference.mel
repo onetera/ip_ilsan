@@ -1,0 +1,15 @@
+global proc DI_multipleImport(int $numItems, string $assetName, string $fileName)
+{
+    for($i=1; $i<=$numItems; $i++)
+    {
+        file -import -type "mayaBinary" -ra true -namespace ($assetName + "_#") -options "v=0"  -pr -loadReferenceDepth "all" $fileName;
+    }
+}
+
+global proc DI_multipleReference(int $numItems, string $assetName, string $fileName)
+{
+    for($i=1; $i<=$numItems; $i++)
+    {
+        file -r -type "mayaBinary" -gl -loadReferenceDepth "all" -shd "displayLayers" -shd "shadingNetworks" -shd "renderLayersByName" -namespace ($assetName + "_#") -options "v=0" $fileName;
+    }
+}

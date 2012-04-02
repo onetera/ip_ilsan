@@ -1,0 +1,101 @@
+global proc kis_replaceReference ()
+{
+	string $win = "kis_replaceReferenceWin";
+	if (`window -ex $win`) deleteUI $win;
+
+	window -s 0 $win;
+	columnLayout -adj 1 -cat both 1;
+		textFieldButtonGrp -cw3 80 200 120 -adj 3 -l "old reference" -text "" -ed 1 -bl "<< select object" kis_rrwOld_TFBG;
+		textFieldButtonGrp -e -bc "kis_rrwCurrentRef" kis_rrwOld_TFBG;
+		textFieldButtonGrp -cw3 80 200 120 -adj 3 -l "new reference" -text "" -ed 1 -bl "<< select file"   kis_rrwNew_TFBG;
+		textFieldButtonGrp -e -bc "kis_rrwSelectNewFile" kis_rrwNew_TFBG;
+		separator -h 10 -style "in";
+		rowLayout -numberOfColumns 2 -columnWidth2 200 200 -ct2 "both" "both";
+			button -l "replace selected" -c "kis_rrwSelected";
+			button -l "replace all"      -c "kis_rrwAll";
+	showWindow $win;
+}
+
+global proc kis_rrwCurrentRef ()
+{
+	string $sel[] = `ls -sl`;
+	string $rfnNode;
+	string $ref[];
+	for ($s in $sel) {
+		$rfnNode = `referenceQuery -rfn $s`;
+		if (`objExists $rfnNode`) $ref[size($ref)] = $rfnNode;
+	}
+	$ref = stringArrayRemoveDuplicates ($ref);
+	
+	string $text;
+	for ($r in $ref) $text += $r +",";
+	textFieldButtonGrp -e -text $text kis_rrwOld_TFBG;
+}
+	
+
+global proc kis_rrwSelectNewFile ()
+{
+	string $result[] = `fileDialog2 -fm 1 -ff "Maya Files (*.ma *.mb)" -okc "OK"`;
+	textFieldButtonGrp -e -text $result[0] kis_rrwNew_TFBG;
+}
+
+
+global proc kis_rrwSelected ()
+{
+	string $refString = `textFieldButtonGrp -q -text kis_rrwOld_TFBG`;
+	string $ref[];
+	tokenize $refString "," $ref;
+	
+	string $new = `textFieldButtonGrp -q -text kis_rrwNew_TFBG`;
+	string $parent;
+	for ($r in $ref) {
+		$parent = `referenceQuery -parent -rfn $r`;
+		if ($parent != "") {
+			string $result = `confirmDialog -title "Reference depth warning!!"
+		           -message ($r +" is a child of another reference file.\nThis replacement will not be saved.")
+		           -button "Ignore and proceed" -button "Cancel" -dismissString "Cancel"`;
+			if ($result == "Cancel") 
+				return;
+			else 
+				break;
+		}
+	}
+	for ($r in $ref) {
+		file -loadReference $r -options "v=0" $new;
+		print ("\n"+ $r +"\t: 's been replaced with "+ $new);
+	}
+}
+	
+
+global proc kis_rrwAll ()
+{
+	string $refString = `textFieldButtonGrp -q -text kis_rrwOld_TFBG`;
+	string $ref[];
+	tokenize $refString "," $ref;
+	
+	string $old;
+	for ($r in $ref) {
+		$old = `referenceQuery -wcn -filename $r`;
+		if (`filetest -file $old`) break;
+	}
+	string $new = `textFieldButtonGrp -q -text kis_rrwNew_TFBG`;
+	
+	string $refAll[] = `ls -type reference`;
+	string $parent, $file;
+	for ($r in $refAll) {
+		if ( $r == "sharedReferenceNode") continue;
+		$parent = `referenceQuery -parent -rfn $r`;
+		if ($parent != "") {
+			warning ($r +"\t: is a child of another reference file. Skip replacing file.");
+			continue;
+		}
+	 	catchQuiet($file = `referenceQuery -filename $r`);
+		//print $file;
+		//print "\n";
+		if (`match $old $file` != "") {
+			file -loadReference $r -options "v=0" $new;
+			print ("\n"+ $r +"\t: 's been replaced with "+ $new);
+		}
+	}
+}
+

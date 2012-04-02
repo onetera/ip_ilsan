@@ -1,0 +1,142 @@
+#! /Applications/Nuke6.2v2/Nuke6.2v2.app/Contents/MacOS/Nuke6.2v2 -nx
+version 6.2 v2
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="501" y="22" w="1502" h="993" screen="0">
+        <splitter orientation="1">
+            <split size="948"/>
+            <splitter orientation="1">
+                <split size="117"/>
+                <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                    <page id="Toolbar.1"/>
+                </dock>
+                <split size="827"/>
+                <splitter orientation="2">
+                    <split size="484"/>
+                    <dock id="" activePageId="Viewer.1">
+                        <page id="Viewer.1"/>
+                    </dock>
+                    <split size="483"/>
+                    <dock id="" activePageId="DAG.1">
+                        <page id="DAG.1"/>
+                        <page id="Curve Editor.1"/>
+                    </dock>
+                </splitter>
+            </splitter>
+            <split size="550"/>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name /Users/higgsdecay/Documents/workspace/ibrowser/template/master.nk
+ frame 13
+ last_frame 17
+ lock_range true
+ format "1920 1080 0 0 1920 1080 1 HD"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+}
+Read {
+ inputs 0
+ file /show/wuxia/seq/AA/AA01/roto/dev/scenes/0813.#####.dpx
+ format "1920 1080 0 0 1920 1080 1 HD"
+ last 17
+ origlast 17
+ origset true
+ on_error checkerboard
+ timecode 01:03:16:01
+ name SOURCE
+ xpos 138
+ ypos -239
+}
+Reformat {
+ black_outside true
+ name Reformat1
+ xpos 138
+ ypos -145
+}
+Vectorfield {
+ vfield_file /show/wuxia/config/global/lut/wuxia.cube
+ colorspaceIn Cineon
+ colorspaceOut sRGB
+ name Vectorfield1
+ xpos 138
+ ypos -113
+}
+idea_slate {
+ name idea_slate1
+ note_font "DejaVu Sans"
+ xpos 9
+ ypos -113
+ plate_shotname SHOT
+ plate_version 34
+ plate_jobname JOB
+ plate_task TASK
+ plate_artist "Jungwook Seo"
+ plate_status Custom...
+ CustomStatus TEMP
+ plate_description1 NOTE1
+ plate_description2 ""
+ plate_description3 ""
+ plate_description4 ""
+ advance 1
+ handlesOUT {{handlesIN i}}
+ ver ""
+ focalmm ""
+ CompanyName ""
+ slate_frame {{first_frame-1 i}}
+ Fonts 1
+ regfont /lustre/film_render/zzz/fonts/MALGUN.TTF
+ boldfont /lustre/film_render/zzz/fonts/MALGUNBD.TTF
+ frame 1
+ first_frame {{"\[exists parent.input]==1?\[value parent.input.first_frame]:0" i}}
+ last_frame {{"\[exists parent.input]==1?\[value parent.input.last_frame]:0" i}}
+ Overlays 0
+ TypeSize 20
+ UITLOpacity {{parent.OverlaysOpacity i}}
+ LogoOverlayOpacity {{OverlaysOpacity}}
+ MaskOverlay 0
+ MaskAspectRatio 2.3
+ MaskOpacity 0.8
+ Testers 0
+ Slate 1
+ filelogo /lustre/film_render/zzz/template/CI_blackBG2.png
+ file " "
+ StatusSettings 1
+}
+set N188ef520 [stack 0]
+Viewer {
+ input_process false
+ name Viewer1
+ xpos 9
+ ypos -178
+}
+push $N188ef520
+Write {
+ file test.mov
+ file_type mov
+ codec jpeg
+ quality Normal
+ keyframerate 0
+ settings 0000000000000000000000000000019a7365616e0000000100000001000000000000018676696465000000010000000e00000000000000227370746c0000000100000000000000006a70656700000000001800000200000000207470726c000000010000000000000000000000000018000000000000000000246472617400000001000000000000000000000000000000530000010000000100000000156d70736f00000001000000000000000000000000186d66726100000001000000000000000000000000000000187073667200000001000000000000000000000000000000156266726100000001000000000000000000000000166d70657300000001000000000000000000000000002868617264000000010000000000000000000000000000000000000000000000000000000000000016656e647300000001000000000000000000000000001663666c67000000010000000000000000004400000018636d66720000000100000000000000006170706c00000014636c75740000000100000000000000000000001c766572730000000100000000000000000003001c00010000
+ checkHashOnRead false
+ name MOV
+ xpos 9
+ ypos -53
+}
+push $N188ef520
+Write {
+ file /Users/higgsdecay/output/proxy.####.jpg
+ file_type jpeg
+ _jpeg_quality 1
+ checkHashOnRead false
+ version 1
+ name PROXY
+ xpos -113
+ ypos -118
+}

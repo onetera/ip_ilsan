@@ -1,0 +1,62 @@
+global proc mrgo_exportWorld()
+{
+    string $targetControl = "mrgo:mrgo_worldz_CON";
+    select $targetControl;
+    delete -staticChannels -unitlessAnimationCurves false -hierarchy none -controlPoints 0 -shape 1;
+
+    int $startFrame = 70;
+    currentTime $startFrame;
+    setKeyframe;
+
+    string $buffer[];
+    string $fullName = `file -q -sn`;
+    string $newPath = `substitute "/scenes" $fullName "/data/anim"`;
+    $numTokens = `tokenize $newPath "." $buffer`;
+    
+    sysFile -makeDir $buffer[0];
+    string $mrgoWorld = ($buffer[0] + "/mrgo_world.anim");
+    
+    if(!(`pluginInfo -query -loaded animImportExport`))
+        catch(`loadPlugin "/usr/autodesk/maya2011-x64/bin/plug-ins/animImportExport.so"`);
+        
+    file -force -options "precision=8;intValue=17;nodeNames=0;verboseUnits=0;whichRange=1;range=0:10;options=curve;hierarchy=none;controlPoints=0;shapes=0;helpPictures=0;useChannelBox=0;copyKeyCmd=-animation objects -option curve -hierarchy none -controlPoints 0 -shape 0 "
+         -typ "animExport" -pr -es $mrgoWorld;
+}
+
+global proc mrgo_muteWorld()
+{
+    mute "mrgo:mrgo_worldz_CON.tx";
+    mute "mrgo:mrgo_worldz_CON.ty";
+    mute "mrgo:mrgo_worldz_CON.tz";
+    mute "mrgo:mrgo_worldz_CON.rx";
+    mute "mrgo:mrgo_worldz_CON.ry";
+    mute "mrgo:mrgo_worldz_CON.rz";
+    mute "mrgo:mrgo_worldz_CON.ohtherWorld";
+}
+
+global proc mrgo_unmuteWorld()
+{
+    mute -disable -force "mrgo:mrgo_worldz_CON.tx";
+    mute -disable -force "mrgo:mrgo_worldz_CON.ty";
+    mute -disable -force "mrgo:mrgo_worldz_CON.tz";
+    mute -disable -force "mrgo:mrgo_worldz_CON.rx";
+    mute -disable -force "mrgo:mrgo_worldz_CON.ry";
+    mute -disable -force "mrgo:mrgo_worldz_CON.rz";
+    mute -disable -force "mrgo:mrgo_worldz_CON.ohtherWorld";
+}
+
+global proc mrgo_initiateWorld()
+{
+    setAttr "mrgo:mrgo_worldz_CON.tx" 0;
+    setAttr "mrgo:mrgo_worldz_CON.ty" 0;
+    setAttr "mrgo:mrgo_worldz_CON.tz" 0;
+    setAttr "mrgo:mrgo_worldz_CON.rx" 0;
+    setAttr "mrgo:mrgo_worldz_CON.ry" 0;
+    setAttr "mrgo:mrgo_worldz_CON.rz" 0;
+    setAttr "mrgo:mrgo_worldz_CON.ohtherWorld" 0;
+}
+
+//mrgo_exportWorld;
+//mrgo_initiateWorld;
+//mrgo_muteWorld;
+

@@ -1,0 +1,22 @@
+try:
+    reload(sys.modules['Core.Note.Note2'])
+    reload(sys.modules['foundations.globals.constants'])
+    reload(sys.modules['foundations.tractor'])
+    reload(sys.modules['Core.Note.Note'])
+    reload(sys.modules['Core.iPipelineInfo'])
+    reload(sys.modules['Core.iPipelineActions'])
+    reload(sys.modules['Core.iPipelineInit'])
+    reload(sys.modules['Core.iPipelineUtility'])
+    reload(sys.modules['Gui.Functions.assistantFunctions'])
+    reload(sys.modules['Custom.DI_animTransfer'])
+    reload(sys.modules['foundations.nuke'])
+    reload(sys.modules['ui.common'])
+    reload(ipipeline)
+except:
+    print "couldn't python sript"
+
+import sys
+if not '/Users/higgsdecay/work/di/ipipeline' in sys.path:
+    sys.path.append('/Users/higgsdecay/work/di/ipipeline')
+import ipipeline
+ipipeline.pipeline()

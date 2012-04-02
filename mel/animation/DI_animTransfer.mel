@@ -1,0 +1,114 @@
+global proc DI_animTransfer(string $newFile, string $output_sel, string $selectedAssets[])
+{
+    //string $originalFile = `file -q -sceneName`;
+    //string $newPath = `substitute "/scenes" $originalFile "/data/anim"`;
+    //string $newFile = `substitute ".mb" $newPath ".anim"`; // /show/mrgo/seq/SS_01/ACR/ani/dev/data/anim/ACR_ani_v03_w03.anim
+    
+    float $startFrame = `playbackOptions -q -minTime`;
+    float $endFrame = `playbackOptions -q -maxTime`;
+    int $frameMargin = 10;
+    $startFrame -= $frameMargin;
+    $endFrame += $frameMargin;
+    
+    DI_selectControl $output_sel $selectedAssets;
+    DI_selectConstraint;
+    
+    string $selected[] = `ls -selection`;
+    if(size($selected) != 0)
+    {
+        bakeResults -simulation true -t ( "" + $startFrame + ":" + $endFrame) -sampleBy 1 -disableImplicitControl false
+    			-preserveOutsideKeys true -sparseAnimCurveBake false -controlPoints false -shape false $selected;
+	}
+	
+    DI_selectControl $output_sel $selectedAssets;
+	
+    currentTime ($endFrame);
+    setKeyframe;
+    
+    if(!(`pluginInfo -query -loaded animImportExport`))
+        catch(`loadPlugin "/usr/autodesk/maya2011-x64/bin/plug-ins/animImportExport.so"`);
+    file -force -options "precision=8;intValue=17;nodeNames=0;verboseUnits=0;whichRange=1;range=0:10;options=curve;hierarchy=none;controlPoints=0;shapes=0;helpPictures=0;useChannelBox=0;copyKeyCmd=-animation objects -option curve -hierarchy none -controlPoints 0 -shape 0 "
+         -type "animExport" -preserveReferences -exportSelected $newFile;
+}
+
+global proc DI_animImport(string $newFile)
+{
+    if(!(`pluginInfo -query -loaded animImportExport`))
+        catch(`loadPlugin "/usr/autodesk/maya2011-x64/bin/plug-ins/animImportExport.so"`);
+    file -import -type "animImport" -rdn -rpr "clash" -options ";targetTime=4;copies=1;option=replaceCompletely;pictures=0;connect=0;"  -pr -loadReferenceDepth "all" $newFile;
+}
+
+global proc DI_selectConstraint()
+{
+	string $selected[] = `ls -selection`;
+	string $element;
+	string $constrained[];
+	for($element in $selected)
+	{
+		string $connections[] = `listConnections -type constraint -destination false $element`;
+		string $elementArray[] = stringToStringArray($element, "");
+		if (size($connections) != 0) appendStringArray($constrained, $elementArray, 1);
+	}
+	select $constrained;
+}
+
+global proc DI_selectControl(string $output_sel, string $selectedAssets[])
+{
+    // choose output path (for currently open)
+    //string $output_sel = "/lustre2/show/sample/seq/myway_test/myway_0010/ani/pub/script/myway_0010_ani_v01.txt";
+    int $isFileExist = `filetest -e $output_sel`; // true if file (or directory) exists
+    
+    if(!$isFileExist)
+    {
+        // choose assets (in UI - pick)
+        //string $lcvp_sel = "/lustre2/show/myWay/assets/prop/lcvp/rig/pub/script/lcvp_rig_v01.txt";
+        //string $quincy_sel = "/lustre2/show/myWay/assets/prop/quincy/rig/pub/script/quincy_rig_v01.txt";
+        
+        // append strings to string array (this is temporary)
+        //$selectedAssets[0] = $lcvp_sel;
+        //$selectedAssets[1] = $quincy_sel;
+        
+        string $asset_sel;
+        string $outSelection;
+        
+        for($asset_sel in $selectedAssets)
+        {
+            // selection clear
+            select -clear;
+            
+            // open the file for reading
+            $fileId = `fopen $asset_sel "r"`;
+            
+            // get the first line of text
+            string $firstLine = `fgetline $fileId`;
+            string $selectionList[] = stringToStringArray($firstLine, " ");
+            
+            for($each in $selectionList)
+            {
+                select -toggle ("*:" + $each);
+            }
+        
+            string $shotSelection[] = `ls -selection`;
+            $outSelection += " " + stringArrayToString($shotSelection, " ");
+        }
+        
+        $fileId = `fopen $output_sel "w"`;
+        fprint $fileId $outSelection;
+        fclose $fileId;
+    }
+    
+    // open the file for reading
+    $fileId = `fopen $output_sel "r"`;
+            
+    // get the first line of text
+    string $firstLine = `fgetline $fileId`;
+            
+    string $selectionList[] = stringToStringArray($firstLine, " ");
+    select -clear;
+           
+    for($each in $selectionList)
+    {
+        select -toggle $each;
+    }
+
+}

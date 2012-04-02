@@ -1,0 +1,35 @@
+// Digital IDEa Maya Project Definition
+// Written by wondermc, Fri Jun 10, 2011
+
+///////////////////////////////////////
+// Common
+///////////////////////////////////////
+// Main
+workspace -fr "scene" "scenes";
+workspace -fr "mayaAscii" "scenes";
+workspace -fr "mayaBinary" "scenes";
+workspace -fr "images" "images";
+workspace -fr "publish" "publish";
+
+// Protect AutoMakes
+workspace -fr "templates" "scenes";
+workspace -fr "offlineEdit" "scenes";
+workspace -fr "movie" "scenes";
+
+// Tmp
+workspace -fr "autoSave" "tmp";
+workspace -fr "iprImages" "tmp";
+workspace -fr "depth" "tmp";
+workspace -fr "mentalray" "tmp";
+workspace -fr "3dPaintTextures" "tmp";
+workspace -fr "particles" "tmp";
+
+///////////////////////////////////////
+// WorkCode
+///////////////////////////////////////
+
+// ani, rig, fx
+//workspace -fr "diskCache" "data";
+
+// texture, render
+//workspace -fr "sourceImages" "sourceimages";

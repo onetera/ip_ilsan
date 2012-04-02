@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WORKCODE VERSION="1.0">
+    <DIRECTORY NAME="model" DESCRIPTION="Modeling">
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="images" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="sculpt" DESCRIPTION="Sculpting">
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="images" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="rig" DESCRIPTION="Rigging">
+        <DIRECTORY NAME="data" DESCRIPTION="">
+            <DIRECTORY NAME="anim" DESCRIPTION=""/>
+            <DIRECTORY NAME="fbx" DESCRIPTION=""/>
+            <DIRECTORY NAME="geoCache" DESCRIPTION=""/>
+            <DIRECTORY NAME="obj" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="preview" DESCRIPTION=""/>
+        <DIRECTORY NAME="scenes" DESCRIPTION="">
+            <DIRECTORY NAME="previous" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="script" DESCRIPTION=""/>
+        <DIRECTORY NAME="sourceimages" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="hair" DESCRIPTION="">
+        <DIRECTORY NAME="data" DESCRIPTION="">
+            <DIRECTORY NAME="anim" DESCRIPTION=""/>
+            <DIRECTORY NAME="fbx" DESCRIPTION=""/>
+            <DIRECTORY NAME="gCurve" DESCRIPTION=""/>
+            <DIRECTORY NAME="geoCache" DESCRIPTION=""/>
+            <DIRECTORY NAME="obj" DESCRIPTION=""/>
+            <DIRECTORY NAME="zelos" DESCRIPTION=""/>
+            <DIRECTORY NAME="zFurAttr" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="preview" DESCRIPTION=""/>
+        <DIRECTORY NAME="scenes" DESCRIPTION="">
+            <DIRECTORY NAME="previous" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="script" DESCRIPTION=""/>
+        <DIRECTORY NAME="sourceimages" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="cloth" DESCRIPTION="">
+        <DIRECTORY NAME="data" DESCRIPTION="">
+            <DIRECTORY NAME="anim" DESCRIPTION=""/>
+            <DIRECTORY NAME="fbx" DESCRIPTION=""/>
+            <DIRECTORY NAME="geoCache" DESCRIPTION=""/>
+            <DIRECTORY NAME="obj" DESCRIPTION=""/>
+            <DIRECTORY NAME="qualoth" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="preview" DESCRIPTION=""/>
+        <DIRECTORY NAME="scenes" DESCRIPTION="">
+            <DIRECTORY NAME="previous" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="script" DESCRIPTION=""/>
+        <DIRECTORY NAME="sourceimages" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="finalize" DESCRIPTION="">
+        <DIRECTORY NAME="data" DESCRIPTION="">
+            <DIRECTORY NAME="anim" DESCRIPTION=""/>
+            <DIRECTORY NAME="fbx" DESCRIPTION=""/>
+            <DIRECTORY NAME="geoCache" DESCRIPTION=""/>
+            <DIRECTORY NAME="obj" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="preview" DESCRIPTION=""/>
+        <DIRECTORY NAME="scenes" DESCRIPTION="">
+            <DIRECTORY NAME="previous" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="script" DESCRIPTION=""/>
+        <DIRECTORY NAME="sourceimages" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="lookdev" DESCRIPTION="Look Development">
+        <DIRECTORY NAME="data" DESCRIPTION=""/>
+        <DIRECTORY NAME="images" DESCRIPTION=""/>
+        <DIRECTORY NAME="preview" DESCRIPTION=""/>
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="sourceimages" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="layout" DESCRIPTION="">
+        <DIRECTORY NAME="data" DESCRIPTION="">
+            <DIRECTORY NAME="3de" DESCRIPTION=""/>
+            <DIRECTORY NAME="boujou" DESCRIPTION=""/>
+            <DIRECTORY NAME="nuke" DESCRIPTION=""/>
+            <DIRECTORY NAME="pftrack" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="preview" DESCRIPTION=""/>
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="matchmove" DESCRIPTION="">
+        <DIRECTORY NAME="data" DESCRIPTION="">
+            <DIRECTORY NAME="3de" DESCRIPTION=""/>
+            <DIRECTORY NAME="boujou" DESCRIPTION=""/>
+            <DIRECTORY NAME="nuke" DESCRIPTION=""/>
+            <DIRECTORY NAME="pftrack" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="preview" DESCRIPTION=""/>
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="ani" DESCRIPTION="Animation">
+        <DIRECTORY NAME="data" DESCRIPTION="">
+            <DIRECTORY NAME="anim" DESCRIPTION=""/>
+            <DIRECTORY NAME="fbx" DESCRIPTION=""/>
+            <DIRECTORY NAME="geoCache" DESCRIPTION=""/>
+            <DIRECTORY NAME="obj" DESCRIPTION=""/>
+	<DIRECTORY NAME="moc" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="preview" DESCRIPTION=""/>
+        <DIRECTORY NAME="scenes" DESCRIPTION="">
+            <DIRECTORY NAME="previous" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="script" DESCRIPTION=""/>
+        <DIRECTORY NAME="sourceimages" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="texture" DESCRIPTION="Texturing">
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="images" DESCRIPTION=""/>
+        <DIRECTORY NAME="sourceimages" DESCRIPTION="">
+            <DIRECTORY NAME="psd" DESCRIPTION=""/>
+            <DIRECTORY NAME="uv" DESCRIPTION=""/>
+            <DIRECTORY NAME="tif" DESCRIPTION=""/>
+            <DIRECTORY NAME="tex" DESCRIPTION=""/>
+        </DIRECTORY>
+    </DIRECTORY>
+    <DIRECTORY NAME="shading" DESCRIPTION="Shading">
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="images" DESCRIPTION=""/>
+        <DIRECTORY NAME="sourceimages" DESCRIPTION="">
+            <DIRECTORY NAME="psd" DESCRIPTION=""/>
+            <DIRECTORY NAME="uv" DESCRIPTION=""/>
+            <DIRECTORY NAME="tif" DESCRIPTION=""/>
+            <DIRECTORY NAME="tex" DESCRIPTION=""/>
+        </DIRECTORY>
+    </DIRECTORY>
+    <DIRECTORY NAME="render" DESCRIPTION="Lighting &amp; Rendering">
+        <DIRECTORY NAME="data" DESCRIPTION=""/>
+        <DIRECTORY NAME="images" DESCRIPTION=""/>
+        <DIRECTORY NAME="preview" DESCRIPTION=""/>
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="sourceimages" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="fx" DESCRIPTION="Visual Effects">
+        <DIRECTORY NAME="data" DESCRIPTION="">
+            <DIRECTORY NAME="anim" DESCRIPTION=""/>
+            <DIRECTORY NAME="fbx" DESCRIPTION=""/>
+            <DIRECTORY NAME="geoCache" DESCRIPTION=""/>
+            <DIRECTORY NAME="obj" DESCRIPTION=""/>
+    </DIRECTORY>
+        <DIRECTORY NAME="images" DESCRIPTION=""/>
+        <DIRECTORY NAME="particles" DESCRIPTION=""/>
+        <DIRECTORY NAME="preview" DESCRIPTION=""/>
+        <DIRECTORY NAME="precomp" DESCRIPTION=""/>
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="sourceimages" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="mp" DESCRIPTION="Matte Painting">
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="wip" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="comp" DESCRIPTION="Compositing">
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="wip" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="roto" DESCRIPTION="Rotoscoping">
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="wip" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="mg" DESCRIPTION="Motion Graphic">
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="wip" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="retime" DESCRIPTION="Retiming">
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="wip" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="cleanplate" DESCRIPTION="wire remove, rig remove, paint, marker remove, dust remove, etc">
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="wip" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="s3dprep" DESCRIPTION="Stereoscopic Preparation">
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="wip" DESCRIPTION=""/>
+    </DIRECTORY>
+    <DIRECTORY NAME="sconv" DESCRIPTION="Stereo Converting">
+        <DIRECTORY NAME="scenes" DESCRIPTION=""/>
+        <DIRECTORY NAME="wip" DESCRIPTION=""/>
+    </DIRECTORY>
+</WORKCODE>
