@@ -88,7 +88,7 @@
      </rect>
     </property>
     <property name="currentIndex" >
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab" >
      <attribute name="title" >
@@ -1009,7 +1009,7 @@
         <x>10</x>
         <y>480</y>
         <width>381</width>
-        <height>29</height>
+        <height>22</height>
        </rect>
       </property>
       <property name="readOnly" >
@@ -1022,7 +1022,7 @@
         <x>400</x>
         <y>480</y>
         <width>114</width>
-        <height>31</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text" >
@@ -1034,32 +1034,6 @@
      <attribute name="title" >
       <string>Shot Browser</string>
      </attribute>
-     <widget class="QLineEdit" name="shotLocationField" >
-      <property name="geometry" >
-       <rect>
-        <x>10</x>
-        <y>480</y>
-        <width>501</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="readOnly" >
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="exploreShotButton" >
-      <property name="geometry" >
-       <rect>
-        <x>520</x>
-        <y>480</y>
-        <width>114</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text" >
-       <string>Explore</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="showViewPlayblastButton" >
       <property name="enabled" >
        <bool>false</bool>
@@ -1371,6 +1345,32 @@
         <string>Date</string>
        </property>
       </column>
+     </widget>
+     <widget class="QLineEdit" name="shotLocationField" >
+      <property name="geometry" >
+       <rect>
+        <x>10</x>
+        <y>480</y>
+        <width>381</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="readOnly" >
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="exploreShotButton" >
+      <property name="geometry" >
+       <rect>
+        <x>400</x>
+        <y>480</y>
+        <width>114</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text" >
+       <string>Explore</string>
+      </property>
      </widget>
     </widget>
    </widget>

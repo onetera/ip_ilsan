@@ -102,8 +102,7 @@ class iPipelineInfo(object):
             else:
                 fileName=""
         else:
-            if tab==1:
-                print 'self.libPath : ' , self.libPath
+            if tab==1:                
                 fileName += self.libPath                
             elif tab==2:
                 fileName += self.shotPath
@@ -113,19 +112,15 @@ class iPipelineInfo(object):
             if archive:
                 projectPath = self.showPath + "/" + self.currOpenProjectName + "/"
                 fileName = fileName.replace(self.currProjectPath, projectPath)
-#                print 'archive projectPath : ' , projectPath
             
             if len(level1):
-                fileName += level1+"/"
-                print 'leve1...OK :' ,level1
+                fileName += level1+"/"                
                 if len(level2):
-                    fileName += level2+"/"
-                    print 'leve2...OK :' ,level2
+                    fileName += level2+"/"                    
 
                     if len(level3):
-                        fileName += level3+"/"
-                        print 'leve3...OK :' ,level3
-                    print 'mode : ' , mode
+                        fileName += level3+"/"                       
+                    
                     if mode=="devFolder":
                         fileName += devFolder
 
@@ -133,8 +128,7 @@ class iPipelineInfo(object):
                         fileName += pubFolder
 
                     elif mode=="sceneFolder":
-                        fileName += devFolder+"/"+scenesFolder+"/"
-                        print 'scene Dolder....OK'
+                        fileName += devFolder+"/"+scenesFolder+"/"                        
 
                     elif mode=="previewFile":
                         fileName = self.getFileName(tab, level1, level2, level3, "sceneFolder", offset, archive)
@@ -226,12 +220,10 @@ class iPipelineInfo(object):
                             ver ='v01'
                         fileName = pubFolder+'/scenes/'+level2+'_'+level3+'_'+ver+'.mb'
                     
-                    elif mode=="historyFile":
-                        print 'historyFile.......OK'
+                    elif mode=="historyFile":                        
                         fileName = self.getFileName(tab, level1, level2, level3, "sceneFolder", offset, archive)                        
                         if len(level3):
-                            fileName += level2+"_"+level3+"_ComponentNote.xml"
-                            print 'XML fileName : ' , fileName
+                            fileName += level2+"_"+level3+"_ComponentNote.xml"                            
                             
                     elif mode=="childFolder":
                         if depth == 2:
@@ -241,12 +233,7 @@ class iPipelineInfo(object):
 
                     elif mode=="folderTest":
                         fileName = QString(str(fileName).split('dev/scenes/')[0])
-                    else :
-                        print 'mode false...........'
-                else : 
-                    print 'false..........level2'
-            else : 
-                print 'false..........level1'
+               
                 
 
         
@@ -317,8 +304,7 @@ class iPipelineInfo(object):
     
     def getEventNotes(self, tab, level1, level2, level3, offset=0, archive=0):
         historyFile = self.getFileName(tab, level1, level2, level3, "historyFile", offset, archive)
-#        if historyFile == '' :
-#            print 'historyFile...........Fasle'        
+        
         #outString = ""
         nc = []
         if QFileInfo(historyFile).isFile():

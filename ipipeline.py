@@ -99,8 +99,7 @@ class iPipeline(QMainWindow,
     This class is the **iPipeline** class.
     """
     __instance = None
-    def __new__(cls, *args, **kwargs):
-        print 'new'
+    def __new__(cls, *args, **kwargs):        
         if not cls.__instance:    
             cls.__instance = super(iPipeline, cls).__new__(cls, *args, **kwargs)
         return cls.__instance
@@ -113,7 +112,7 @@ class iPipeline(QMainWindow,
         """        
         QMainWindow.__init__(self, parent)        
         uic.loadUi(Constants.frameworkUIFile, self)
-        
+        self.resize(531,625)
         
         
         self.sourceModule(Constants.DI_ani)
@@ -123,8 +122,8 @@ class iPipeline(QMainWindow,
         if sys.platform == "darwin":
             self.showPath = "/Users/higgsdecay/field/show"
         else:
-#            self.showPath = "/show"
-            self.showPath = "/home/idea/temp/Show"
+            self.showPath = "/show"
+#            self.showPath = "/home/idea/temp/Show"
 
         self.workcodeModel = StandardTreeModel(self)
         self.workcodedata = self.workcodeModel.load(QString(Constants.workcodeFile))
