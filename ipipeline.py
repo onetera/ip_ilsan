@@ -38,7 +38,7 @@ except ImportError:
 #***********************************************************************************************
 import ui.common
 
-sys.path.append('/home/idea/work/ipipeline/')
+
 
 import Core.Note.Note2
 from foundations.globals.constants import Constants
@@ -90,7 +90,8 @@ WIP_RE = re.compile("_w[0-9]{2}")
 #***    Module classes and definitions.
 #***********************************************************************************************
 
-
+PIPELINE_DEV = os.getenv( 'PIPELINE_DEV' )
+DEV_SHOW = 0
 
 class iPipeline(QMainWindow,
                 iPipelineInit, iPipelineActions, iPipelineInfo,iPipelineUtility,
@@ -98,11 +99,11 @@ class iPipeline(QMainWindow,
     """
     This class is the **iPipeline** class.
     """
-    __instance = None
-    def __new__(cls, *args, **kwargs):        
-        if not cls.__instance:    
-            cls.__instance = super(iPipeline, cls).__new__(cls, *args, **kwargs)
-        return cls.__instance
+#    __instance = None
+#    def __new__(cls, *args, **kwargs):        
+#        if not cls.__instance:    
+#            cls.__instance = super(iPipeline, cls).__new__(cls, *args, **kwargs)
+#        return cls.__instance
         
     def __init__(self, parent=None):
         """
@@ -122,8 +123,10 @@ class iPipeline(QMainWindow,
         if sys.platform == "darwin":
             self.showPath = "/Users/higgsdecay/field/show"
         else:
-            self.showPath = "/show"
-#            self.showPath = "/home/idea/temp/Show"
+            if not DEV_SHOW:
+                self.showPath = "/show"
+            else:
+                self.showPath = "/home/idea/temp/Show"
 
         self.workcodeModel = StandardTreeModel(self)
         self.workcodedata = self.workcodeModel.load(QString(Constants.workcodeFile))
@@ -1025,7 +1028,7 @@ class iPipeline(QMainWindow,
         if len(subject):
             fileName = "."+self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+wip+"_"+subject+".mb.thumb.jpg"
         else:
-            fileName = "."+self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+wip+".mb.thumb.jpg"
+            fileName = "."+self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+wip+".mb.thumb.jpg"        
         image = self.createThumbnailN(tab, level1, level2, level3, fileName)
         if QFile.exists(image):
             self.currOpenPreviewImage.setPixmap(QPixmap(image))
@@ -1951,16 +1954,29 @@ class iPipeline(QMainWindow,
             selected = 1            
         elif mode == "publish":
             path = str(self.getFileName( tab , self.currOpenLevel1, self.currOpenLevel2, self.currOpenLevel3, "pubFolder"))
-            ver = os.path.basename( sceneFile ).split('_')[2]  
+            ver = os.path.basename( sceneFile ).split('_')[2]
+            wip = ''  
             try :           
                 self.currOpenSubject = os.path.splitext(os.path.basename(str(sceneFile)))[0].split(ver+"_")[1]
             except : 
                 self.currOpenSubject =''
             selected = 0
-          
-        previewImage = path+("/scenes/.%s.thumb.jpg" % os.path.basename(str(sceneFile))) 
-        location = self.showPath + '/' + os.path.dirname( '/'.join( sceneFileList[:-2] ) )   
-                    
+           
+
+        # preview Image
+        subject = self.currOpenSubjectField.text()
+        if len(subject):
+            fileName = "."+self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+wip+"_"+subject+".mb.thumb.jpg"
+        else:
+            fileName = "."+self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+wip+".mb.thumb.jpg" 
+#        previewImage = self.createThumbnailN(tab, self.currOpenLevel1, self.currOpenLevel2, self.currOpenLevel3, fileName)
+        previewImage = path + ("/scenes/" + fileName)
+        print 'previewImage : ' , previewImage        
+        if not QFileInfo(previewImage).isFile():
+            previewImage = NO_PREVIEW_FILENAME
+            print  'NO_PREVIEW_FILENAME'            
+         
+        location = self.showPath + '/' + os.path.dirname( '/'.join( sceneFileList[:-2] ) )
         xmlFile = path+("/scenes/.%s.xml" % os.path.basename(str(sceneFile)))
         if QFileInfo(xmlFile).isFile():
             n = Core.Note.Note2.NoteContainer()

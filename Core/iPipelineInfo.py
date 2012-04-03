@@ -39,6 +39,9 @@ WIP_RE = re.compile('_w[0-9]{2}')
 #***********************************************************************************************
 #***    Module classes and definitions.
 #***********************************************************************************************
+PIPELINE_DEV = os.getenv( 'PIPELINE_DEV' )
+
+
 class iPipelineInfo(object):
     """
     This class is the **iPipelineInfo** class.
