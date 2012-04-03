@@ -42,7 +42,7 @@ import ui.common
 
 import Core.Note.Note2
 from foundations.globals.constants import Constants
-#from foundations.tractor import Tractor
+from foundations.tractor import Tractor
 from Core.iPipelineActions import iPipelineActions
 from Core.iPipelineInfo import iPipelineInfo
 from Core.iPipelineInit import iPipelineInit
@@ -1624,6 +1624,8 @@ class iPipeline(QMainWindow,
             self.currOpenHistoryTable.setItem(row, 3, wip)
             self.currOpenHistoryTable.setItem(row, 4, subject)
             self.currOpenHistoryTable.setItem(row, 5, date)
+            self.currOpenHistoryTable.setRowHeight( row , 20 )
+            
         self.currOpenHistories = historyObj
 
     def loadAssetHistory(self):
