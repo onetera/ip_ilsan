@@ -51,7 +51,7 @@ class Constants():
     else:
         applicationDirectory = "Z:/higgsdecay/work/di/ipipeline/"
     
-    frameworkUIFile = applicationDirectory+"ui/ipipeline_GUI05.ui"
+    frameworkUIFile = applicationDirectory+"ui/ipipeline_GUI06.ui"
     DI_animTransfer = applicationDirectory+"Gui/DI_animTransfer/DI_animTransfer02.ui"
     DI_animTransferAlone = applicationDirectory+"Gui/DI_animTransfer/DI_animTransferAlone.ui"
     

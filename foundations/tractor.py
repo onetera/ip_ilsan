@@ -21,11 +21,19 @@ import os
 #***********************************************************************************************
 #***    Internal imports.
 #***********************************************************************************************
-import foundations.nuke as nuke
-from foundations.globals.constants import Constants
-
+try:
+    import foundations.nuke as nuke
+    from foundations.globals.constants import Constants
+except :
+    print "import Error"
+    import nuke 
+    import globals.constants.Constants
+    
+    
+    
+    
 class Tractor(object):
-    def __init__(self, userName, shot, workcode, playblastFile, startFrame, endFrame, width, height, ratio):
+    def __init__(self, userName, shot, workcode, playblastFile, startFrame, endFrame, width, height, ratio , pbias ):        
         self.userName = userName
         self.shot = shot
         self.workcode = workcode
@@ -119,7 +127,7 @@ class Tractor(object):
 
         # alfred info
         alfredInfo = """##AlfredToDo 3.0
-Job -title {[mov] %(job)s (%(first)s-%(last)s)} -comment {[Artist] : %(username)s,   [Note] : } -pbias 10 -service {mov} -subtasks {
+Job -title {[mov] %(job)s (%(first)s-%(last)s)} -comment {[Artist] : %(username)s,   [Note] : } -pbias %(pbias)s -service {mov} -subtasks {
   Task -title {Frame.%(first)s-%(last)s} -cmds {
       RemoteCmd {/Applications/Nuke6.2v2/NukeX6.2v2.app/NukeX6.2v2 -F %(m_first)s-%(last)s -m 2 -t -X MOV -x %(scenefile)s} -atleast {1} -atmost {1} -samhost 1 -service {mov}
   } -cleanup {
@@ -137,6 +145,10 @@ Job -title {[mov] %(job)s (%(first)s-%(last)s)} -comment {[Artist] : %(username)
     'alffile': alffile,
     'nukefile': nukefile,
     'movefile': movefile,
-    'tempdir': tempdir
+    'tempdir': tempdir,
+    'pbias' : pbias
     }
         return alfredInfo
+
+if __name__ == '__main__' :
+    trac = Tractor( 'onetera' , 'test' , 'rig' , '/lustre/TEMP/_test.mov' , 0 , 100 , 720 , 480 , 10  )

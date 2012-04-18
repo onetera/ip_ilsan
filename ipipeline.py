@@ -1057,7 +1057,8 @@ class iPipeline(QMainWindow,
             fileName = self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+wip+".mov"
 
         playblastFile, startFrame, endFrame, width, height, ratio = self.recordPlayblastForSequenceN(tab, level1, level2, level3, fileName)
-        Tractor(self.userName, level2, level3, playblastFile, startFrame, endFrame, width, height, ratio)
+        priority = self.tracPriority_spinBox.value()        
+        Tractor(self.userName, level2, level3, playblastFile, startFrame, endFrame, width, height, ratio , priority )
 
         messageBox = QMessageBox(self)
         messageBox.setText('Success')
