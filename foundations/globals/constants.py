@@ -32,6 +32,8 @@ __status__ = "Production"
 #***********************************************************************************************
 test = 0
 
+
+
 class Constants():
     """
     This class is the **Constants** class.
@@ -43,7 +45,7 @@ class Constants():
         applicationDirectory = "/Users/higgsdecay/work/release/ipipeline/"
     elif sys.platform == "linux2":
         if test == 1:
-             applicationDirectory = '/home/idea/work/ipipeline/v0.2.6.5/'
+             applicationDirectory = '/home/idea/work/ipipeline/'
         else :
             applicationDirectory = "/lustre/INHouse/MAYA/common/file/ipipeline/"
     else:

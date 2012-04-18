@@ -4,7 +4,7 @@ from PyQt4.QtGui import *
 
 import time
 
-class XML(object):
+class iXML(object):
     def __init__(self):
         # xml read
         self.filename = ''

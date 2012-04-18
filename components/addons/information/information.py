@@ -20,10 +20,21 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import uic
 
+
+try:
+    import maya.cmds as cmds
+    import maya.mel as mel
+    standAlone = False
+except ImportError:
+    standAlone = True
+    
+
 #***********************************************************************************************
 #***    Internal imports.
 #***********************************************************************************************
 from foundations.globals.constants import Constants
+
+
 
 #***********************************************************************************************
 #***    Module classes and definitions.
@@ -31,8 +42,8 @@ from foundations.globals.constants import Constants
 class Information(QDialog):
 
     def __init__(self, title, level2, level3, ver, wip, subjectName, currentlyFilename, latestFilename, parent=None):
-        QDialog.__init__(self, parent)
-        uic.loadUi(Constants.applicationDirectory+"components/addons/information/ui/information04.ui", self)
+        QDialog.__init__(self, parent)        
+        uic.loadUi(Constants.applicationDirectory+"components/addons/information/ui/information05.ui", self)
 
         self.level2 = level2
         self.level3 = level3
@@ -70,10 +81,20 @@ class Information(QDialog):
 
         self.connect(self.Pub_spinBox, SIGNAL("valueChanged(int)"), self.updateCustomField)
         self.connect(self.Wip_spinBox, SIGNAL("valueChanged(int)"), self.updateCustomField)
-        self.connect(self.Subject_lineEdit, SIGNAL("textChanged(const QString&)"), self.updateCustomField)
-
+        self.connect(self.Subject_lineEdit, SIGNAL("textChanged(const QString&)"), self.updateCustomField)        
+        self.buttonBox.button(QDialogButtonBox.Save).clicked.connect(self.saveas)
+                
         self.setWindowTitle(title)
+        self.result = 0
 
+
+    def saveas(self):
+        theFile = cmds.fileDialog2(dialogStyle=2)
+        if theFile == None : return
+        cmds.file(rename = theFile[0] )
+        cmds.file( save = 1  )
+        self.result = 1
+        
     def updateCustomField(self):
         pub = str(self.Pub_spinBox.value()).zfill(2)
         wip = str(self.Wip_spinBox.value()).zfill(2)
@@ -96,6 +117,7 @@ class Information(QDialog):
             self.groupBox.setEnabled(False)
         else:
             self.groupBox.setEnabled(True)
+
 
     def accept(self):
         if self.Currently_radioButton.isChecked():
@@ -126,7 +148,7 @@ class Information(QDialog):
             application = "iQualoth"
 
         ctime = 1
-
+        self.result = 1
         self.emit(SIGNAL("save"), filename, self.commentTextEdit.toPlainText(), status, progress, ctime, application, self.subjectName)
         self.close()
 

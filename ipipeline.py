@@ -61,7 +61,7 @@ from components.addons.workcodeManager.workcodeManager import WorkcodeManager
 from components.tools.animation.multipleImportReference.multipleImportReference import MultipleImportReference
 from py.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
 
-from xml2 import XML
+from xml2 import iXML
 from xml_new import XmlNew
 
 
@@ -408,7 +408,7 @@ class iPipeline(QMainWindow,
         _xmlfile = os.path.join(sceneFolder, '.%s.xml' % filename)
         if os.path.exists(_xmlfile):
             xmlfile = QFile( QString(_xmlfile))
-            xml = XML()
+            xml = iXML()
             xml.read(xmlfile)
     
             comment = self.currOpenCommentField.toPlainText()
@@ -439,6 +439,11 @@ class iPipeline(QMainWindow,
             self.currOpenCommentField.setPlainText(comment)
         QMessageBox.information(self, "Info", "Success")
 
+    def openSaveAs(self):
+        theFile = cmds.fileDialog2(dialogStyle=2)[0]
+        cmds.file(rename = theFile )
+        cmds.file( save = 1  )
+        
     def sceneFileSelected(self, item, tab, mode):
         currSelected = self.getCurrentlySelectedItem(tab, 3)
         level1 = currSelected[0]
@@ -515,7 +520,7 @@ class iPipeline(QMainWindow,
         self.selected_comment_xml = os.path.join(sceneFolder, '.%s.xml' % filename)
         if os.path.exists(self.selected_comment_xml):
             xmlfile = QFile( QString(self.selected_comment_xml))
-            self.selected_comment_item = XML()
+            self.selected_comment_item = iXML()
             self.selected_comment_item.read(xmlfile)
             self.currOpenCommentHistoryField.setPlainText(self.selected_comment_item.findElement("comment"))
             self.currOpenClearSelectedCommentButton.setEnabled(True)
@@ -556,7 +561,7 @@ class iPipeline(QMainWindow,
         _xmlfile = os.path.join(sceneFolder, '.%s.xml' % filename)
         if os.path.exists(_xmlfile):
             xmlfile = QFile( QString(_xmlfile))
-            xml = XML()
+            xml = iXML()
             xml.read(xmlfile)
             self.assetCommentField.setPlainText(xml.findElement("comment"))
 
@@ -595,7 +600,7 @@ class iPipeline(QMainWindow,
         _xmlfile = os.path.join(sceneFolder, '.%s.xml' % filename)
         if os.path.exists(_xmlfile):
             xmlfile = QFile( QString(_xmlfile))
-            xml = XML()
+            xml = iXML()
             xml.read(xmlfile)
             self.shotCommentField.setPlainText(xml.findElement("comment"))
 
@@ -1218,7 +1223,10 @@ class iPipeline(QMainWindow,
                 type = 'mayaBinary'
                 QMessageBox.warning(self, "warning", "openPipelineSaveWorkshop: Invalid file format ("+ext+") specified: saving to Maya Binary")
             # 씬파일 저장
+            
             cmds.file(save=True, type=type)
+            print 'saved scene'
+            print str(destinationFile)
         except:
             os.system('touch %s' % os.path.join(sceneFolder, str(destinationFile)))
 
@@ -1756,7 +1764,7 @@ class iPipeline(QMainWindow,
     #===========================================================================
     # 정리할 함수들 = 시작 =
     #===========================================================================
-    def componentDoubleClicked(self, tab, mode, item=None):
+    def componentDoubleClicked(self, tab, mode, item=None):        
         selected = 1
         currSelected = self.getCurrentlySelectedItem(tab, 3)
         self.currOpenLevel1 = currSelected[0]
@@ -1779,14 +1787,15 @@ class iPipeline(QMainWindow,
             selected = 0
             path = str(self.getFileName(self.currOpenTab, self.currOpenLevel1, self.currOpenLevel2, self.currOpenLevel3, "pubFolder"))
 
-        if item is not None:
+        if item is not None:            
             sceneFile = path+"/scenes/"+item.text()
             previewImage = path+("/scenes/.%s.thumb.jpg" % item.text())
             if not QFileInfo(previewImage).isFile():
                 previewImage = NO_PREVIEW_FILENAME
             self.componentOpened(devFolder, sceneFile, mode, tab, currSelected, selected, previewImage, path)
+            
         else: # item is None
-            # 버전별 씬파일 보여주는 다이얼로그
+            # 버전별 씬파일 보여주는 다이얼로그            
             sceneFolder = str(self.getFileName(tab, currSelected[0], currSelected[1], currSelected[2], "sceneFolder"))
             mayaFiles = glob.glob(sceneFolder+"*.mb")
 
