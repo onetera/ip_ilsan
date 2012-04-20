@@ -27,7 +27,7 @@
             <DIRECTORY NAME="anim" DESCRIPTION=""/>
             <DIRECTORY NAME="fbx" DESCRIPTION=""/>
             <DIRECTORY NAME="gCurve" DESCRIPTION=""/>
-            <DIRECTORY NAME="geoCache" DESCRIPTION=""/>
+            <DIRECTORY NAME="hairCache" DESCRIPTION=""/>
             <DIRECTORY NAME="obj" DESCRIPTION=""/>
             <DIRECTORY NAME="zelos" DESCRIPTION=""/>
             <DIRECTORY NAME="zFurAttr" DESCRIPTION=""/>
@@ -39,6 +39,24 @@
         <DIRECTORY NAME="script" DESCRIPTION=""/>
         <DIRECTORY NAME="sourceimages" DESCRIPTION=""/>
     </DIRECTORY>
+    <DIRECTORY NAME="fur" DESCRIPTION="">
+        <DIRECTORY NAME="data" DESCRIPTION="">
+            <DIRECTORY NAME="anim" DESCRIPTION=""/>
+            <DIRECTORY NAME="fbx" DESCRIPTION=""/>
+            <DIRECTORY NAME="gCurve" DESCRIPTION=""/>
+            <DIRECTORY NAME="furCache" DESCRIPTION=""/>
+            <DIRECTORY NAME="obj" DESCRIPTION=""/>
+            <DIRECTORY NAME="zelos" DESCRIPTION=""/>
+            <DIRECTORY NAME="zFurAttr" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="preview" DESCRIPTION=""/>
+        <DIRECTORY NAME="scenes" DESCRIPTION="">
+            <DIRECTORY NAME="previous" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="script" DESCRIPTION=""/>
+        <DIRECTORY NAME="sourceimages" DESCRIPTION=""/>
+    </DIRECTORY>
+    
     <DIRECTORY NAME="cloth" DESCRIPTION="">
         <DIRECTORY NAME="data" DESCRIPTION="">
             <DIRECTORY NAME="anim" DESCRIPTION=""/>
