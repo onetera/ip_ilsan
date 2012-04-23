@@ -65,16 +65,6 @@ from xml2 import iXML
 from xml_new import XmlNew
 
 
-
-#***********************************************************************************************
-#***    Module attributes.
-#***********************************************************************************************
-__author__ = "Seo Jungwook"
-__copyright__ = "Copyright (C) 2011 - Seo Jungwook"
-__maintainer__ = "Seo Jungwook"
-__email__ = "rndvfx@gmail.com"
-__status__ = "Production"
-
 #***********************************************************************************************
 #***    Global Variables.
 #***********************************************************************************************
@@ -92,6 +82,7 @@ WIP_RE = re.compile("_w[0-9]{2}")
 
 PIPELINE_DEV = os.getenv( 'PIPELINE_DEV' )
 DEV_SHOW = 0
+
 
 class iPipeline(QMainWindow,
                 iPipelineInit, iPipelineActions, iPipelineInfo,iPipelineUtility,
@@ -113,16 +104,22 @@ class iPipeline(QMainWindow,
         """        
         QMainWindow.__init__(self, parent)        
         uic.loadUi(Constants.frameworkUIFile, self)
-        self.resize(531,625)
-        
+        if self.tabWidget.currentIndex() == 0 :
+            self.resize(958,625)
+        else :
+            self.resize(531,625)        
         
         self.sourceModule(Constants.DI_ani)
         self.sourceModule(Constants.DI_finalize)
         self.initialize()
         self.loadSettings()
-        if sys.platform == "darwin":
-            self.showPath = "/Users/higgsdecay/field/show"
-        else:
+#        if sys.platform == "darwin":
+#            self.showPath = "/Users/higgsdecay/field/show"
+        if 'win' in sys.platform:
+             self.showPath = r"\\10.0.200.100"
+             self.theOS = 'win'             
+        elif 'linux' in sys.platform:
+            self.theOS = 'linux'
             if not DEV_SHOW:
                 self.showPath = "/show"
             else:
@@ -191,71 +188,68 @@ class iPipeline(QMainWindow,
 # For Mr.Go project.
 #------------------------------------------------------------------------------ 
 
-    def createActions(self):
-        self.ani_createGroupControlAct = self.createAction("ani_createGroupControl", self.ani_createGroupControl)
-        self.ani_replaceReferenceAct = self.createAction("ani_replaceReference", self.ani_replaceReference)
-        self.ani_animTransferAct = self.createAction("ani_animTransfer", self.ani_animTransfer)
-        self.finalize_geoBakeAct = self.createAction("finalize_geoBake", self.finalize_geoBake)
-        self.finalize_cacheFileLoaderAct = self.createAction("mrgo_CacheDialog", self.finalize_cacheFileLoader)
-        self.finalize_importToolAct = self.createAction("mrgo_ImportTool", self.finalize_importTool)
-      
-    def createToolBars(self):
-        shelfToolBar = QToolBar("Shelf")
-        shelfToolBar.addAction(self.ani_createGroupControlAct)
-        shelfToolBar.addAction(self.ani_replaceReferenceAct)
-        shelfToolBar.addAction(self.finalize_geoBakeAct)
-        shelfToolBar.addAction(self.finalize_cacheFileLoaderAct)
-        shelfToolBar.addAction(self.finalize_importToolAct)
-        shelfToolBar.addAction(self.ani_animTransferAct)
-        self.addToolBar(shelfToolBar)
-
-    def ani_animTransfer(self):
-        if self.currOpenLevel3 == "ani":
-            at = AnimTransfer("alone", self)
-            self.connect(at, SIGNAL("run"), self.ani_animTransfer2)
-            at.show()
-
-    def ani_animTransfer2(self, animFile, txtFile, selectedAsset):
-        if standAlone : return
-        mel.eval('DI_animTransfer "%s" "%s" %s' % (animFile, txtFile, selectedAsset))
-
-    def ani_createGroupControl(self):
-        if standAlone : return   
-        mel.eval("DI_createGroupControl")
-
-    def ani_replaceReference(self):
-        if standAlone : return
-        mel.eval("kis_replaceReference")
-
-    def finalize_geoBake(self):
-        if standAlone : return
-        startFrame = 70
-        endFrame = int(cmds.playbackOptions(q=True, maxTime=True)) + 1 # florat
-        location = cmds.workspace(q=True, fullName=True) # unicode
-
-        sceneFileName = str(self.currOpenFileNameLabel.text())
-        if len(sceneFileName) == 0:
-            geoCachePath = os.path.join(location, "data", "geoCache")
-        else:
-            geoCachePath = os.path.join(location, "data", "geoCache", os.path.splitext(sceneFileName)[0])
-
-        geoBake = GeoBake(startFrame, endFrame, geoCachePath, self)
-        geoBake.setModal(True)
-        geoBake.show()
-
-    def finalize_cacheFileLoader(self):
-        if standAlone : return
-        mrgo_CacheDialog()
-
-    def finalize_importTool(self):
-        if standAlone : return
-        mrgoImportTool()
+#    def createActions(self):
+#        self.ani_createGroupControlAct = self.createAction("ani_createGroupControl", self.ani_createGroupControl)
+#        self.ani_replaceReferenceAct = self.createAction("ani_replaceReference", self.ani_replaceReference)
+#        self.ani_animTransferAct = self.createAction("ani_animTransfer", self.ani_animTransfer)
+#        self.finalize_geoBakeAct = self.createAction("finalize_geoBake", self.finalize_geoBake)
+#        self.finalize_cacheFileLoaderAct = self.createAction("mrgo_CacheDialog", self.finalize_cacheFileLoader)
+#        self.finalize_importToolAct = self.createAction("mrgo_ImportTool", self.finalize_importTool)
+#      
+#    def createToolBars(self):
+#        shelfToolBar = QToolBar("Shelf")
+#        shelfToolBar.addAction(self.ani_createGroupControlAct)
+#        shelfToolBar.addAction(self.ani_replaceReferenceAct)
+#        shelfToolBar.addAction(self.finalize_geoBakeAct)
+#        shelfToolBar.addAction(self.finalize_cacheFileLoaderAct)
+#        shelfToolBar.addAction(self.finalize_importToolAct)
+#        shelfToolBar.addAction(self.ani_animTransferAct)
+#        self.addToolBar(shelfToolBar)
+#
+#    def ani_animTransfer(self):
+#        if self.currOpenLevel3 == "ani":
+#            at = AnimTransfer("alone", self)
+#            self.connect(at, SIGNAL("run"), self.ani_animTransfer2)
+#            at.show()
+#
+#    def ani_animTransfer2(self, animFile, txtFile, selectedAsset):
+#        if standAlone : return
+#        mel.eval('DI_animTransfer "%s" "%s" %s' % (animFile, txtFile, selectedAsset))
+#
+#    def ani_createGroupControl(self):
+#        if standAlone : return   
+#        mel.eval("DI_createGroupControl")
+#
+#    def ani_replaceReference(self):
+#        if standAlone : return
+#        mel.eval("kis_replaceReference")
+#
+#    def finalize_geoBake(self):
+#        if standAlone : return
+#        startFrame = 70
+#        endFrame = int(cmds.playbackOptions(q=True, maxTime=True)) + 1 # florat
+#        location = cmds.workspace(q=True, fullName=True) # unicode
+#
+#        sceneFileName = str(self.currOpenFileNameLabel.text())
+#        if len(sceneFileName) == 0:
+#            geoCachePath = os.path.join(location, "data", "geoCache")
+#        else:
+#            geoCachePath = os.path.join(location, "data", "geoCache", os.path.splitext(sceneFileName)[0])
+#
+#        geoBake = GeoBake(startFrame, endFrame, geoCachePath, self)
+#        geoBake.setModal(True)
+#        geoBake.show()
+#
+#    def finalize_cacheFileLoader(self):
+#        if standAlone : return
+#        mrgo_CacheDialog()
+#
+#    def finalize_importTool(self):
+#        if standAlone : return
+#        mrgoImportTool()
 
 #------------------------------------------------------------------------------ 
 #------------------------------------------------------------------------------ 
-
-
-
 
     def createConnections(self):
         # Common

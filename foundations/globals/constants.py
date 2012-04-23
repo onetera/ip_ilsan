@@ -41,15 +41,15 @@ class Constants():
     
     debugMode = False
     applicationName = "iPipeline v0.2.6.5"
-    if sys.platform == "darwin":
-        applicationDirectory = "/Users/higgsdecay/work/release/ipipeline/"
-    elif sys.platform == "linux2":
+#    if sys.platform == "darwin":
+#        applicationDirectory = "/Users/higgsdecay/work/release/ipipeline/"
+    if 'linux' in sys.platform :
         if test == 1:
              applicationDirectory = '/home/idea/work/ipipeline/'
         else :
             applicationDirectory = "/lustre/INHouse/MAYA/common/file/ipipeline/"
     else:
-        applicationDirectory = "Z:/higgsdecay/work/di/ipipeline/"
+        applicationDirectory = r"\\10.0.200.100\lustre_INHouse\MAYA\common\file\ipipeline/"
     
     frameworkUIFile = applicationDirectory+"ui/ipipeline_GUI06.ui"
     DI_animTransfer = applicationDirectory+"Gui/DI_animTransfer/DI_animTransfer02.ui"

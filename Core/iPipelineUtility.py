@@ -79,8 +79,7 @@ class iPipelineUtility(object):
         return version_re.findall(file)[0]
 
     def getDirectoryList(self, path):
-        """
-        
+        """        
         :param path: Provided path. ( QString )
         :return: ( List )
         """
@@ -112,10 +111,17 @@ class iPipelineUtility(object):
             return sorted(filter(pattern_re.search, children))
 
 if __name__ == "__main__":
-    i = iPipelineUtility()
-    #i.sourceModule('/Users/higgsdecay/work/di/ipipeline/scripts/openPipeline')
-    print i.getVersionFromFile('test_v01_w01.mb')
-    print i.getDepth("test", "test2", "test3")
-    #for mel in i.sourceModule('/Users/higgsdecay/work/di/ipipeline/scripts/openPipeline'):
-        #print mel
-    #i.getVersionFromFile("AA03_comp_v01_w01.mb")
+    thePath = QDir('/show').entryList(QDir.Dirs|QDir.NoDotAndDotDot)
+    print thePath
+    print '======================================='
+    for x in dir(thePath):
+        if x[0] != '_':
+            print x
+    
+#    i = iPipelineUtility()
+#    i.sourceModule('/Users/higgsdecay/work/di/ipipeline/scripts/openPipeline')
+#    print i.getVersionFromFile('test_v01_w01.mb')
+#    print i.getDepth("test", "test2", "test3")
+#    for mel in i.sourceModule('/Users/higgsdecay/work/di/ipipeline/scripts/openPipeline'):
+#        print mel
+#    i.getVersionFromFile("AA03_comp_v01_w01.mb")
