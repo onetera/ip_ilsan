@@ -159,8 +159,8 @@ class iPipeline(QMainWindow,
             historyTable.setColumnWidth(3, 25)
             historyTable.setColumnWidth(4, 70)
 
-#        self.createActions()
-#        self.createToolBars()
+        self.createActions()
+        self.createToolBars()
         self.createMenus()
         
         self.setWindowTitle(Constants.applicationName)
@@ -188,41 +188,41 @@ class iPipeline(QMainWindow,
 # For Mr.Go project.
 #------------------------------------------------------------------------------ 
 
-#    def createActions(self):
-#        self.ani_createGroupControlAct = self.createAction("ani_createGroupControl", self.ani_createGroupControl)
-#        self.ani_replaceReferenceAct = self.createAction("ani_replaceReference", self.ani_replaceReference)
-#        self.ani_animTransferAct = self.createAction("ani_animTransfer", self.ani_animTransfer)
+    def createActions(self):
+        self.ani_createGroupControlAct = self.createAction("ani_createGroupControl", self.ani_createGroupControl)
+        self.ani_replaceReferenceAct = self.createAction("ani_replaceReference", self.ani_replaceReference)
+        self.ani_animTransferAct = self.createAction("ani_animTransfer", self.ani_animTransfer)
 #        self.finalize_geoBakeAct = self.createAction("finalize_geoBake", self.finalize_geoBake)
 #        self.finalize_cacheFileLoaderAct = self.createAction("mrgo_CacheDialog", self.finalize_cacheFileLoader)
 #        self.finalize_importToolAct = self.createAction("mrgo_ImportTool", self.finalize_importTool)
 #      
-#    def createToolBars(self):
-#        shelfToolBar = QToolBar("Shelf")
-#        shelfToolBar.addAction(self.ani_createGroupControlAct)
-#        shelfToolBar.addAction(self.ani_replaceReferenceAct)
+    def createToolBars(self):
+        shelfToolBar = QToolBar("Shelf")
+        shelfToolBar.addAction(self.ani_createGroupControlAct)
+        shelfToolBar.addAction(self.ani_replaceReferenceAct)
 #        shelfToolBar.addAction(self.finalize_geoBakeAct)
 #        shelfToolBar.addAction(self.finalize_cacheFileLoaderAct)
 #        shelfToolBar.addAction(self.finalize_importToolAct)
-#        shelfToolBar.addAction(self.ani_animTransferAct)
-#        self.addToolBar(shelfToolBar)
+        shelfToolBar.addAction(self.ani_animTransferAct)
+        self.addToolBar(shelfToolBar)
 #
-#    def ani_animTransfer(self):
-#        if self.currOpenLevel3 == "ani":
-#            at = AnimTransfer("alone", self)
-#            self.connect(at, SIGNAL("run"), self.ani_animTransfer2)
-#            at.show()
-#
-#    def ani_animTransfer2(self, animFile, txtFile, selectedAsset):
-#        if standAlone : return
-#        mel.eval('DI_animTransfer "%s" "%s" %s' % (animFile, txtFile, selectedAsset))
-#
-#    def ani_createGroupControl(self):
-#        if standAlone : return   
-#        mel.eval("DI_createGroupControl")
-#
-#    def ani_replaceReference(self):
-#        if standAlone : return
-#        mel.eval("kis_replaceReference")
+    def ani_animTransfer(self):
+        if self.currOpenLevel3 == "ani":
+            at = AnimTransfer("alone", self)
+            self.connect(at, SIGNAL("run"), self.ani_animTransfer2)
+            at.show()
+
+    def ani_animTransfer2(self, animFile, txtFile, selectedAsset):
+        if standAlone : return
+        mel.eval('DI_animTransfer "%s" "%s" %s' % (animFile, txtFile, selectedAsset))
+
+    def ani_createGroupControl(self):
+        if standAlone : return   
+        mel.eval("DI_createGroupControl")
+
+    def ani_replaceReference(self):
+        if standAlone : return
+        mel.eval("kis_replaceReference")
 #
 #    def finalize_geoBake(self):
 #        if standAlone : return
