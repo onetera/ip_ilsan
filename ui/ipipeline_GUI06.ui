@@ -686,19 +686,6 @@
        <string>no preview</string>
       </property>
      </widget>
-     <widget class="QSpinBox" name="spinBox" >
-      <property name="geometry" >
-       <rect>
-        <x>110</x>
-        <y>400</y>
-        <width>61</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="value" >
-       <number>10</number>
-      </property>
-     </widget>
      <widget class="QLabel" name="priority_label" >
       <property name="geometry" >
        <rect>
@@ -710,6 +697,19 @@
       </property>
       <property name="text" >
        <string>Tractor Priority</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="tracPriority_spinBox" >
+      <property name="geometry" >
+       <rect>
+        <x>110</x>
+        <y>400</y>
+        <width>61</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="value" >
+       <number>10</number>
       </property>
      </widget>
     </widget>

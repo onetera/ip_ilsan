@@ -294,6 +294,9 @@ class iPipeline(QMainWindow,
                      self.updateCurrentlyComment)
         self.connect( self.refreshOpenedButton , SIGNAL("clicked()") ,
                       self.refreshCurrentlyOpen )
+        
+#        self.connect( self.tracPriority_spinBox , SIGNAL("valueChanged()") ,
+#                      self.printTrcPriority )
 
         # Asset Browser
         self.connect(self.assetTypeScrollList, SIGNAL("itemClicked(QListWidgetItem*)"),
@@ -381,7 +384,9 @@ class iPipeline(QMainWindow,
         self.connect(self.shotScrollList, SIGNAL("customContextMenuRequested(const QPoint&)"),
                      lambda value: self.assetShotListMenu("shot", value))
 
-        
+#        
+#    def printTrcPriority(self):
+#        print self.tracPriority_spinBox.value() 
 
     def clearComment(self):
         self.currOpenCommentField.clear()
