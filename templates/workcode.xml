@@ -22,6 +22,20 @@
         <DIRECTORY NAME="script" DESCRIPTION=""/>
         <DIRECTORY NAME="sourceimages" DESCRIPTION=""/>
     </DIRECTORY>
+    <DIRECTORY NAME="dyn" DESCRIPTION="">
+        <DIRECTORY NAME="data" DESCRIPTION="">
+            <DIRECTORY NAME="sim" DESCRIPTION=""/>
+            <DIRECTORY NAME="fbx" DESCRIPTION=""/>
+            <DIRECTORY NAME="obj" DESCRIPTION=""/>
+            <DIRECTORY NAME="zelos" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="preview" DESCRIPTION=""/>
+        <DIRECTORY NAME="scenes" DESCRIPTION="">
+            <DIRECTORY NAME="previous" DESCRIPTION=""/>
+        </DIRECTORY>
+        <DIRECTORY NAME="script" DESCRIPTION=""/>
+        <DIRECTORY NAME="sourceimages" DESCRIPTION=""/>
+    </DIRECTORY>
     <DIRECTORY NAME="hair" DESCRIPTION="">
         <DIRECTORY NAME="data" DESCRIPTION="">
             <DIRECTORY NAME="anim" DESCRIPTION=""/>
@@ -30,7 +44,7 @@
             <DIRECTORY NAME="hairCache" DESCRIPTION=""/>
             <DIRECTORY NAME="obj" DESCRIPTION=""/>
             <DIRECTORY NAME="zelos" DESCRIPTION=""/>
-            <DIRECTORY NAME="zFurAttr" DESCRIPTION=""/>
+            <DIRECTORY NAME="zHairAttr" DESCRIPTION=""/>
         </DIRECTORY>
         <DIRECTORY NAME="preview" DESCRIPTION=""/>
         <DIRECTORY NAME="scenes" DESCRIPTION="">

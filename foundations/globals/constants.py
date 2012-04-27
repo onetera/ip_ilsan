@@ -17,7 +17,7 @@
 #***    External imports.
 #***********************************************************************************************
 import sys
-
+import os
 #***********************************************************************************************
 #***    Module attributes.
 #***********************************************************************************************
@@ -30,7 +30,7 @@ __status__ = "Production"
 #***********************************************************************************************
 #***    Module classes and definitions.
 #***********************************************************************************************
-test = 0
+test = os.path.isfile('/home/idea/work/develop.py')
 
 
 
@@ -40,7 +40,7 @@ class Constants():
     """
     
     debugMode = False
-    applicationName = "iPipeline v0.2.6.5"
+    applicationName = "iPipeline v0.2.7.0"
 #    if sys.platform == "darwin":
 #        applicationDirectory = "/Users/higgsdecay/work/release/ipipeline/"
     if 'linux' in sys.platform :
@@ -49,7 +49,7 @@ class Constants():
         else :
             applicationDirectory = "/lustre/INHouse/MAYA/common/file/ipipeline/"
     else:
-        applicationDirectory = r"\\10.0.200.100\lustre_INHouse\MAYA\common\file\ipipeline/"
+        applicationDirectory = "//10.0.200.100/_lustre_INHouse/MAYA/common/file/ipipeline/"
     
     frameworkUIFile = applicationDirectory+"ui/ipipeline_GUI06.ui"
     DI_animTransfer = applicationDirectory+"Gui/DI_animTransfer/DI_animTransfer02.ui"
@@ -66,4 +66,8 @@ class Constants():
     tractor = '/lustre/INHouse/Tractor/tractor-blade/tractor-spool.py'
     tractorHome = 'http://10.0.99.20/tractor/dashboard'
     engine_ip = '10.0.99.20'
+
+
+if __name__ == '__main__' : 
+    print os.path.isfile('/hsme/idea/work/develop.py')
     

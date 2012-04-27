@@ -59,9 +59,9 @@ class iPipelineActions(object):
 #        theFile = cmds.fileDialog2(dialogStyle=2)[0]
 #        cmds.file(rename = theFile )
 #        cmds.file( save = 1  )
-
+           
     def openItem(self, type, newProject, devel):
-
+        
         if self.checkItem():
             """check modified current file or not"""
             
@@ -145,12 +145,17 @@ class iPipelineActions(object):
         
             # set the current project
         try:
+            if 'win' in sys.platform: 
+                newProject = '/' + newProject
             mel.eval('setProject "%s"' % newProject)
         except:
             return True
 
+        print 'devel : ' ,devel
         if QFileInfo(devel).isFile():
             cmds.file(devel, open=True, force=True)
+            print 'theFile is exist'
+            
         elif type=="devel" and not QFileInfo(devel).isFile():
             messageBox = QMessageBox(self)
             messageBox.setText("You are about to edit an item for the first time. Would you like to start with an new scene, or the currently open scene?")

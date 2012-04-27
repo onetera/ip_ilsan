@@ -105,9 +105,9 @@ class iPipeline(QMainWindow,
         QMainWindow.__init__(self, parent)        
         uic.loadUi(Constants.frameworkUIFile, self)
         if self.tabWidget.currentIndex() == 0 :
-            self.resize(958,625)
+            self.resize(958,650)
         else :
-            self.resize(531,625)        
+            self.resize(531,650)        
         
         self.sourceModule(Constants.DI_ani)
         self.sourceModule(Constants.DI_finalize)
@@ -138,7 +138,8 @@ class iPipeline(QMainWindow,
         self.createConnections()
 
         self.updateUI('currOpen')
-        self.userNameLineEdit.setText(self.userName)
+        self.userNameLineEdit.setText(self.userName)        
+        
         self.projNameCombo.addItems(self.getDirectoryList(self.showPath))
         try:
             self.projNameCombo.setCurrentIndex(
@@ -756,33 +757,33 @@ class iPipeline(QMainWindow,
 
     def updateWorkingTab(self, tab):
         if tab == 0:
-            self.resize(958,625)
+            self.resize(958,650)
             self.resizeButton.setText( '<<<')
         elif tab == 1:            
-            self.resize(531,625)
+            self.resize(531,650)
             self.resizeButton.setText( '>>>')
             self.updateAssetTypeList()
         elif tab == 2:
-            self.resize(531,625)
+            self.resize(531,650)
             self.resizeButton.setText( '>>>')
             self.updateSequenceList()
     
     def resizing(self): 
         if self.size().width() < 710: 
             if self.tabWidget.currentIndex() == 0:
-                self.resize(958,625)
+                self.resize(958,650)
                 self.resizeButton.setText( '<<<')
             else :
-                self.resize(958,625)
+                self.resize(958,650)
                 self.resizeButton.setText( '<<<')
             
         else :
             if self.tabWidget.currentIndex() == 0:                
-                self.resize(706,625)
+                self.resize(706,650)
                 self.resizeButton.setText( '>>>')
             else :
                 self.resizeButton.setText( '>>>') 
-                self.resize(531,625)
+                self.resize(531,650)
         
     def resizeWin(self , x , y ):
         self.resize( x , y )
@@ -1228,7 +1229,10 @@ class iPipeline(QMainWindow,
             print 'saved scene'
             print str(destinationFile)
         except:
-            os.system('touch %s' % os.path.join(sceneFolder, str(destinationFile)))
+            if 'win' in sys.platform:
+                os.system('type NUL>%s' % os.path.join(sceneFolder, str(destinationFile)))                
+            else:
+                os.system('touch %s' % os.path.join(sceneFolder, str(destinationFile)))                
 
         # xml 생성
         historyFile = str(self.getFileName(tab, level1, level2, level3, "historyFile", 0, 1))
@@ -1456,12 +1460,13 @@ class iPipeline(QMainWindow,
                 os.makedirs(geoCacheFolder)
 
         # publishFolder 내에 생성되지 않은 폴더가 존재할 경우 폴더 생성
-        if not QDir(dirname).exists():
+        if not QDir(dirname).exists():            
             os.makedirs(dirname)
 
         # 퍼블리쉬된 파일의 퍼미션을 쓰기모드로 변경
         if QFileInfo(publishFile).isFile():
-            os.chmod(publishFile, 0777)
+            if not 'win' in sys.platform:
+                os.chmod(publishFile, 0777)
 
         # publish file 저장
         if level3 == "ani" and self.projNameCombo.currentText() == "mrgo":
@@ -1484,13 +1489,20 @@ class iPipeline(QMainWindow,
                 QMessageBox.warning(self, QString.fromLocal8Bit("경고"),
                     QString.fromLocal8Bit("[DI_geoBake] Bake가 되지 않았습니다."))
         else:
-            # 저장된 파일을 publish 폴더로 복사
-            os.system('cp -rfv %s %s' % (develFile, publishFile))
+            # 저장된 파일을 publish 폴더로 복사            
+            if 'win' in sys.platform:
+                cmds.file(rename=publishFile)
+                cmds.file(save=True, type=type)
+                cmds.file(rename=develFile)
+            else:
+                os.system('cp -rfv %s %s' % (develFile, publishFile))
+            
 
 
         # 퍼블리쉬된 파일의 퍼미션을 읽기모드로 변경
         if QFileInfo(publishFile).isFile():
-            os.chmod(publishFile, 0555)
+            if not 'win' in sys.platform:
+                os.chmod(publishFile, 0555)
 
         currDate = self.getDate()
         currTime = self.getTime()
@@ -1549,11 +1561,16 @@ class iPipeline(QMainWindow,
         devImage = self.takeSnapshot()
         pubImage = os.path.join(pubSceneFolder, ".%s.thumb.jpg" % os.path.basename(publishFile)   )
 
-        os.system("cp -rf %s %s" % (devXML, pubXML))
-        os.system("cp -rf %s %s" % (devImage, pubImage))
+        if 'win' in sys.platform:
+            os.system("copy %s %s" % (devXML, pubXML))
+            os.system("copy %s %s" % (devImage, pubImage))
+        else :
+            os.system("cp -rf %s %s" % (devXML, pubXML))
+            os.system("cp -rf %s %s" % (devImage, pubImage))
+            
 
-        QMessageBox.information(self, QString.fromLocal8Bit("성공"),
-                            QString.fromLocal8Bit("%s\n퍼블리쉬 완료되었습니다." % publishFile))
+        QMessageBox.information(self, QString.fromLocal8Bit("Success"),
+                            QString.fromLocal8Bit("%s\n completed publish." % publishFile))
 
         if closeSceneFile:
             self.closeFile2()
@@ -1841,6 +1858,7 @@ class iPipeline(QMainWindow,
                 self.componentFileUI.show()
 
     def componentOpened(self, devFolder, sceneFile, mode, tab, currSelected, selected, previewImage, path, sp=None):
+        print 'componentOpened'
         if sp is not None:
             sceneFile = path+"/scenes/"+sp.text()
 
@@ -1858,10 +1876,10 @@ class iPipeline(QMainWindow,
             self.currOpenCommentField.setPlainText(comment)
         else:
             self.currOpenCommentField.clear()
-
+         
         if not self.openItem("devel", devFolder, str(sceneFile)):
             return
-
+        
         sceneFolder = str(self.getFileName(tab, currSelected[0], currSelected[1], currSelected[2], "sceneFolder", 0, 1))
         if sceneFile == "":
             ver = "v01"

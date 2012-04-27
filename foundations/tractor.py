@@ -43,7 +43,7 @@ class Tractor(object):
         self.width = width
         self.height = height
         self.ratio = ratio
-        
+        self.pbias = pbias
         self.process()
 
     def process(self):
@@ -106,7 +106,8 @@ class Tractor(object):
             nuke_filename,
             movefile,
             tempdir,
-            deletefile], True)
+            deletefile,
+            self.pbias ], True  )
 
         f = open(alfred_filename, 'w')
         f.write(tractor_script)
@@ -119,7 +120,7 @@ class Tractor(object):
             )
 
     def submit(self, arg, checked):
-        (job,username,notes,first,last,scenefile,alffile,nukefile,movefile,tempdir,deletefile) = arg
+        (job,username,notes,first,last,scenefile,alffile,nukefile,movefile,tempdir,deletefile,pbias) = arg
         if checked:
             m_first = str(int(first) - 1)
         else:

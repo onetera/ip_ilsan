@@ -17,7 +17,7 @@
 #***    External imports.
 #***********************************************************************************************
 import re
-import glob
+import glob , os , sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 try:
@@ -83,13 +83,21 @@ class iPipelineUtility(object):
         :param path: Provided path. ( QString )
         :return: ( List )
         """
-        dirList = QDir(path).entryList(QDir.Dirs|QDir.NoDotAndDotDot)
-        return dirList
+        if 'linux' in sys.platform:
+            dirList = QDir(path).entryList(QDir.Dirs|QDir.NoDotAndDotDot)
+            return dirList
+        else :
+#            dirList = QDir(path).entryList(QDir.Dirs|QDir.NoDotAndDotDot) 
+            dirList = [ x for x in QDir(path).entryList(QDir.Dirs|QDir.NoDotAndDotDot) if x[0] != '_' ]
+            return dirList
 
     def sourceModule(self, path):
         melFiles = QDir(path).entryList(QDir.Files|QDir.NoDotAndDotDot)
+        
         print "----- Sourcing " + path + "------"
         for eachFile in melFiles:
+            if not os.path.isfile( eachFile ) :
+                continue                
             if eachFile.endsWith(".mel"):
                 scriptFile = path + "/" + eachFile
                 cmdString = "source \"" + scriptFile + "\""

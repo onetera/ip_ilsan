@@ -49,18 +49,21 @@ class WorkcodeManager(QDialog):
     def accept(self):
         taskName = str(self.Workcode_listWidget.currentItem().text())
         root = str(self.getFileName(self.tab, self.level1, self.level2, taskName, "folderTest"))
-        historyFile = self.getFileName(self.tab, self.level1, self.level2, taskName, "historyFile")
+        historyFile = self.getFileName(self.tab, self.level1, self.level2, taskName, "historyFile")        
         if os.path.exists(root):
             print "already exists."
-        else: 
+        else:            
             createFolderList = []
             devFolder = os.path.join(root, "dev")
             pubFolder = os.path.join(root, "pub")
             workspaceFile = os.path.join(str(devFolder), "workspace.mel")
             createFolderList.append(devFolder)
-            createFolderList.append(pubFolder)
+            createFolderList.append(pubFolder)            
             subFolderList = self.workcodedata[taskName]
+             
             source_workspace = Constants.workspaceDirectory + "/" + taskName + ".mel"
+            print " workcode debug - source_workspace :  \n" , source_workspace
+            
             if not QFileInfo(source_workspace).isFile():
                 return
             for sub in subFolderList:
