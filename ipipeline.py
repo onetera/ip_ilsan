@@ -2215,9 +2215,13 @@ def pipeline_console():
 #***    Launcher.
 #***********************************************************************************************
 if __name__ == "__main__": 
-#    for x in sys.path:
-#        print x 
+    settings = QSettings("DIGITAL idea", "iPipeline")
+    for x in dir( settings ):
+        if x[0] != '_':
+            print x
+    print settings.pyqtConfigure()
 #    test = iPipelineInfo()
     
 #    print test.getFileName( 0 , 'cha', 'humanA', 'rig', 'historyFile', 0, 0)
-    pipeline_console()
+#    pipeline_console()
+

@@ -166,7 +166,7 @@
     <DIRECTORY NAME="render" DESCRIPTION="Lighting &amp; Rendering">
         <DIRECTORY NAME="data" DESCRIPTION=""/>
         <DIRECTORY NAME="images" DESCRIPTION=""/>
-        <DIRECTORY NAME="precomp" DESCRIPTION=""/>
+        <DIRECTORY NAME="preview" DESCRIPTION=""/>
         <DIRECTORY NAME="scenes" DESCRIPTION=""/>
         <DIRECTORY NAME="sourceimages" DESCRIPTION=""/>
     </DIRECTORY>
