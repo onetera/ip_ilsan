@@ -92,16 +92,15 @@ class iPipelineUtility(object):
             return dirList
 
     def sourceModule(self, path):
-        melFiles = QDir(path).entryList(QDir.Files|QDir.NoDotAndDotDot)
-        
+        melFiles = QDir(path).entryList(QDir.Files|QDir.NoDotAndDotDot)        
         print "----- Sourcing " + path + "------"
-        for eachFile in melFiles:
-            if not os.path.isfile( eachFile ) :
+        for eachFile in melFiles:            
+            if not os.path.isfile( path + os.sep + eachFile ) :                
                 continue                
             if eachFile.endsWith(".mel"):
                 scriptFile = path + "/" + eachFile
                 cmdString = "source \"" + scriptFile + "\""
-                print "//// Source: " + cmdString
+                print "//// Source: " + cmdString                
                 if standAlone == True : return 
                 mel.eval(cmdString)
         return buffer

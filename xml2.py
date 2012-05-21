@@ -242,9 +242,11 @@ class Application(object):
         return temp
 
 if __name__ == '__main__':
-    inFile = QFile( QString( 'preferences.xml'))
-    xml = XML()
+    inFile = QFile( QString( '/home/idea/workcode.xml'))
+    xml = iXML()
     xml.read2( inFile)
-    print xml.updateElement3()
+    aa = xml.domDocument.elementsByTagName(QString('DIRECTORY'))
+    print aa.item(0).localName()
+#    print xml.updateElement3()
 
 
