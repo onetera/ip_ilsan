@@ -332,7 +332,7 @@ class iPipelineActions(object):
         cmds.setAttr("defaultRenderGlobals.imageFormat", format)
         return fileName
 
-    def recordPlayblastForSequenceN(self, tab, level1, level2, level3, fileName):
+    def recordPlayblastForSequenceN(self, tab, level1, level2, level3, fileName , previewScale ):
         # "/Users/higgsdecay/test"
         playblastFile = os.path.join(str(self.getFileName(tab, level1, level2, level3, "devFolder", 0, 1)), "preview", os.path.splitext(str(fileName))[0], str(fileName))
         # create the preview folder
@@ -351,7 +351,7 @@ class iPipelineActions(object):
         # playblast -startTime 1 -endTime 10  -format iff -filename "/Users/higgsdecay/output/ACR_rig_v02_w03" 
         #-forceOverwrite  -sequenceTime 0 -clearCache 0 -viewer 1 -showOrnaments 1 -fp 4 -percent 50 -widthHeight 1920 1080;
         cmds.playblast(startTime=startFrame, endTime=endFrame, format="image",
-                       filename=os.path.splitext(str(playblastFile))[0], showOrnaments=False, viewer=False, percent=50,
+                       filename=os.path.splitext(str(playblastFile))[0], showOrnaments=False, viewer=False, percent= previewScale ,
                        sequenceTime=False, forceOverwrite=True,
                        widthHeight=[int(width), int(height)])
         cmds.setAttr("defaultRenderGlobals.imageFormat", format)

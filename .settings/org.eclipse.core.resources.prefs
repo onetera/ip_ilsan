@@ -1,8 +1,14 @@
 eclipse.preferences.version=1
+encoding//Core/Workcode/Workcode.py=utf-8
 encoding//Core/iPipelineActions.py=utf-8
+encoding//Core/iPipelineInfo.py=utf-8
 encoding//Core/iPipelineInit.py=utf-8
 encoding//Core/iPipelineProject.py=utf-8
 encoding//Core/iPipelineUtility.py=utf-8
+encoding//components/addons/information/information.py=utf-8
+encoding//components/addons/publishWindow/publishWindow.py=utf-8
+encoding//components/addons/publishWindowAni/publishWindowAni.py=utf-8
+encoding//components/addons/workcodeManager/workcodeManager.py=utf-8
 encoding//foundations/globals/constants.py=utf-8
 encoding//foundations/tractor.py=utf-8
 encoding/ipipeline.py=utf-8

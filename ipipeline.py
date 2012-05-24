@@ -58,6 +58,8 @@ from components.addons.information.information import Information
 from components.addons.publishWindow.publishWindow import PublishWindow
 from components.addons.publishWindowAni.publishWindowAni import PublishWindowAni
 from components.addons.workcodeManager.workcodeManager import WorkcodeManager
+from components.addons.layerManager.layerManager import layerManager
+
 from components.tools.animation.multipleImportReference.multipleImportReference import MultipleImportReference
 from py.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
 
@@ -745,15 +747,22 @@ class iPipeline(QMainWindow,
             namespace = os.path.splitext(str(itemName))[0]
         else: # assetName
             namespace = str(assetName)
+            
         if ex == "reference (assetName:)":
             if not standAlone :
                 mel.eval("file -r -gl -namespace \"%s\" -lrd \"all\" -options \"v=0\" \"%s\"" % (namespace, fileName))
+                
+                
         elif ex == "import (assetName:)":
             if not standAlone :
                 mel.eval("file -import -namespace \"%s\" -ra true -options \"v=0\"  -pr -loadReferenceDepth \"all\" \"%s\"" % (namespace, fileName))
         elif ex == "import":
             if not standAlone :
                 mel.eval("file -import -type \"mayaBinary\" -rdn -rpr \"clash\" -options \"v=0;p=17\"  -pr -loadReferenceDepth \"all\" \"%s\"" % (fileName))
+             
+        if os.path.isfile( fileName[:-3] + '.layml' ):    
+            lm = layerManager()                  
+            lm.constructLayer( fileName[:-3] + '.layml' )
 
     def updateWorkingTab(self, tab):
         if tab == 0:
@@ -1056,7 +1065,8 @@ class iPipeline(QMainWindow,
         else:
             fileName = self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+wip+".mov"
 
-        playblastFile, startFrame, endFrame, width, height, ratio = self.recordPlayblastForSequenceN(tab, level1, level2, level3, fileName)
+        previewScale = self.previewScale_spinBox.value() 
+        playblastFile, startFrame, endFrame, width, height, ratio = self.recordPlayblastForSequenceN(tab, level1, level2, level3, fileName , previewScale)
         priority = self.tracPriority_spinBox.value()        
         Tractor(self.userName, level2, level3, playblastFile, startFrame, endFrame, width, height, ratio , priority )
 
@@ -1226,6 +1236,7 @@ class iPipeline(QMainWindow,
             # 씬파일 저장
             
             cmds.file(save=True, type=type)
+            
             print 'saved scene'
             print str(destinationFile)
         except:
@@ -1234,6 +1245,10 @@ class iPipeline(QMainWindow,
             else:
                 os.system('touch %s' % os.path.join(sceneFolder, str(destinationFile)))                
 
+        if str( level3 ) == 'model':
+            lm = layerManager()
+            lm.writeXML( os.path.join(sceneFolder, str( level2 ) + '_' + str( level3 ) + '.layml' ) )
+                         
         # xml 생성
         historyFile = str(self.getFileName(tab, level1, level2, level3, "historyFile", 0, 1))
         nc = NoteContainer()
@@ -2215,12 +2230,12 @@ def pipeline_console():
 #***    Launcher.
 #***********************************************************************************************
 if __name__ == "__main__": 
-    settings = QSettings("DIGITAL idea", "iPipeline")
-    for x in dir( settings ):
-        if x[0] != '_':
-            print x
-    print settings.pyqtConfigure()
-#    test = iPipelineInfo()
+#    settings = QSettings("DIGITAL idea", "iPipeline")
+#    for x in dir( settings ):
+#        if x[0] != '_':
+#            print x
+#    print settings.pyqtConfigure()
+    test = pipeline_console()
     
 #    print test.getFileName( 0 , 'cha', 'humanA', 'rig', 'historyFile', 0, 0)
 #    pipeline_console()

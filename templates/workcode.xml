@@ -146,6 +146,7 @@
     <DIRECTORY NAME="texture" DESCRIPTION="Texturing">
         <DIRECTORY NAME="scenes" DESCRIPTION=""/>
         <DIRECTORY NAME="images" DESCRIPTION=""/>
+        <DIRECTORY NAME="shader" DESCRIPTION=""/>
         <DIRECTORY NAME="sourceimages" DESCRIPTION="">
             <DIRECTORY NAME="psd" DESCRIPTION=""/>
             <DIRECTORY NAME="uv" DESCRIPTION=""/>

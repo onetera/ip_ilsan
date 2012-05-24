@@ -10,6 +10,7 @@ workspace -fr "mayaAscii" "scenes";
 workspace -fr "mayaBinary" "scenes";
 workspace -fr "images" "images";
 workspace -fr "publish" "publish";
+workspace -fr "shaders" "shader";
 
 // Protect AutoMakes
 workspace -fr "templates" "scenes";

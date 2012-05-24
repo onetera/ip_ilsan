@@ -30,7 +30,7 @@ __status__ = "Production"
 #***********************************************************************************************
 #***    Module classes and definitions.
 #***********************************************************************************************
-test = os.path.isfile('/home/idea/work/develop.py')
+test = 0
 
 
 
@@ -40,7 +40,7 @@ class Constants():
     """
     
     debugMode = False
-    applicationName = "iPipeline v0.2.7.0"
+    applicationName = "iPipeline v0.2.7.1"
 #    if sys.platform == "darwin":
 #        applicationDirectory = "/Users/higgsdecay/work/release/ipipeline/"
     if 'linux' in sys.platform :
@@ -51,7 +51,7 @@ class Constants():
     else:
         applicationDirectory = "//10.0.200.100/_lustre_INHouse/MAYA/common/file/ipipeline/"
     
-    frameworkUIFile = applicationDirectory+"ui/ipipeline_GUI06.ui"
+    frameworkUIFile = applicationDirectory+"ui/ipipeline_GUI07.ui"
     DI_animTransfer = applicationDirectory+"Gui/DI_animTransfer/DI_animTransfer02.ui"
     DI_animTransferAlone = applicationDirectory+"Gui/DI_animTransfer/DI_animTransferAlone.ui"
     
