@@ -20,8 +20,22 @@ class layerManager:
         for x in layers:
             layerData.append( [ x , cmds.editDisplayLayerMembers( x , q=1) ] )
         return layerData
-          
-          
+      
+    def inLayer( self , layerData ):
+        for ln in layerData:
+            if cmds.ls( ln[0] ) != []:
+                cmds.delete( ln[0] )
+            cmds.createDisplayLayer( name=ln[0] )
+            print ln[0]
+            map ( lambda item : cmds.editDisplayLayerMembers( ln[0] , item )  , ln[1] )
+            
+            
+    def createLMnode(self):        
+        lm = cmds.createNode( '' , n='model_layerInfo' )
+        cmds.addAttr( lm , longName = 'notes' , dataType='string' )
+        cmds.setAttr( lm + '.notes' , self.outLayer() , type='string' )
+        print 'created model_layerInfo............'
+                 
     def layer2XMl(self):
         doc  = minidom.Document()
         dom = doc.createComment( 'XML Layer Information')        

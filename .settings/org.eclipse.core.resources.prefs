@@ -5,6 +5,7 @@ encoding//Core/iPipelineInfo.py=utf-8
 encoding//Core/iPipelineInit.py=utf-8
 encoding//Core/iPipelineProject.py=utf-8
 encoding//Core/iPipelineUtility.py=utf-8
+encoding//Gui/Functions/assistantFunctions.py=utf-8
 encoding//components/addons/information/information.py=utf-8
 encoding//components/addons/publishWindow/publishWindow.py=utf-8
 encoding//components/addons/publishWindowAni/publishWindowAni.py=utf-8

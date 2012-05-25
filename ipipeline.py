@@ -195,6 +195,7 @@ class iPipeline(QMainWindow,
         self.ani_createGroupControlAct = self.createAction("ani_createGroupControl", self.ani_createGroupControl)
         self.ani_replaceReferenceAct = self.createAction("ani_replaceReference", self.ani_replaceReference)
         self.ani_animTransferAct = self.createAction("ani_animTransfer", self.ani_animTransfer)
+        self.mod_layerInfoAct = self.createAction("mod_layerInfo", self.mod_layerInfo )
 #        self.finalize_geoBakeAct = self.createAction("finalize_geoBake", self.finalize_geoBake)
 #        self.finalize_cacheFileLoaderAct = self.createAction("mrgo_CacheDialog", self.finalize_cacheFileLoader)
 #        self.finalize_importToolAct = self.createAction("mrgo_ImportTool", self.finalize_importTool)
@@ -202,13 +203,22 @@ class iPipeline(QMainWindow,
     def createToolBars(self):
         shelfToolBar = QToolBar("Shelf")
         shelfToolBar.addAction(self.ani_createGroupControlAct)
-        shelfToolBar.addAction(self.ani_replaceReferenceAct)
+        shelfToolBar.addAction(self.ani_replaceReferenceAct)        
 #        shelfToolBar.addAction(self.finalize_geoBakeAct)
 #        shelfToolBar.addAction(self.finalize_cacheFileLoaderAct)
 #        shelfToolBar.addAction(self.finalize_importToolAct)
         shelfToolBar.addAction(self.ani_animTransferAct)
+        shelfToolBar.addAction(self.mod_layerInfoAct)
         self.addToolBar(shelfToolBar)
 #
+    def mod_layerInfo(self):
+        if cmds.ls( 'model_layerInfo' ) == []:
+            return
+        lm = cmds.ls( 'model_layerInfo' )[0]
+        layerData = cmds.getAttr( lm + '.notes')
+        LM= layerManager()
+        LM.inLayer( eval( layerData ) )
+        
     def ani_animTransfer(self):
         if self.currOpenLevel3 == "ani":
             at = AnimTransfer("alone", self)
@@ -760,9 +770,9 @@ class iPipeline(QMainWindow,
             if not standAlone :
                 mel.eval("file -import -type \"mayaBinary\" -rdn -rpr \"clash\" -options \"v=0;p=17\"  -pr -loadReferenceDepth \"all\" \"%s\"" % (fileName))
              
-        if os.path.isfile( fileName[:-3] + '.layml' ):    
-            lm = layerManager()                  
-            lm.constructLayer( fileName[:-3] + '.layml' )
+#        if os.path.isfile( fileName[:-3] + '.layml' ):    
+#            lm = layerManager()                  
+#            lm.constructLayer( fileName[:-3] + '.layml' )
 
     def updateWorkingTab(self, tab):
         if tab == 0:
@@ -1224,6 +1234,14 @@ class iPipeline(QMainWindow,
         ver = int(VER_RE.findall( fileName )[0][2:])
         wip = int(WIP_RE.findall( fileName )[0][2:])
 
+        # model layer information
+        if str( level3 ) == 'model' and cmds.ls( 'model_layerInfo' ) == [] :
+            print' creating model layer information'
+            lm = layerManager()
+            lm.createLMnode()
+        else:
+            print 'failed create lm node...........'
+
         try:
             cmds.file(rename=str(destinationFile))
             if ext == 'ma':
@@ -1236,18 +1254,16 @@ class iPipeline(QMainWindow,
             # 씬파일 저장
             
             cmds.file(save=True, type=type)
-            
-            print 'saved scene'
-            print str(destinationFile)
+
         except:
             if 'win' in sys.platform:
                 os.system('type NUL>%s' % os.path.join(sceneFolder, str(destinationFile)))                
             else:
                 os.system('touch %s' % os.path.join(sceneFolder, str(destinationFile)))                
 
-        if str( level3 ) == 'model':
-            lm = layerManager()
-            lm.writeXML( os.path.join(sceneFolder, str( level2 ) + '_' + str( level3 ) + '.layml' ) )
+#        if str( level3 ) == 'model':
+#            lm = layerManager()
+#            lm.writeXML( os.path.join(sceneFolder, str( level2 ) + '_' + str( level3 ) + '.layml' ) )
                          
         # xml 생성
         historyFile = str(self.getFileName(tab, level1, level2, level3, "historyFile", 0, 1))
