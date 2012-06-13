@@ -27,7 +27,8 @@ try:
 except :
     print "import Error"
     import nuke 
-    import globals.constants.Constants
+#    import globals.constants.Constants
+    from globals.constants import Constants
     
     
     

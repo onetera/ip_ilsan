@@ -16,13 +16,38 @@
 #***********************************************************************************************
 #***    External imports.
 #***********************************************************************************************
-import sys
-import os
-import re
-import glob
+from Core.Note.Note import NoteContainer, Note
+from Core.Workcode.Workcode import StandardTreeModel
+from Core.iPipelineActions import iPipelineActions
+from Core.iPipelineInfo import iPipelineInfo
+from Core.iPipelineInit import iPipelineInit
+from Core.iPipelineUtility import iPipelineUtility
+from Gui.Functions.assistantFunctions import assistantFunctions
+from PyQt4 import uic
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4 import uic
+from components.addons.information.information import Information
+from components.addons.layerManager.layerManager import layerManager
+from components.addons.publishWindow.publishWindow import PublishWindow
+from components.addons.publishWindowAni.publishWindowAni import PublishWindowAni
+from components.addons.workcodeManager.workcodeManager import WorkcodeManager
+from components.tools.animation.animImport.animImport import AnimImport
+from components.tools.animation.animTransfer.animTransfer import AnimTransfer
+from components.tools.animation.multipleImportReference.multipleImportReference import \
+    MultipleImportReference
+from components.tools.animation.selectionTool.selectionTool import SelectionTool
+from components.tools.finalize.geoBake.geoBake import GeoBake # new mel script
+from foundations.globals.constants import Constants
+from foundations.tractor import Tractor
+from py.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
+from xml2 import iXML
+from xml_new import XmlNew
+import Core.Note.Note2
+import glob
+import os
+import re
+import sys
+import ui.common
 
 try:
     import maya.cmds as cmds
@@ -36,35 +61,11 @@ except ImportError:
 #***********************************************************************************************
 #***    Internal imports.
 #***********************************************************************************************
-import ui.common
 
 
 
-import Core.Note.Note2
-from foundations.globals.constants import Constants
-from foundations.tractor import Tractor
-from Core.iPipelineActions import iPipelineActions
-from Core.iPipelineInfo import iPipelineInfo
-from Core.iPipelineInit import iPipelineInit
-from Core.iPipelineUtility import iPipelineUtility
-from Core.Note.Note import NoteContainer, Note
-from Core.Workcode.Workcode import StandardTreeModel
-from Gui.Functions.assistantFunctions import assistantFunctions
-from components.tools.animation.animTransfer.animTransfer import AnimTransfer
-from components.tools.animation.selectionTool.selectionTool import SelectionTool
-from components.tools.animation.animImport.animImport import AnimImport
-from components.tools.finalize.geoBake.geoBake import GeoBake # new mel script
-from components.addons.information.information import Information
-from components.addons.publishWindow.publishWindow import PublishWindow
-from components.addons.publishWindowAni.publishWindowAni import PublishWindowAni
-from components.addons.workcodeManager.workcodeManager import WorkcodeManager
-from components.addons.layerManager.layerManager import layerManager
 
-from components.tools.animation.multipleImportReference.multipleImportReference import MultipleImportReference
-from py.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
 
-from xml2 import iXML
-from xml_new import XmlNew
 
 
 #***********************************************************************************************
@@ -82,7 +83,7 @@ WIP_RE = re.compile("_w[0-9]{2}")
 #***    Module classes and definitions.
 #***********************************************************************************************
 
-PIPELINE_DEV = os.getenv( 'PIPELINE_DEV' )
+PIPELINE_DEV = 1
 DEV_SHOW = 0
 
 
@@ -97,7 +98,10 @@ class iPipeline(QMainWindow,
 #        if not cls.__instance:    
 #            cls.__instance = super(iPipeline, cls).__new__(cls, *args, **kwargs)
 #        return cls.__instance
-        
+
+
+    
+       
     def __init__(self, parent=None):
         """
         This method initializes the class.
@@ -106,17 +110,19 @@ class iPipeline(QMainWindow,
         """        
         QMainWindow.__init__(self, parent)        
         uic.loadUi(Constants.frameworkUIFile, self)
+        
+        self.tabXsize = 670
         if self.tabWidget.currentIndex() == 0 :
-            self.resize(958,650)
+            self.resize(730,self.tabXsize)
         else :
-            self.resize(531,650)        
+            self.resize(531,self.tabXsize)        
         
         self.sourceModule(Constants.DI_ani)
         self.sourceModule(Constants.DI_finalize)
         self.initialize()
-        self.loadSettings()
-#        if sys.platform == "darwin":
-#            self.showPath = "/Users/higgsdecay/field/show"
+        self.loadSettings()        
+
+
         if 'win' in sys.platform:
              self.showPath = r"\\10.0.200.100"
              self.theOS = 'win'             
@@ -187,19 +193,14 @@ class iPipeline(QMainWindow,
 
     def createMenus(self):
         pass
-#------------------------------------------------------------------------------ 
-# For Mr.Go project.
-#------------------------------------------------------------------------------ 
 
     def createActions(self):
         self.ani_createGroupControlAct = self.createAction("ani_createGroupControl", self.ani_createGroupControl)
         self.ani_replaceReferenceAct = self.createAction("ani_replaceReference", self.ani_replaceReference)
         self.ani_animTransferAct = self.createAction("ani_animTransfer", self.ani_animTransfer)
         self.mod_layerInfoAct = self.createAction("mod_layerInfo", self.mod_layerInfo )
-#        self.finalize_geoBakeAct = self.createAction("finalize_geoBake", self.finalize_geoBake)
-#        self.finalize_cacheFileLoaderAct = self.createAction("mrgo_CacheDialog", self.finalize_cacheFileLoader)
-#        self.finalize_importToolAct = self.createAction("mrgo_ImportTool", self.finalize_importTool)
-#      
+    
+
     def createToolBars(self):
         shelfToolBar = QToolBar("Shelf")
         shelfToolBar.addAction(self.ani_createGroupControlAct)
@@ -210,7 +211,7 @@ class iPipeline(QMainWindow,
         shelfToolBar.addAction(self.ani_animTransferAct)
         shelfToolBar.addAction(self.mod_layerInfoAct)
         self.addToolBar(shelfToolBar)
-#
+
     def mod_layerInfo(self):
         if cmds.ls( 'model_layerInfo' ) == []:
             return
@@ -662,12 +663,18 @@ class iPipeline(QMainWindow,
         st.show()
 
     def componentMenu(self, pos, tab, mode):
+        saveAsCurrentDevAct = self.createAction( "Create Current Scene into Devel" , lambda : self.saveAsCurrentDev(tab) )
+#        createEmptyDevAct = self.createAction( "Create empty scnene" , self.createEmptyDev )
         refAssetAct = self.createAction("reference (assetName:)", lambda: self.importReference(tab, "reference (assetName:)", mode, 0))
         importAssetAct = self.createAction("import (assetName:)", lambda: self.importReference(tab, "import (assetName:)", mode, 0))
         multipleImportAct = self.createAction("multiple import (assetname:)", lambda: self.multipleSelected(tab, mode, 1))
         multipleRefAct = self.createAction("multiple reference (assetname:)", lambda: self.multipleSelected(tab, mode, 0))
         importAct = self.createAction("import", lambda: self.importReference(tab, "import", mode, 0))
         menu = QMenu()
+        if mode == 'devel':
+            menu.addAction(saveAsCurrentDevAct)
+#            menu.addAction(createEmptyDevAct)
+            menu.addSeparator()
         menu.addAction(refAssetAct)
         menu.addAction(multipleRefAct)
         menu.addSeparator()
@@ -676,6 +683,41 @@ class iPipeline(QMainWindow,
         menu.addAction(multipleImportAct)
         menu.exec_(self.assetDevelList.mapToGlobal(pos))
 
+    def saveAsCurrentDev(self , tab ):
+        if tab ==1 :
+            sceneFolder = str( self.assetLocationField.text() )+"dev/scenes/"
+        elif tab ==2 :
+            sceneFolder = str( self.shotLocationField.text() )+"dev/scenes/"
+#        item = self.getCurrentlySelectedItem( tab , 3 )
+#        level1 , level2 , level3 = item
+#        sceneFolder = str(self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1))        
+        sceneFiles = glob.glob(sceneFolder+"*.mb")
+#        sceneFileName = str(self.currOpenFileNameLabel.text())
+        ver_wip = VER_WIP_RE.findall( sceneFiles[-1] )[0] # return v01_w02
+        currVer = int(ver_wip[1:3])
+        currWip = int(ver_wip[-2:])
+        if QFileInfo(os.path.join(sceneFolder, sceneFiles[-1])).isFile():
+            while True:
+                currWip += 1
+                curLatestVersion = os.path.join(sceneFolder, sceneFiles[-1].replace(ver_wip, ver_wip[:-2]+str(currWip).zfill(2)))
+                if not QFileInfo(curLatestVersion).isFile():
+                    break
+        else:
+            curLatestVersion = os.path.join(sceneFolder, sceneFiles[-1] )
+        if standAlone:
+            print curLatestVersion            
+        else:
+            cmds.file( rename = curLatestVersion )
+            cmds.file( s=1 )
+        if tab ==1:
+            self.loadAssetBrowse()
+        elif tab == 2:
+            self.loadShotBrowse()
+        
+    def createEmptyDev(self):
+        print 'createEmptyDev'
+        
+        
     def multipleSelected(self, tab, mode, sel):
         self.multipleImportUI = QDialog(self)
         label = QLabel("Number of Copies:")
@@ -770,39 +812,37 @@ class iPipeline(QMainWindow,
             if not standAlone :
                 mel.eval("file -import -type \"mayaBinary\" -rdn -rpr \"clash\" -options \"v=0;p=17\"  -pr -loadReferenceDepth \"all\" \"%s\"" % (fileName))
              
-#        if os.path.isfile( fileName[:-3] + '.layml' ):    
-#            lm = layerManager()                  
-#            lm.constructLayer( fileName[:-3] + '.layml' )
-
     def updateWorkingTab(self, tab):
         if tab == 0:
-            self.resize(958,650)
+            self.resize(730,self.tabXsize)
+#            self.resize(958,650)
             self.resizeButton.setText( '<<<')
         elif tab == 1:            
-            self.resize(531,650)
+            self.resize(531,self.tabXsize)
             self.resizeButton.setText( '>>>')
             self.updateAssetTypeList()
         elif tab == 2:
-            self.resize(531,650)
+            self.resize(531,self.tabXsize)
             self.resizeButton.setText( '>>>')
             self.updateSequenceList()
     
     def resizing(self): 
-        if self.size().width() < 710: 
+        if self.size().width() < 740: 
             if self.tabWidget.currentIndex() == 0:
-                self.resize(958,650)
+                self.resize(958,self.tabXsize)
                 self.resizeButton.setText( '<<<')
             else :
-                self.resize(958,650)
+                self.resize(958,self.tabXsize)
                 self.resizeButton.setText( '<<<')
             
         else :
             if self.tabWidget.currentIndex() == 0:                
-                self.resize(706,650)
+                self.resize(730,self.tabXsize)
+#                self.resize(706,650)
                 self.resizeButton.setText( '>>>')
             else :
                 self.resizeButton.setText( '>>>') 
-                self.resize(531,650)
+                self.resize(531,self.tabXsize)
         
     def resizeWin(self , x , y ):
         self.resize( x , y )
@@ -911,6 +951,7 @@ class iPipeline(QMainWindow,
     #===========================================================================
     # assetInformation
     #===========================================================================
+    
     def assetInformation(self):
         tab = 1
         selected = 1
@@ -934,6 +975,9 @@ class iPipeline(QMainWindow,
     #===========================================================================
     # "Shot Browser" Tab
     #===========================================================================
+    
+    
+    
     def updateSequenceList(self):
         currSelected = self.getCurrentlySelectedItem(2, 1)
         self.sequenceScrollList.clear()
@@ -1495,9 +1539,9 @@ class iPipeline(QMainWindow,
             os.makedirs(dirname)
 
         # 퍼블리쉬된 파일의 퍼미션을 쓰기모드로 변경
-        if QFileInfo(publishFile).isFile():
-            if not 'win' in sys.platform:
-                os.chmod(publishFile, 0777)
+#        if QFileInfo(publishFile).isFile():
+#            if not 'win' in sys.platform:
+#                os.chmod(publishFile, 0777)
 
         # publish file 저장
         if level3 == "ani" and self.projNameCombo.currentText() == "mrgo":
@@ -1684,6 +1728,7 @@ class iPipeline(QMainWindow,
             
         self.currOpenHistories = historyObj
 
+
     def loadAssetHistory(self):
         currSelected = self.getCurrentlySelectedItem(1, 3)
         historyObj =  self.getEventNotes(1, currSelected[0], currSelected[1], currSelected[2])
@@ -1812,6 +1857,8 @@ class iPipeline(QMainWindow,
     #===========================================================================
     # 정리할 함수들 = 시작 =
     #===========================================================================
+    
+    
     def componentDoubleClicked(self, tab, mode, item=None):        
         selected = 1
         currSelected = self.getCurrentlySelectedItem(tab, 3)
@@ -2217,16 +2264,18 @@ class iPipeline(QMainWindow,
             return False
         return True
 
-def pipeline():
-    global app    
-    try:        
-        app.close()        
-    except :        
-        app = iPipeline()
-    app.show()
+def ipipeline():
+    if standAlone ==False :
+        global app    
+        try:        
+            app.close()        
+        except :        
+            app = iPipeline()
+        app.show()
+    else :
+        pipeline_console()
         
     
-    print ' iPipeline'
 
 def pipeline_console():
     app = QApplication(sys.argv)
@@ -2246,13 +2295,5 @@ def pipeline_console():
 #***    Launcher.
 #***********************************************************************************************
 if __name__ == "__main__": 
-#    settings = QSettings("DIGITAL idea", "iPipeline")
-#    for x in dir( settings ):
-#        if x[0] != '_':
-#            print x
-#    print settings.pyqtConfigure()
-    test = pipeline_console()
-    
-#    print test.getFileName( 0 , 'cha', 'humanA', 'rig', 'historyFile', 0, 0)
-#    pipeline_console()
+    ipipeline()
 

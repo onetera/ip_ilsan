@@ -305,6 +305,7 @@ class iPipelineActions(object):
         previewFolder = os.path.dirname(playblastFile)
         if not os.path.exists(previewFolder):
             os.makedirs(previewFolder)
+#            os.chmod( previewFolder , 0775 )
         startFrame = cmds.getAttr("defaultRenderGlobals.startFrame")
         endFrame = cmds.getAttr("defaultRenderGlobals.endFrame")
         format = cmds.getAttr("defaultRenderGlobals.imageFormat")

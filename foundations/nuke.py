@@ -1,6 +1,7 @@
 import os
 import __builtin__
-from foundations.globals.constants import Constants
+from globals.constants import Constants
+
 
 __all__ = ['open', 'Error']
 

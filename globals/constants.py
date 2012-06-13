@@ -30,8 +30,8 @@ __status__ = "Production"
 #***********************************************************************************************
 #***    Module classes and definitions.
 #***********************************************************************************************
-DEVEL = 1
 
+DEVEL = 1
 
 
 class Constants():
@@ -40,17 +40,16 @@ class Constants():
     """
     
     debugMode = False
-    applicationName = "iPipeline v0.3.0.0"
+    applicationName = "iPipeline v0.2.7.2"
 #    if sys.platform == "darwin":
 #        applicationDirectory = "/Users/higgsdecay/work/release/ipipeline/"
     if 'linux' in sys.platform :
-        if DEVEL:
+        if DEVEL == 1:
              applicationDirectory = '/home/idea/work/ipipeline/'
         else :
             applicationDirectory = "/lustre/INHouse/MAYA/common/file/ipipeline/"
     else:
         applicationDirectory = "//10.0.200.100/_lustre_INHouse/MAYA/common/file/ipipeline/"
-    
     if DEVEL:
         frameworkUIFile = "/lustre/INHouse/MAYA/common/file/ipipeline/ui/ipipeline_GUI07.ui"
     else :
