@@ -43,6 +43,10 @@ from py.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
 from xml2 import iXML
 from xml_new import XmlNew
 import Core.Note.Note2
+
+import notice
+import userInfo
+
 import glob
 import os
 import re
@@ -108,14 +112,20 @@ class iPipeline(QMainWindow,
         
         :param parent: ( QWidget )
         """        
-        QMainWindow.__init__(self, parent)        
-        uic.loadUi(Constants.frameworkUIFile, self)
+        QMainWindow.__init__(self, parent)
         
-        self.tabXsize = 670
+        self.userinfo = userInfo.UserInfo()
+        
+        
+#        notice.notice     
+        uic.loadUi(Constants.frameworkUIFile, self)
+        print Constants.frameworkUIFile
+
+        self.tabYsize = 640
         if self.tabWidget.currentIndex() == 0 :
-            self.resize(730,self.tabXsize)
+            self.resize(730,self.tabYsize)
         else :
-            self.resize(531,self.tabXsize)        
+            self.resize(531,self.tabYsize)        
         
         self.sourceModule(Constants.DI_ani)
         self.sourceModule(Constants.DI_finalize)
@@ -131,7 +141,7 @@ class iPipeline(QMainWindow,
             if not DEV_SHOW:
                 self.showPath = "/show"
             else:
-                self.showPath = "/home/idea/temp/Show"
+                self.showPath = "/home/d10218/temp/Show"
 
         self.workcodeModel = StandardTreeModel(self)
         self.workcodedata = self.workcodeModel.load(QString(Constants.workcodeFile))
@@ -146,8 +156,18 @@ class iPipeline(QMainWindow,
         self.createConnections()
 
         self.updateUI('currOpen')
-        self.userNameLineEdit.setText(self.userName)        
         
+        if self.userinfo.checkAccount():
+            self.label_15.hide()                 
+            self.userNameLineEdit.hide()
+            
+            # 바꿔야 할부분 self.userinfo 변수를 사용 할것.            
+            self.userName = self.userinfo.num
+            self.ip_statusBar.showMessage(u' 사번 : %s  이름 : %s ' % (self.userinfo.num , self.userinfo.name ) )
+        else:
+            self.ip_statusBar.showMessage(u'개인 계정으로 로그인 바랍니다. 조만간 개인 계정이 막혀 마야 사용이 불가능 해집니다.')
+            self.userNameLineEdit.setText( self.userName )
+                    
         self.projNameCombo.addItems(self.getDirectoryList(self.showPath))
         try:
             self.projNameCombo.setCurrentIndex(
@@ -168,12 +188,14 @@ class iPipeline(QMainWindow,
             historyTable.setColumnWidth(3, 25)
             historyTable.setColumnWidth(4, 70)
 
-        self.createActions()
-        self.createToolBars()
-        self.createMenus()
+#        self.createActions()
+#        self.createToolBars()
+#        self.createMenus()
         
         self.setWindowTitle(Constants.applicationName)
         self.setStyleSheet("font-size: 11px")
+
+        
 
     def assetMouseMoveEvent(self, event):
         currSelected = self.getCurrentlySelectedItem(1, 2)
@@ -191,52 +213,53 @@ class iPipeline(QMainWindow,
         output = "Shot:"+assetName+":"+scriptFolder
         ui.common.startDrag(output, self)
 
-    def createMenus(self):
-        pass
-
-    def createActions(self):
-        self.ani_createGroupControlAct = self.createAction("ani_createGroupControl", self.ani_createGroupControl)
-        self.ani_replaceReferenceAct = self.createAction("ani_replaceReference", self.ani_replaceReference)
-        self.ani_animTransferAct = self.createAction("ani_animTransfer", self.ani_animTransfer)
-        self.mod_layerInfoAct = self.createAction("mod_layerInfo", self.mod_layerInfo )
+#    def createMenus(self):
+#        pass
+#
+#    def createActions(self):
+#        
+#        self.ani_createGroupControlAct = self.createAction("ani_createGroupControl", self.ani_createGroupControl)
+#        self.ani_replaceReferenceAct = self.createAction("ani_replaceReference", self.ani_replaceReference)
+#        self.ani_animTransferAct = self.createAction("ani_animTransfer", self.ani_animTransfer)
+#        self.mod_layerInfoAct = self.createAction("mod_layerInfo", self.mod_layerInfo )
     
 
-    def createToolBars(self):
-        shelfToolBar = QToolBar("Shelf")
-        shelfToolBar.addAction(self.ani_createGroupControlAct)
-        shelfToolBar.addAction(self.ani_replaceReferenceAct)        
-#        shelfToolBar.addAction(self.finalize_geoBakeAct)
-#        shelfToolBar.addAction(self.finalize_cacheFileLoaderAct)
-#        shelfToolBar.addAction(self.finalize_importToolAct)
-        shelfToolBar.addAction(self.ani_animTransferAct)
-        shelfToolBar.addAction(self.mod_layerInfoAct)
-        self.addToolBar(shelfToolBar)
+#    def createToolBars(self):
+#        shelfToolBar = QToolBar("Shelf")
+#        shelfToolBar.addAction(self.ani_createGroupControlAct)
+#        shelfToolBar.addAction(self.ani_replaceReferenceAct)        
+##        shelfToolBar.addAction(self.finalize_geoBakeAct)
+##        shelfToolBar.addAction(self.finalize_cacheFileLoaderAct)
+##        shelfToolBar.addAction(self.finalize_importToolAct)
+#        shelfToolBar.addAction(self.ani_animTransferAct)
+#        shelfToolBar.addAction(self.mod_layerInfoAct)
+#        self.addToolBar(shelfToolBar)
 
-    def mod_layerInfo(self):
-        if cmds.ls( 'model_layerInfo' ) == []:
-            return
-        lm = cmds.ls( 'model_layerInfo' )[0]
-        layerData = cmds.getAttr( lm + '.notes')
-        LM= layerManager()
-        LM.inLayer( eval( layerData ) )
+#    def mod_layerInfo(self):
+#        if cmds.ls( 'model_layerInfo' ) == []:
+#            return
+#        lm = cmds.ls( 'model_layerInfo' )[0]
+#        layerData = cmds.getAttr( lm + '.notes')
+#        LM= layerManager()
+#        LM.inLayer( eval( layerData ) )
         
-    def ani_animTransfer(self):
-        if self.currOpenLevel3 == "ani":
-            at = AnimTransfer("alone", self)
-            self.connect(at, SIGNAL("run"), self.ani_animTransfer2)
-            at.show()
+#    def ani_animTransfer(self):
+##        if self.currOpenLevel3 == "ani":
+#        at = AnimTransfer("alone", self)
+#        self.connect(at, SIGNAL("run"), self.ani_animTransfer2)
+#        at.show()
+#
+#    def ani_animTransfer2(self, animFile, txtFile, selectedAsset):
+#        if standAlone : return
+#        mel.eval('DI_animTransfer "%s" "%s" %s' % (animFile, txtFile, selectedAsset))
 
-    def ani_animTransfer2(self, animFile, txtFile, selectedAsset):
-        if standAlone : return
-        mel.eval('DI_animTransfer "%s" "%s" %s' % (animFile, txtFile, selectedAsset))
-
-    def ani_createGroupControl(self):
-        if standAlone : return   
-        mel.eval("DI_createGroupControl")
-
-    def ani_replaceReference(self):
-        if standAlone : return
-        mel.eval("kis_replaceReference")
+#    def ani_createGroupControl(self):
+#        if standAlone : return   
+#        mel.eval("DI_createGroupControl")
+#
+#    def ani_replaceReference(self):
+#        if standAlone : return
+#        mel.eval("kis_replaceReference")
 #
 #    def finalize_geoBake(self):
 #        if standAlone : return
@@ -266,6 +289,9 @@ class iPipeline(QMainWindow,
 #------------------------------------------------------------------------------ 
 
     def createConnections(self):
+        # Menu
+        self.connect(self.actionIPipeline_Wiki, SIGNAL("triggered()"),self.openWiki)
+        
         # Common
         self.connect(self.tabWidget, SIGNAL("currentChanged(int)"),
                      self.updateWorkingTab)
@@ -282,8 +308,7 @@ class iPipeline(QMainWindow,
                      self.saveDevelSelected)
         self.connect(self.currOpenSavePublishButton, SIGNAL("clicked()"),
                      self.savePublishSelected)
-        #self.connect(self.currOpenRollbackButton, SIGNAL("clicked()"),
-        #             self.rollbackUI)
+
         self.connect(self.currOpenCloseButton, SIGNAL("clicked()"),
                      self.closeFile)
         self.connect(self.currOpenSnapshotButton, SIGNAL("clicked()"),
@@ -307,10 +332,8 @@ class iPipeline(QMainWindow,
         self.connect(self.currOpenHistoryTable, SIGNAL("itemClicked(QTableWidgetItem*)"),
                      self.updateCurrentlyComment)
         self.connect( self.refreshOpenedButton , SIGNAL("clicked()") ,
-                      self.refreshCurrentlyOpen )
-        
-#        self.connect( self.tracPriority_spinBox , SIGNAL("valueChanged()") ,
-#                      self.printTrcPriority )
+                      self.refreshCurrentlyOpen )        
+
 
         # Asset Browser
         self.connect(self.assetTypeScrollList, SIGNAL("itemClicked(QListWidgetItem*)"),
@@ -398,10 +421,13 @@ class iPipeline(QMainWindow,
         self.connect(self.shotScrollList, SIGNAL("customContextMenuRequested(const QPoint&)"),
                      lambda value: self.assetShotListMenu("shot", value))
 
-#        
-#    def printTrcPriority(self):
-#        print self.tracPriority_spinBox.value() 
 
+
+    def openWiki(self):
+        os.system( 'firefox http://10.0.98.11:8080/display/GBL/Home' )
+     
+     
+        
     def clearComment(self):
         self.currOpenCommentField.clear()
 
@@ -684,6 +710,9 @@ class iPipeline(QMainWindow,
         menu.exec_(self.assetDevelList.mapToGlobal(pos))
 
     def saveAsCurrentDev(self , tab ):
+        self.saveDevelSelected()
+        pass
+        
         if tab ==1 :
             sceneFolder = str( self.assetLocationField.text() )+"dev/scenes/"
         elif tab ==2 :
@@ -814,35 +843,35 @@ class iPipeline(QMainWindow,
              
     def updateWorkingTab(self, tab):
         if tab == 0:
-            self.resize(730,self.tabXsize)
+            self.resize(730,self.tabYsize)
 #            self.resize(958,650)
             self.resizeButton.setText( '<<<')
         elif tab == 1:            
-            self.resize(531,self.tabXsize)
+            self.resize(531,self.tabYsize)
             self.resizeButton.setText( '>>>')
             self.updateAssetTypeList()
         elif tab == 2:
-            self.resize(531,self.tabXsize)
+            self.resize(531,self.tabYsize)
             self.resizeButton.setText( '>>>')
             self.updateSequenceList()
     
     def resizing(self): 
         if self.size().width() < 740: 
             if self.tabWidget.currentIndex() == 0:
-                self.resize(958,self.tabXsize)
+                self.resize(958,self.tabYsize)
                 self.resizeButton.setText( '<<<')
             else :
-                self.resize(958,self.tabXsize)
+                self.resize(958,self.tabYsize)
                 self.resizeButton.setText( '<<<')
             
         else :
             if self.tabWidget.currentIndex() == 0:                
-                self.resize(730,self.tabXsize)
+                self.resize(730,self.tabYsize)
 #                self.resize(706,650)
                 self.resizeButton.setText( '>>>')
             else :
                 self.resizeButton.setText( '>>>') 
-                self.resize(531,self.tabXsize)
+                self.resize(531,self.tabYsize)
         
     def resizeWin(self , x , y ):
         self.resize( x , y )
@@ -1204,7 +1233,7 @@ class iPipeline(QMainWindow,
 
         sceneFolder = str(self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1))
         sceneFiles = glob.glob(sceneFolder+"*.mb")
-        
+        print 'sceneFileName : ' , sceneFileName
         ver_wip = VER_WIP_RE.findall( sceneFileName )[0] # return v01_w02
         currVer = int(ver_wip[1:3])
         currWip = int(ver_wip[-2:])
@@ -2241,7 +2270,7 @@ class iPipeline(QMainWindow,
 #            return
 
         settings = QSettings("DIGITAL idea", "iPipeline")
-        settings.setValue("username", self.userNameLineEdit.text())
+#        settings.setValue("username", self.userNameLineEdit.text())
         settings.setValue("projectname", self.projNameCombo.currentText())
         settings.setValue("geometry", self.saveGeometry())
         settings.setValue("assetWindowState", self.splitter_asset.saveState())
@@ -2250,8 +2279,8 @@ class iPipeline(QMainWindow,
 
     def loadSettings(self):
         settings = QSettings("DIGITAL idea", "iPipeline")
-        if settings.contains("username"):
-            self.userName = settings.value("username").toString()
+#        if settings.contains("username"):
+#            self.userName = settings.value("username").toString()
         if settings.contains("projectname"):
             self.projectName = settings.value("projectname").toString()
         settings.setValue("geometry", self.saveGeometry())

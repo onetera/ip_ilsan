@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>951</width>
-    <height>625</height>
+    <height>636</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <widget class="QComboBox" name="projNameCombo">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>100</x>
       <y>10</y>
       <width>151</width>
       <height>26</height>
@@ -25,9 +25,12 @@
     </property>
    </widget>
    <widget class="QLabel" name="label_15">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>3</x>
+      <x>310</x>
       <y>10</y>
       <width>81</width>
       <height>20</height>
@@ -43,7 +46,7 @@
    <widget class="QLineEdit" name="userNameLineEdit">
     <property name="geometry">
      <rect>
-      <x>93</x>
+      <x>400</x>
       <y>10</y>
       <width>131</width>
       <height>22</height>
@@ -53,7 +56,7 @@
    <widget class="QLabel" name="label_16">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>0</x>
       <y>10</y>
       <width>91</width>
       <height>20</height>
@@ -69,7 +72,7 @@
    <widget class="QPushButton" name="resizeButton">
     <property name="geometry">
      <rect>
-      <x>490</x>
+      <x>260</x>
       <y>8</y>
       <width>31</width>
       <height>31</height>
@@ -89,7 +92,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -1445,11 +1448,29 @@
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>Help</string>
     </property>
+    <addaction name="actionIPipeline_Wiki"/>
+    <addaction name="actionWhatsnew"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
+  <widget class="QStatusBar" name="ip_statusBar"/>
+  <action name="actionIPipeline_Wiki">
+   <property name="text">
+    <string>iPipeline Wiki</string>
+   </property>
+  </action>
+  <action name="actionNotice">
+   <property name="text">
+    <string>Notice</string>
+   </property>
+  </action>
+  <action name="actionWhatsnew">
+   <property name="text">
+    <string>History</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

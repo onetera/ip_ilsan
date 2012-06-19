@@ -30,7 +30,7 @@ __status__ = "Production"
 #***********************************************************************************************
 #***    Module classes and definitions.
 #***********************************************************************************************
-DEVEL = 1
+DEVEL = os.path.isfile('/home/d10218/work/develop.py')
 
 
 
@@ -45,7 +45,7 @@ class Constants():
 #        applicationDirectory = "/Users/higgsdecay/work/release/ipipeline/"
     if 'linux' in sys.platform :
         if DEVEL:
-             applicationDirectory = '/home/idea/work/ipipeline/'
+             applicationDirectory = '/home/d10218/work/ipipeline/'
         else :
             applicationDirectory = "/lustre/INHouse/MAYA/common/file/ipipeline/"
     else:
