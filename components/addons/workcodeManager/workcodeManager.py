@@ -71,6 +71,8 @@ class WorkcodeManager(QDialog):
             # 디렉토리 생성
             for folder in createFolderList:
                 os.makedirs(folder)
+                if 'preview' in folder:
+                    os.chmod( folder , 0777 )
             QFile.copy(source_workspace, workspaceFile)
             # workspace.mel 의 퍼미션을 읽기모드로 변경
             os.chmod(workspaceFile, 0555)

@@ -16,6 +16,9 @@
 #***    External imports.
 #***********************************************************************************************
 import os
+import glob
+import re
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import uic
@@ -32,19 +35,29 @@ except ImportError:
 #***********************************************************************************************
 #***    Internal imports.
 #***********************************************************************************************
-from foundations.globals.constants import Constants
-
-
+if os.getenv('LOGNAME') == 'DIGITALIDEA\\d10218':
+    import sys
+    sys.path.append( '/home/d10218/work/ipipeline' )
+    from foundations.globals.constants import Constants
+else :    
+    from foundations.globals.constants import Constants
+    
+from deptTree import deptTree , DeptTree
+from xsend import Message
+from userInfo import UserInformation
 
 #***********************************************************************************************
 #***    Module classes and definitions.
 #***********************************************************************************************
 class Information(QDialog):
 
-    def __init__(self, title, level2, level3, ver, wip, subjectName, currentlyFilename, latestFilename, parent=None):
-        QDialog.__init__(self, parent)        
-        uic.loadUi(Constants.applicationDirectory+"components/addons/information/ui/information05.ui", self)
+    def __init__(self, title='', level2='', level3='', ver=1, wip=1, subjectName='', currentlyFilename='', latestFilename='', parent=None):
+        QDialog.__init__(self, parent) 
+        uifile = sorted(glob.glob(Constants.applicationDirectory+"components/addons/information/ui/*.ui"))[-1]     
+        uic.loadUi( uifile , self)
+#        uic.loadUi(Constants.applicationDirectory+"components/addons/information/ui/information06.ui", self)
 
+        self.userinfo = UserInformation()
         self.level2 = level2
         self.level3 = level3
         self.subjectName = subjectName
@@ -82,18 +95,32 @@ class Information(QDialog):
         self.connect(self.Pub_spinBox, SIGNAL("valueChanged(int)"), self.updateCustomField)
         self.connect(self.Wip_spinBox, SIGNAL("valueChanged(int)"), self.updateCustomField)
         self.connect(self.Subject_lineEdit, SIGNAL("textChanged(const QString&)"), self.updateCustomField)        
-        self.buttonBox.button(QDialogButtonBox.Save).clicked.connect(self.saveas)
-                
+        self.connect(self.touser_btn, SIGNAL("clicked()"), self.addUser )
+#        self.buttonBox.button(QDialogButtonBox.Save).clicked.connect(self.saveas)
+            
+        if os.path.basename(currentlyFilename) != '' :
+            self.msg_textedit.setText( u'%s님이 %s를 업로드 하였습니다.' % (self.userinfo.name , os.path.basename(currentlyFilename) ))
+        self.loadSettings()      
         self.setWindowTitle(title)
-        self.result = 0
+#        self.result = 0
 
-
-    def saveas(self):
-        theFile = cmds.fileDialog2(dialogStyle=2)
-        if theFile == None : return
-        cmds.file(rename = theFile[0] )
-        cmds.file( save = 1  )
-        self.result = 1
+    def addUser(self):
+        touserList = DeptTree( self )
+        touserList.connect( touserList ,  SIGNAL("Send"),  self.addUserToLineEditor )
+        
+    def addUserToLineEditor(self , theList ):
+        txt = str( self.tojid_lineEdit.text() )
+        if len( theList ) > 1 :
+            theStr = [txt] + theList[1:] if txt != '' else theList[1:] 
+            users = ', '.join( theStr )
+            self.tojid_lineEdit.setText( unicode(users ) )
+        
+#    def saveas(self):
+#        theFile = cmds.fileDialog2(dialogStyle=2)
+#        if theFile == None : return
+#        cmds.file(rename = theFile[0] )
+#        cmds.file( save = 1  )
+#        self.result = 1
         
     def updateCustomField(self):
         pub = str(self.Pub_spinBox.value()).zfill(2)
@@ -119,7 +146,8 @@ class Information(QDialog):
             self.groupBox.setEnabled(True)
 
 
-    def accept(self):
+    def accept(self):        
+
         if self.Currently_radioButton.isChecked():
             filename = self.Currently_lineEdit.text()
         elif self.Latest_radioButton.isChecked():
@@ -150,7 +178,16 @@ class Information(QDialog):
         ctime = 1
         self.result = 1
         self.emit(SIGNAL("save"), filename, self.commentTextEdit.toPlainText(), status, progress, ctime, application, self.subjectName)
+        if self.tojid_lineEdit.text() != '' and self.sendMsg_gbox.isChecked() :
+            for x in self.parseUserList():
+                Message( x , self.msg_textedit.toPlainText() )
         self.close()
+
+    def parseUserList(self):
+        ''' [ dxxxxxx , dxxxxx , dxxxxx ] '''
+        thetxt = str( self.tojid_lineEdit.text() ) 
+        if thetxt == '' : return
+        return [ re.search( 'd\d{5}' , x).group() for x in thetxt.split(',') ]
 
     def confirmDialog(self, title, text):
         msg = QMessageBox.question(self, title, text, QMessageBox.Ok | QMessageBox.Cancel)
@@ -158,8 +195,28 @@ class Information(QDialog):
             return False
         return True
     
+
+    def closeEvent(self, e):
+        settings = QSettings("DIGITAL idea", "iPipeline")
+        settings.beginGroup("develPub")
+        settings.setValue("devmsglist", unicode( self.tojid_lineEdit.text() ) )
+        settings.setValue("msgchecked", self.sendMsg_gbox.isChecked() )
+        settings.endGroup()
+
+    def loadSettings(self):
+        settings = QSettings("DIGITAL idea", "iPipeline")
+        settings.beginGroup("develPub")        
+        if settings.contains("devmsglist"):
+            self.tojid_lineEdit.setText( settings.value("devmsglist").toString()  )
+        if settings.contains("msgchecked"):
+            self.sendMsg_gbox.setChecked( settings.value("msgchecked").toBool()  )
+            
+            
+            
     
 if __name__ == '__main__':
+#    print Constants.applicationDirectory+"components/addons/information/ui/information06.ui"
+#    import foundations
     app = QApplication(sys.argv)
     mainWin = Information()
     mainWin.show()

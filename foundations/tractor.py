@@ -88,13 +88,18 @@ class Tractor(object):
 
         try:
             os.mkdir(tempdir)
+            try:
+                os.chmod( tempdir , 0777 )
+            except :
+                pass
         except:
             pass
 
         f = open(nuke_filename, 'w')
         for line in nuke_script:
-            f.write(line.encode('utf-8'))
+            f.write(line.encode('utf-8'))            
         f.close()
+        os.chmod( nuke_filename , 0777 )
 
         tractor_script = self.submit([
             base,
@@ -113,6 +118,7 @@ class Tractor(object):
         f = open(alfred_filename, 'w')
         f.write(tractor_script)
         f.close()
+        os.chmod( alfred_filename , 0777 )
 
         os.system('%s --engine=%s --user=idea %s &' % (
             Constants.tractor,

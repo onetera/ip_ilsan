@@ -21,11 +21,11 @@ import os
 #***********************************************************************************************
 #***    Module attributes.
 #***********************************************************************************************
-__author__ = "Seo Jungwook"
-__copyright__ = "Copyright (C) 2011 - Seo Jungwook"
-__maintainer__ = "Seo Jungwook"
-__email__ = "rndvfx@gmail.com"
-__status__ = "Production"
+#__author__ = "Seo Jungwook"
+#__copyright__ = "Copyright (C) 2011 - Seo Jungwook"
+#__maintainer__ = "Seo Jungwook"
+#__email__ = "rndvfx@gmail.com"
+#__status__ = "Production"
 
 #***********************************************************************************************
 #***    Module classes and definitions.
@@ -40,7 +40,7 @@ class Constants():
     """
     
     debugMode = False
-    applicationName = "iPipeline v0.3.0.0"
+    applicationName = "iPipeline v0.3.0.1"
 #    if sys.platform == "darwin":
 #        applicationDirectory = "/Users/higgsdecay/work/release/ipipeline/"
     if 'linux' in sys.platform :
@@ -55,6 +55,10 @@ class Constants():
         frameworkUIFile = "/lustre/INHouse/MAYA/common/file/ipipeline/ui/ipipeline_GUI07.ui"
     else :
         frameworkUIFile = applicationDirectory+"ui/ipipeline_GUI07.ui"
+        
+    deptTreeUI = applicationDirectory+"ui/deptTree_01.ui"
+    ldapAddress = '10.0.99.10'
+        
     DI_animTransfer = applicationDirectory+"Gui/DI_animTransfer/DI_animTransfer02.ui"
     DI_animTransferAlone = applicationDirectory+"Gui/DI_animTransfer/DI_animTransferAlone.ui"
     

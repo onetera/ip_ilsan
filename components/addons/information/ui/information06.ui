@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>407</width>
-    <height>555</height>
+    <height>604</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
@@ -18,7 +24,7 @@
     <number>6</number>
    </property>
    <property name="margin">
-    <number>9</number>
+    <number>6</number>
    </property>
    <item>
     <layout class="QGridLayout">
@@ -204,8 +210,17 @@
       <string>Status</string>
      </property>
      <layout class="QGridLayout">
-      <property name="margin">
+      <property name="leftMargin">
        <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>5</number>
       </property>
       <property name="spacing">
        <number>6</number>
@@ -253,8 +268,17 @@
       <string>Application</string>
      </property>
      <layout class="QGridLayout">
-      <property name="margin">
+      <property name="leftMargin">
        <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>5</number>
       </property>
       <property name="spacing">
        <number>6</number>
@@ -304,16 +328,64 @@
     </widget>
    </item>
    <item>
-    <widget class="QTextEdit" name="commentTextEdit"/>
+    <widget class="QTextEdit" name="commentTextEdit">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>60</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="sendMsg_gbox">
+     <property name="title">
+      <string>Send Message to Spark</string>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="margin">
+       <number>5</number>
+      </property>
+      <item row="1" column="0">
+       <widget class="QLineEdit" name="tojid_lineEdit"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="touser_btn">
+        <property name="text">
+         <string>To:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QTextEdit" name="msg_textedit">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>60</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <spacer>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Preferred</enum>
+     </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>20</width>
+       <width>3</width>
        <height>40</height>
       </size>
      </property>

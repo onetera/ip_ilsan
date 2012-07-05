@@ -296,6 +296,8 @@ class iPipelineActions(object):
     def recordPlayblast(self, tab, level1, level2, level3):
         playblastFile = self.getFileName(tab, level1, level2, level3, "playblastFile")
         cmds.playblast(filename=str(playblastFile), forceOverwrite=True, format="movie", viewer=False, showOrnaments=False)
+        previewFolder = os.path.dirname(playblastFile)
+        os.chmod( previewFolder , 0777 )
         return playblastFile
 
     def recordPlayblastForSequence(self, tab, level1, level2, level3, offset=0, archive=0):
@@ -305,7 +307,9 @@ class iPipelineActions(object):
         previewFolder = os.path.dirname(playblastFile)
         if not os.path.exists(previewFolder):
             os.makedirs(previewFolder)
-#            os.chmod( previewFolder , 0775 )
+            os.chmod( previewFolder , 0777 )
+        else : 
+            os.chmod( previewFolder , 0777 )
         startFrame = cmds.getAttr("defaultRenderGlobals.startFrame")
         endFrame = cmds.getAttr("defaultRenderGlobals.endFrame")
         format = cmds.getAttr("defaultRenderGlobals.imageFormat")
@@ -317,11 +321,13 @@ class iPipelineActions(object):
         cmds.setAttr("defaultRenderGlobals.imageFormat", 8)
         # playblast -startTime 1 -endTime 10  -format iff -filename "/Users/higgsdecay/output/ACR_rig_v02_w03" 
         #-forceOverwrite  -sequenceTime 0 -clearCache 0 -viewer 1 -showOrnaments 1 -fp 4 -percent 50 -widthHeight 1920 1080;
+        
         cmds.playblast(startTime=startFrame, endTime=endFrame, format="image",
                        filename=str(playblastFile), showOrnaments=False, viewer=False, percent=50,
                        sequenceTime=False, forceOverwrite=True,
                        widthHeight=[int(width), int(height)])
         cmds.setAttr("defaultRenderGlobals.imageFormat", format)
+        
         return (playblastFile+".####.jpg", int(startFrame), int(endFrame), int(width), int(height), ratio)
 
     def createThumbnail(self, tab, level1, level2, level3, offset=0, archive=0):
@@ -340,6 +346,7 @@ class iPipelineActions(object):
         previewFolder = os.path.dirname(playblastFile)
         if not os.path.exists(previewFolder):
             os.makedirs(previewFolder)
+            os.chmod( previewFolder , 0777 )
         startFrame = cmds.getAttr("defaultRenderGlobals.startFrame")
         endFrame = cmds.getAttr("defaultRenderGlobals.endFrame")
         format = cmds.getAttr("defaultRenderGlobals.imageFormat")
@@ -355,6 +362,8 @@ class iPipelineActions(object):
                        filename=os.path.splitext(str(playblastFile))[0], showOrnaments=False, viewer=False, percent= previewScale ,
                        sequenceTime=False, forceOverwrite=True,
                        widthHeight=[int(width), int(height)])
+        for x in glob.glob( previewFolder+os.sep+'*.*' ):
+            os.chmod(x , 0777)
         cmds.setAttr("defaultRenderGlobals.imageFormat", format)
         return (playblastFile, int(startFrame), int(endFrame), int(width), int(height), ratio)
         #return (playblastFile+".####.jpg", int(startFrame), int(endFrame), int(width), int(height), ratio)
