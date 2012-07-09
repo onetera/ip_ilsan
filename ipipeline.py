@@ -44,6 +44,7 @@ from xml2 import iXML
 from xml_new import XmlNew
 import Core.Note.Note2
 
+
 import notice
 import userInfo
 
@@ -711,38 +712,49 @@ class iPipeline(QMainWindow,
         menu.exec_(self.assetDevelList.mapToGlobal(pos))
 
     def saveAsCurrentDev(self , tab ):       
+        self.currOpenTab = tab
         subjectName = str(self.currOpenSubjectField.text())
-
          # destination file information   
         if tab ==1 :     
             level1 = self.assetTypeScrollList.currentItem().text()
             level2 = self.assetScrollList.currentItem().text()
             level3 = self.componentScrollList.currentItem().text() 
-            sceneFileName = str( self.assetDevelList.currentItem().text() )
+            sceneFileName = str( self.assetDevelList.currentItem().text() ) if self.assetDevelList.currentItem() != None else '' 
 
         elif tab ==2:
             level1 = self.sequenceScrollList.currentItem().text()
             level2 = self.shotScrollList.currentItem().text()
             level3 = self.shotComponentScrollList.currentItem().text()  
-            sceneFileName = str( self.shotDevelList.currentItem().text() )
+            sceneFileName = str( self.shotDevelList.currentItem().text() ) if self.shotDevelList.currentItem() != None else ''
 
+        self.currOpenProjectName = self.projNameCombo.currentText()
         sceneFolder = str(self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1))
-       
-        sceneFiles = glob.glob(sceneFolder+"*.mb")        
-        ver_wip = VER_WIP_RE.findall( sceneFileName )[0] # return v01_w02
-        currVer = int(ver_wip[1:3])
-        currWip = int(ver_wip[-2:])        
         
-        develname = self.assetDevelList.currentItem().text() if self.assetDevelList.currentItem() != None else ''     
+        sceneFiles = glob.glob(sceneFolder+"*.mb")
+        if len( sceneFiles ):        
+            ver_wip = VER_WIP_RE.findall( sceneFileName )[0] # return v01_w02
+            currVer = int(ver_wip[1:3])
+            currWip = int(ver_wip[-2:])        
         
-        if QFileInfo(os.path.join(sceneFolder, sceneFileName)).isFile():
-            while True:
-                currWip += 1
-                curLatestVersion = os.path.join(sceneFolder, sceneFileName.replace(ver_wip, ver_wip[:-2]+str(currWip).zfill(2)))
-                if not QFileInfo(curLatestVersion).isFile():
-                    break
-        else:
+#            develname = self.assetDevelList.currentItem().text() if self.assetDevelList.currentItem() != None else ''     
+            
+            if QFileInfo(os.path.join(sceneFolder, sceneFileName)).isFile():                
+                while True:
+                    currWip += 1
+                    curLatestVersion = os.path.join(sceneFolder, sceneFileName.replace(ver_wip, ver_wip[:-2]+str(currWip).zfill(2)))
+                    if not QFileInfo(curLatestVersion).isFile(): 
+                        print 'correct curLatestVersion : ' , curLatestVersion                       
+                        break
+            else:             
+                curLatestVersion = os.path.join(sceneFolder, sceneFileName)
+                print 'error1 curLatestVersion : ' , curLatestVersion  
+        else :
+            currVer = 1
+            currWip = 1
+            sceneFileName = str(level2) +'_'+ str(level3) + '_v01_w01.mb'                   
             curLatestVersion = os.path.join(sceneFolder, sceneFileName)
+        print 'error2 curLatestVersion : ' , curLatestVersion
+        
 
         # 서브젝트가 존재할 때
         if len(subjectName):
@@ -797,21 +809,20 @@ class iPipeline(QMainWindow,
             level1 = self.assetTypeScrollList.currentItem().text()
             level2 = self.assetScrollList.currentItem().text()
             level3 = self.componentScrollList.currentItem().text() 
-            sceneFileName = str( self.assetDevelList.currentItem().text() )
+            sceneFileName = str( self.assetDevelList.currentItem().text() ) if self.assetDevelList.currentItem() != None else ''
 
         elif tab ==2:
             level1 = self.sequenceScrollList.currentItem().text()
             level2 = self.shotScrollList.currentItem().text()
             level3 = self.shotComponentScrollList.currentItem().text()  
-            sceneFileName = str( self.shotDevelList.currentItem().text() )
-        print 'tab : ' , tab
-        print 'levle1 : ' , level1
-        print 'levle2 : ' , level2
-        print 'levle3 : ' , level3
-        print 'sceneFileName : ' , sceneFileName
-        sceneFolder = str(self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1))
+            sceneFileName = str( self.shotDevelList.currentItem().text() ) if self.shotDevelList.currentItem() != None else ''
+        
+        
+        sceneFolder = str( self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1) )
+        print 'sceneFolder : ' , sceneFolder
         
         fileName = os.path.basename(str(destinationFile))
+        print 'fileName : ' , fileName
         ver = int(VER_RE.findall( fileName )[0][2:])
         wip = int(WIP_RE.findall( fileName )[0][2:])        
         # model layer information
@@ -2113,8 +2124,7 @@ class iPipeline(QMainWindow,
                 self.componentFileUI.resize(480,240)
                 self.componentFileUI.show()
 
-    def componentOpened(self, devFolder, sceneFile, mode, tab, currSelected, selected, previewImage, path, sp=None):
-        print 'componentOpened'
+    def componentOpened(self, devFolder, sceneFile, mode, tab, currSelected, selected, previewImage, path, sp=None):        
         if sp is not None:
             sceneFile = path+"/scenes/"+sp.text()
 

@@ -35,7 +35,7 @@ else :
     
 from deptTree import deptTree , DeptTree
 from xsend import Message
-
+from userInfo import UserInformation
 #***********************************************************************************************
 #***    Module classes and definitions.
 #***********************************************************************************************
@@ -83,8 +83,10 @@ class PublishWindow(QDialog):
         #self.connect(self.Devel1_radioButton, SIGNAL("clicked()"), self.radioButtonClicked)
         #self.connect(self.Devel2_radioButton, SIGNAL("clicked()"), self.radioButtonClicked)
 
+        self.userinfo = UserInformation()
         if os.path.basename(publishFile) != '' :
-            self.msg_textedit.setText( u' %s를 업로드 하였습니다.' % os.path.basename(publishFile) )
+            self.msg_textedit.setText( u'%s님이 %s를 업로드 하였습니다.' % (self.userinfo.name , os.path.basename(publishFile) ))
+#            self.msg_textedit.setText( u' %s를 업로드 하였습니다.' % os.path.basename(publishFile) )
         self.loadSettings()
 
         self.setWindowTitle("Save Publish")
@@ -196,7 +198,8 @@ class PublishWindow(QDialog):
         if settings.contains("closeFile"):
             self.checkBox_close.setChecked(settings.value("closeFile").toBool())
         if settings.contains("msglist"):
-            self.tojid_lineEdit.setText( unicode( settings.value("msglist") ) )
+            self.tojid_lineEdit.setText( settings.value("msglist").toString()  )
+#            self.tojid_lineEdit.setText( unicode( settings.value("msglist") ) )
         if settings.contains("msgchecked"):
             self.sendMsg_gbox.setChecked( settings.value("msgchecked").toBool()  )
             
