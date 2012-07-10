@@ -39,7 +39,8 @@ from components.tools.animation.selectionTool.selectionTool import SelectionTool
 from components.tools.finalize.geoBake.geoBake import GeoBake # new mel script
 from foundations.globals.constants import Constants
 from foundations.tractor import Tractor
-from py.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
+from lib.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
+from lib.checkUp.modelingCheckUp import modelingCheckUp
 from xml2 import iXML
 from xml_new import XmlNew
 import Core.Note.Note2
@@ -120,7 +121,7 @@ class iPipeline(QMainWindow,
         
 #        notice.notice     
         uic.loadUi(Constants.frameworkUIFile, self)
-        print Constants.frameworkUIFile
+        self.ModCheck = modelingCheckUp()
 
         self.tabYsize = 640
         if self.tabWidget.currentIndex() == 0 :
@@ -167,7 +168,7 @@ class iPipeline(QMainWindow,
             theMessage = u' 사번 : %s   이름 : %s   Department : %s' % (self.userinfo.num , self.userinfo.name , self.userinfo.dept  )
             self.ip_statusBar.showMessage( theMessage ) 
         else:
-            self.ip_statusBar.showMessage( u'개인 계정으로 로그인 바랍니다. 조만간 개인 계정이 막혀 마야 사용이 불가능 해집니다.')
+            self.ip_statusBar.showMessage( u'개인 계정으로 로그인 바랍니다. 조만간 idea또는 개인 계정이 막혀 마야 사용이 불가능 해집니다.')
             self.userNameLineEdit.setText( self.userName )
                     
         self.projNameCombo.addItems(self.getDirectoryList(self.showPath))
@@ -1382,6 +1383,10 @@ class iPipeline(QMainWindow,
         w.show()
 
     def saveDevelSelected(self):
+        if not self.ModCheck.allModCheck():
+            return  
+        
+        
         level1 = self.currOpenLevel1Field.text()
         level2 = self.currOpenLevel2Field.text()
         level3 = self.currOpenLevel3Field.text()

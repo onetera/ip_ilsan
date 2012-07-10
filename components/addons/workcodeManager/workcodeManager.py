@@ -62,7 +62,7 @@ class WorkcodeManager(QDialog):
             subFolderList = self.workcodedata[taskName]
              
             source_workspace = Constants.workspaceDirectory + "/" + taskName + ".mel"
-            print " workcode debug - source_workspace :  \n" , source_workspace
+            
             
             if not QFileInfo(source_workspace).isFile():
                 return
