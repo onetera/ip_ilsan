@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ##################################
-# author : Hong joo Ahn
+# author : Hongjoo Ahn
 #
 # mail : 
 #
@@ -22,7 +22,7 @@ except :
 import string
 
 
-class modelingCheckUp:
+class modCheckup:
     def __init__(self):
         if not MAYA:return
         #pass
@@ -36,6 +36,7 @@ class modelingCheckUp:
         self.rpPos = []
         self.spPos = []
         self.rOrder = []
+        self.log = ''
         
     def scale(self,obj):
         if not MAYA:return
@@ -80,21 +81,25 @@ class modelingCheckUp:
             if typ == "scale":
                 self.val = self.scale(x)
                 if self.val != 3:
-                    print '%s is not default scale value. you should check up!'%x
-                    return False
+                    self.log += '%s is not default scale value. you should check up!\n'%x
+#                    return False
                 
             if typ == "axis":
                 self.pivotScaleRo = self.axis(x)
                 if self.pivotScaleRo != 0:
-                    print '%s is not located 0 0 0.. you should check up pivots locations!'%x
-                    return False
+                    self.log += '%s is not located 0 0 0.. you should check up pivots locations!\n'%x
+#                    return False
                 
             if typ == "history":
                 self.checkNum = self.history(x)
                 if self.checkNum != 0:
-                    print '%s has history. you should check up!'%x
-                    return False        
-        return True
+                    self.log += '%s has history. you should check up!\n'%x
+#                    return False        
+    def allCheck(self):
+        self.loop_check('scale')
+        self.loop_check('axis')
+        self.loop_check('history')
+        return self.log
 
 if __name__ == '__main__':
     xx = modelingCheckUp()
