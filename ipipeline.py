@@ -39,7 +39,7 @@ from components.tools.animation.selectionTool.selectionTool import SelectionTool
 from components.tools.finalize.geoBake.geoBake import GeoBake # new mel script
 from foundations.globals.constants import Constants
 from foundations.tractor import Tractor
-from py.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
+from lib.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
 from xml2 import iXML
 from xml_new import XmlNew
 import Core.Note.Note2
