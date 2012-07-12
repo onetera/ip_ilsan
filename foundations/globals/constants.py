@@ -40,7 +40,7 @@ class Constants():
     """
     
     debugMode = False
-    applicationName = "iPipeline v0.3.0.1"
+    applicationName = "iPipeline v0.3.0.2"
 #    if sys.platform == "darwin":
 #        applicationDirectory = "/Users/higgsdecay/work/release/ipipeline/"
     if 'linux' in sys.platform :

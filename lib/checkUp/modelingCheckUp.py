@@ -7,23 +7,24 @@
 #
 # Usage : 
 #
-# Description :
+# Description
 #
 #
+#
 
 
 
-try : 
+try:
     import maya.cmds as mc
     MAYA = 1
 except :
     MAYA = 0
-        
 import string
 
 
 class modelingCheckUp:
     def __init__(self):
+        if not MAYA:return
         #pass
         #self.loop = []
         self.listT = set(mc.ls(type='transform'))
@@ -37,6 +38,7 @@ class modelingCheckUp:
         self.rOrder = []
         
     def scale(self,obj):
+        if not MAYA:return
         self.value = mc.getAttr('%s.sx'%obj) +\
         mc.getAttr('%s.sy'%obj) +\
         mc.getAttr('%s.sz'%obj)
@@ -44,6 +46,7 @@ class modelingCheckUp:
         return self.value
     
     def freeze(self,obj):
+        if not MAYA:return
         self.value = mc.getAttr('%s.tx'%obj) +\
         mc.getAttr('%s.ty'%obj) +\
         mc.getAttr('%s.tz'%obj) +\
@@ -54,6 +57,7 @@ class modelingCheckUp:
         return self.value
     
     def axis(self,obj):
+        if not MAYA:return
         self.rpPos = mc.xform(obj,q=1,ws=1,rp=1)
         self.spPos = mc.xform(obj,q=1,ws=1,sp=1)
         
@@ -63,16 +67,15 @@ class modelingCheckUp:
         return self.checkP
         
         
-    def history(self,obj):        
+    def history(self,obj):
+        if not MAYA:return
         hisL = mc.listHistory(obj,leaf=1)
         shapeL = mc.listRelatives(obj,s=1)[0]
         hisL = [ x for x in hisL if x != shapeL ]
         self.num = len(hisL) # if hisL != [] else ''
-            
         return self.num
         
-    def loop_check(self,typ):
-        
+    def loop_check(self,typ):        
         for x in self.listT:
             if typ == "scale":
                 self.val = self.scale(x)
@@ -90,15 +93,8 @@ class modelingCheckUp:
                 self.checkNum = self.history(x)
                 if self.checkNum != 0:
                     print '%s has history. you should check up!'%x
-                    return False
-        
+                    return False        
         return True
-
-    def allModCheck(self):
-        self.loop_check('scale')
-        self.loop_check('axis')
-        self.loop_check('history')
-
 
 if __name__ == '__main__':
     xx = modelingCheckUp()
