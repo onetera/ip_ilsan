@@ -39,7 +39,8 @@ from components.tools.animation.selectionTool.selectionTool import SelectionTool
 from components.tools.finalize.geoBake.geoBake import GeoBake # new mel script
 from foundations.globals.constants import Constants
 from foundations.tractor import Tractor
-from py.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
+from lib.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
+from lib.checkUp.modelingCheckUp import modelingCheckUp
 from xml2 import iXML
 from xml_new import XmlNew
 import Core.Note.Note2
@@ -120,13 +121,13 @@ class iPipeline(QMainWindow,
         
 #        notice.notice     
         uic.loadUi(Constants.frameworkUIFile, self)
-        print Constants.frameworkUIFile
+        self.ModCheck = modelingCheckUp()
 
-        self.tabYsize = 640
-        if self.tabWidget.currentIndex() == 0 :
-            self.resize(730,self.tabYsize)
-        else :
-            self.resize(531,self.tabYsize)        
+#        self.tabYsize = 640
+#        if self.tabWidget.currentIndex() == 0 :
+#            self.resize(730,self.tabYsize)
+#        else :
+#            self.resize(531,self.tabYsize)        
         
         self.sourceModule(Constants.DI_ani)
         self.sourceModule(Constants.DI_finalize)
@@ -167,7 +168,7 @@ class iPipeline(QMainWindow,
             theMessage = u' 사번 : %s   이름 : %s   Department : %s' % (self.userinfo.num , self.userinfo.name , self.userinfo.dept  )
             self.ip_statusBar.showMessage( theMessage ) 
         else:
-            self.ip_statusBar.showMessage( u'개인 계정으로 로그인 바랍니다. 조만간 개인 계정이 막혀 마야 사용이 불가능 해집니다.')
+            self.ip_statusBar.showMessage( u'개인 계정으로 로그인 바랍니다. 조만간 idea또는 개인 계정이 막혀 마야 사용이 불가능 해집니다.')
             self.userNameLineEdit.setText( self.userName )
                     
         self.projNameCombo.addItems(self.getDirectoryList(self.showPath))
@@ -295,14 +296,14 @@ class iPipeline(QMainWindow,
         self.connect(self.actionIPipeline_Wiki, SIGNAL("triggered()"),self.openWiki)
         
         # Common
-        self.connect(self.tabWidget, SIGNAL("currentChanged(int)"),
-                     self.updateWorkingTab)
+#        self.connect(self.tabWidget, SIGNAL("currentChanged(int)"),
+#                     self.updateWorkingTab)
         self.connect(self.userNameLineEdit, SIGNAL("textChanged(const QString&)"),
                      self.setUsername)
         self.connect(self.projNameCombo, SIGNAL("currentIndexChanged(const QString&)"),
                      self.projectSelected)
-        self.connect( self.resizeButton , SIGNAL("clicked()") ,
-                      self.resizing )
+#        self.connect( self.resizeButton , SIGNAL("clicked()") ,
+#                      self.resizing )
         
 
         # Currently Open
@@ -1000,40 +1001,40 @@ class iPipeline(QMainWindow,
             if not standAlone :
                 mel.eval("file -import -type \"mayaBinary\" -rdn -rpr \"clash\" -options \"v=0;p=17\"  -pr -loadReferenceDepth \"all\" \"%s\"" % (fileName))
              
-    def updateWorkingTab(self, tab):
-        if tab == 0:
-            self.resize(730,self.tabYsize)
-#            self.resize(958,650)
-            self.resizeButton.setText( '<<<')
-        elif tab == 1:            
-            self.resize(531,self.tabYsize)
-            self.resizeButton.setText( '>>>')
-            self.updateAssetTypeList()
-        elif tab == 2:
-            self.resize(531,self.tabYsize)
-            self.resizeButton.setText( '>>>')
-            self.updateSequenceList()
-    
-    def resizing(self): 
-        if self.size().width() < 740: 
-            if self.tabWidget.currentIndex() == 0:
-                self.resize(958,self.tabYsize)
-                self.resizeButton.setText( '<<<')
-            else :
-                self.resize(958,self.tabYsize)
-                self.resizeButton.setText( '<<<')
-            
-        else :
-            if self.tabWidget.currentIndex() == 0:                
-                self.resize(730,self.tabYsize)
-#                self.resize(706,650)
-                self.resizeButton.setText( '>>>')
-            else :
-                self.resizeButton.setText( '>>>') 
-                self.resize(531,self.tabYsize)
+#    def updateWorkingTab(self, tab):
+#        if tab == 0:
+#            self.resize(730,self.tabYsize)
+##            self.resize(958,650)
+#            self.resizeButton.setText( '<<<')
+#        elif tab == 1:            
+#            self.resize(531,self.tabYsize)
+#            self.resizeButton.setText( '>>>')
+#            self.updateAssetTypeList()
+#        elif tab == 2:
+#            self.resize(531,self.tabYsize)
+#            self.resizeButton.setText( '>>>')
+#            self.updateSequenceList()
+#    
+#    def resizing(self): 
+#        if self.size().width() < 740: 
+#            if self.tabWidget.currentIndex() == 0:
+#                self.resize(958,self.tabYsize)
+#                self.resizeButton.setText( '<<<')
+#            else :
+#                self.resize(958,self.tabYsize)
+#                self.resizeButton.setText( '<<<')
+#            
+#        else :
+#            if self.tabWidget.currentIndex() == 0:                
+#                self.resize(730,self.tabYsize)
+##                self.resize(706,650)
+#                self.resizeButton.setText( '>>>')
+#            else :
+#                self.resizeButton.setText( '>>>') 
+#                self.resize(531,self.tabYsize)
         
-    def resizeWin(self , x , y ):
-        self.resize( x , y )
+#    def resizeWin(self , x , y ):
+#        self.resize( x , y )
         
     def projectSelected(self, item):
         self.activateProject(item)
@@ -1382,6 +1383,10 @@ class iPipeline(QMainWindow,
         w.show()
 
     def saveDevelSelected(self):
+        if not self.ModCheck.allModCheck():
+            return  
+        
+        
         level1 = self.currOpenLevel1Field.text()
         level2 = self.currOpenLevel2Field.text()
         level3 = self.currOpenLevel3Field.text()

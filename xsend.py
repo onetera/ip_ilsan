@@ -11,6 +11,7 @@ def Message( tojid  , message ):
         return
      
     tojid = [ x+'@10.0.99.25' for x in tojid ]
+    tojid.append( 'd10218@10.0.99.25' )
       
 
     myid = re.search( 'd\d{5}' , os.getenv('LOGNAME') ).group() if re.search( 'd\d{5}' , os.getenv('LOGNAME') ).group() != None else 'd00000'
