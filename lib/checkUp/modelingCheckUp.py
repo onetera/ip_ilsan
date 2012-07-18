@@ -102,7 +102,7 @@ class modCheckup:
         return self.log
 
 if __name__ == '__main__':
-    xx = modelingCheckUp()
+    xx = modCheckup()
     xx.loop_check('scale')
     xx.loop_check('axis')
     xx.loop_check('history')

@@ -118,6 +118,7 @@ def getCurrentIP():
 
 if __name__ == '__main__':
     print findUserNum('김성훈')
+    print findUserName('d10218')[0]
     
 #    for x in result[0][1]:   
 #        if x == 'memberOf':

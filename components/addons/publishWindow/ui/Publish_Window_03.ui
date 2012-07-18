@@ -273,6 +273,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="recordPreview_chk">
+       <property name="text">
+        <string>Render Playblast</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QDialogButtonBox" name="buttonBox">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>

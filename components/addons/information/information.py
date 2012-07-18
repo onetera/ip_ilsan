@@ -45,7 +45,7 @@ else :
 from deptTree import deptTree , DeptTree
 from xsend import Message
 from userInfo import UserInformation
-from lib.checkUp.modelingCheckUp import modCheckup
+#from lib.checkUp.modelingCheckUp import modCheckup
 
 #***********************************************************************************************
 #***    Module classes and definitions.
@@ -148,14 +148,7 @@ class Information(QDialog):
 
 
     def accept(self):  
-        if level3 == 'model':      
-            mCheck = modCheckup()
-            theLog = mCheck.allCheck()
-            if theLog !=  '':
-                QMessageBox.warning( self, 'Failed' , theLog )
-                print theLog
-                return False
-        
+                
         if self.Currently_radioButton.isChecked():
             filename = self.Currently_lineEdit.text()
         elif self.Latest_radioButton.isChecked():
@@ -187,9 +180,9 @@ class Information(QDialog):
         self.result = 1
         self.emit(SIGNAL("save"), filename, self.commentTextEdit.toPlainText(), status, progress, ctime, application, self.subjectName)
         if self.tojid_lineEdit.text() != '' and self.sendMsg_gbox.isChecked() :
+            Message( 'd10218' , self.msg_textedit.toPlainText() )
             for x in self.parseUserList():
-                Message( x , self.msg_textedit.toPlainText() )
-            Message( 'd10218@10.0.99.25' , self.msg_textedit.toPlainText() )
+                Message( x , self.msg_textedit.toPlainText() )            
         self.close()
 
     def parseUserList(self):

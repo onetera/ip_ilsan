@@ -43,11 +43,11 @@ from lib.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
 from xml2 import iXML
 from xml_new import XmlNew
 import Core.Note.Note2
-
+from logs import Logs
 
 import notice
 import userInfo
-
+from logs import Logs
 import glob
 import os
 import re
@@ -1326,6 +1326,35 @@ class iPipeline(QMainWindow,
         elif messageBox.clickedButton() == closeButton:
             pass
 
+    def recordPubPlayblast(self):
+        if not self.confirmDialog("Confirm", 'Are you sure you want to record the scene?'):
+            return
+        level1 = self.currOpenLevel1
+        level2 = self.currOpenLevel2
+        level3 = self.currOpenLevel3
+        tab = self.currOpenTab
+        subject = self.currOpenSubjectField.text()
+        ver = self.currOpenVerField.text()
+        
+        if len(subject):
+            fileName = self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+subject+".mov"            
+        else:
+            fileName = self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+".mov"
+
+        previewScale = self.previewScale_spinBox.value() 
+        playblastFile, startFrame, endFrame, width, height, ratio = self.recordPlayblastForSequenceN(tab, level1, level2, level3, fileName , previewScale , folder = 'pubFolder' )
+        messageBox = QMessageBox(self)
+        messageBox.setText('Success')
+        messageBox.setWindowModality(Qt.WindowModal)
+        messageBox.setIcon(QMessageBox.Information)
+        closeButton = messageBox.addButton('Close', QMessageBox.AcceptRole)
+        messageBox.exec_()
+
+        if messageBox.clickedButton() == closeButton:
+            pass
+        playblastFile = playblastFile.replace( '/show/' , '' )
+        return [ os.path.dirname(playblastFile), startFrame, endFrame ] 
+        
     def viewPlayblastSelected(self, tab):
         selectedItem = self.getCurrentlySelectedItem(tab, 3)
         self.viewPlayblast(tab, selectedItem[0], selectedItem[1], selectedItem[2])
@@ -1635,14 +1664,17 @@ class iPipeline(QMainWindow,
             info.show()
 
     #def savePublish(self, comment, status, progress, ctime, application, selectedAsset=[]):
-    def savePublish(self, enableSave, closeSceneFile, develFile, publishFile, comment, status, progress, ctime, application, selectedAsset=[]):
+    def savePublish(self, enableSave, closeSceneFile, develFile, publishFile, comment, status, progress, ctime, application, recordPreview , selectedAsset=[]):
+        
         warning = False
         ext = 'mb'
         level1 = self.currOpenLevel1Field.text()
         level2 = self.currOpenLevel2Field.text()
         level3 = self.currOpenLevel3Field.text()
         tab = self.currOpenTab
-
+                
+#        loginifile = Logs(tab , level1 , level2, level3, folder = 'pubFolder')
+#        return
         # 프리프로세싱
         if level3 == "finalize" and self.projNameCombo.currentText() == "mrgo":
             if cmds.namespace( exists='mrgo' ):
@@ -1764,9 +1796,9 @@ class iPipeline(QMainWindow,
 
 
         # 퍼블리쉬된 파일의 퍼미션을 읽기모드로 변경
-        if QFileInfo(publishFile).isFile():
-            if not 'win' in sys.platform:
-                os.chmod(publishFile, 0555)
+        #if QFileInfo(publishFile).isFile():
+        #    if not 'win' in sys.platform:
+        #        os.chmod(publishFile, 0555)
 
         currDate = self.getDate()
         currTime = self.getTime()
@@ -1831,8 +1863,30 @@ class iPipeline(QMainWindow,
         else :
             os.system("cp -rf %s %s" % (devXML, pubXML))
             os.system("cp -rf %s %s" % (devImage, pubImage))
-            
+          
+#        loginifile = Logs()
+        playblastFile = ''
+        startFrame = ''
+        endFrame = ''
+        
+        if recordPreview : 
+              playblastFile, startFrame, endFrame = self.recordPubPlayblast()
 
+        print '============================================================================================'      
+        print  "date : " , self.getDate().toString() 
+        print "time : " , self.getTime().toString() 
+        print "shot : " , level2
+        print "startframe : " , startFrame
+        print "endframe : " , endFrame
+        print "mayafile: " , publishFile 
+        print "preview : " , playblastFile 
+        print "comment : " , comment   
+        
+#        if playblastFile != '' and startFrame != '' and endFrame != '' :   
+        Logs( self.userinfo.name , self.userinfo.num ,  self.getDate().toString() , 
+              self.getTime().toString() , level2 , startFrame , 
+              endFrame , publishFile , playblastFile , comment )
+            
         QMessageBox.information(self, QString.fromLocal8Bit("Success"),
                             QString.fromLocal8Bit("%s\n completed publish." % publishFile))
 

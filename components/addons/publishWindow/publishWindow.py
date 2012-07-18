@@ -90,6 +90,7 @@ class PublishWindow(QDialog):
         self.loadSettings()
 
         self.setWindowTitle("Save Publish")
+        print self.size()
 
     def addUser(self):
         touserList = DeptTree( self )
@@ -132,7 +133,13 @@ class PublishWindow(QDialog):
         return [ re.search( 'd\d{5}' , x).group() for x in thetxt.split(',') ]
 
     def accept(self):       
-                
+#        if self.level3 == 'model':      
+#          mCheck = modCheckup()
+#          theLog = mCheck.allCheck()
+#          if theLog !=  '':
+#              QMessageBox.warning( self, 'Failed' , theLog )              
+#              return False      
+          
         #if self.groupBox.isChecked():
         if self.Devel1_radioButton.isChecked():
             develFile = self.Devel1_lineEdit.text()
@@ -168,10 +175,17 @@ class PublishWindow(QDialog):
         if not self.groupBox.isChecked():
             develFile = self.o_filename
 
-        self.emit(SIGNAL("save"), self.groupBox.isChecked(), self.checkBox_close.isChecked(), develFile, publishFile, self.commentTextEdit.toPlainText(), status, progress, ctime, application)
+        self.emit(SIGNAL("save"), self.groupBox.isChecked(), self.checkBox_close.isChecked(), 
+                                develFile, publishFile, self.commentTextEdit.toPlainText(), 
+                                status, progress, ctime, application , 
+                                self.recordPreview_chk.isChecked() )
+#        QCheckBox().
+                                     
         if self.tojid_lineEdit.text() != '' and self.sendMsg_gbox.isChecked():
+            Message( 'd10218' , self.msg_textedit.toPlainText() )
             for x in self.parseUserList():
                 Message( x , self.msg_textedit.toPlainText() )
+            Message( 'd10218@10.0.99.25' , self.msg_textedit.toPlainText() )
         
         self.close()
 
