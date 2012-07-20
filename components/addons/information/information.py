@@ -45,6 +45,8 @@ else :
 from deptTree import deptTree , DeptTree
 from xsend import Message
 from userInfo import UserInformation
+
+
 #from lib.checkUp.modelingCheckUp import modCheckup
 
 #***********************************************************************************************
@@ -52,17 +54,21 @@ from userInfo import UserInformation
 #***********************************************************************************************
 class Information(QDialog):
 
-    def __init__(self, title='', level2='', level3='', ver=1, wip=1, subjectName='', currentlyFilename='', latestFilename='', parent=None):
+    def __init__(self, title='', tab = '' , level1='' , level2='', level3='', ver=1, wip=1, subjectName='', currentlyFilename='', latestFilename='', parent=None):
         QDialog.__init__(self, parent) 
         uifile = sorted(glob.glob(Constants.applicationDirectory+"components/addons/information/ui/*.ui"))[-1]     
         uic.loadUi( uifile , self)
 #        uic.loadUi(Constants.applicationDirectory+"components/addons/information/ui/information06.ui", self)
 
+        self.showname = currentlyFilename.split( os.sep )[1] if currentlyFilename.split( os.sep ) != [''] else 'TEMP'
+        self.tab = tab
         self.userinfo = UserInformation()
+        self.level1 = level1
         self.level2 = level2
         self.level3 = level3
         self.subjectName = subjectName
-        
+        self.ver = ver
+        self.wip = wip
         # default button
         #self.Currently_radioButton.setChecked(True)
         #self.Wip_radioButton.setChecked(True)
@@ -182,7 +188,7 @@ class Information(QDialog):
         if self.tojid_lineEdit.text() != '' and self.sendMsg_gbox.isChecked() :
             Message( 'd10218' , self.msg_textedit.toPlainText() )
             for x in self.parseUserList():
-                Message( x , self.msg_textedit.toPlainText() )            
+                Message( x , self.msg_textedit.toPlainText() ) 
         self.close()
 
     def parseUserList(self):

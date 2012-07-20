@@ -26,6 +26,7 @@ try:
     standAlone = False
 except ImportError:
     standAlone = True
+from conndb import *    
     
 from components.addons.information.information import Information
 
@@ -168,6 +169,12 @@ class iPipelineActions(object):
             messageBox.exec_()
             if messageBox.clickedButton() == newSceneButton:
                 cmds.file(new=True, force=True)
+                if self.tabWidget.currentIndex() ==1 :                    
+                    createAssetJob(self.projNameCombo.currentText() , self.currOpenLevel1 , self.currOpenLevel2 , self.currOpenLevel3)
+                    self.mssg( '어셋이 Database 서버에 최초 등록 하였습니다.\n' )
+                elif self.tabWidget.currentIndex() ==2:
+                    createJob( self.projNameCombo.currentText() , self.currOpenLevel1 , self.currOpenLevel2 , self.currOpenLevel3)
+                    self.mssg( '샷이 Database 서버에 최초 등록 하였습니다.\n' ) 
             elif messageBox.clickedButton() == messageBox.button(QMessageBox.Cancel):
                 return False
         else:
@@ -295,7 +302,7 @@ class iPipelineActions(object):
 
     def recordPlayblast(self, tab, level1, level2, level3):
         playblastFile = self.getFileName(tab, level1, level2, level3, "playblastFile")
-        cmds.playblast(filename=str(playblastFile), forceOverwrite=True, format="movie", viewer=False, showOrnaments=False)
+        cmds.playblast(filename=str(playblastFile), forceOverwrite=True, format="movie", viewer=False, showOrnaments=False , os=1 )
         previewFolder = os.path.dirname(playblastFile)
         os.chmod( previewFolder , 0777 )
         return playblastFile
@@ -323,7 +330,7 @@ class iPipelineActions(object):
         #-forceOverwrite  -sequenceTime 0 -clearCache 0 -viewer 1 -showOrnaments 1 -fp 4 -percent 50 -widthHeight 1920 1080;
         
         cmds.playblast(startTime=startFrame, endTime=endFrame, format="image",
-                       filename=str(playblastFile), showOrnaments=False, viewer=False, percent=50,
+                       filename=str(playblastFile), showOrnaments=False, viewer=False, percent=100,os=1,
                        sequenceTime=False, forceOverwrite=True,
                        widthHeight=[int(width), int(height)])
         cmds.setAttr("defaultRenderGlobals.imageFormat", format)
@@ -335,7 +342,7 @@ class iPipelineActions(object):
         currFrame = cmds.currentTime(query=True)
         format = cmds.getAttr("defaultRenderGlobals.imageFormat")
         cmds.setAttr("defaultRenderGlobals.imageFormat", 8)
-        cmds.playblast(frame=currFrame, format="image", completeFilename=str(fileName), showOrnaments=False, viewer=False, widthHeight=[164, 105], percent=100)
+        cmds.playblast(frame=currFrame, format="image", completeFilename=str(fileName), showOrnaments=False, viewer=False, widthHeight=[164, 105], percent=100 , os=1)
         cmds.setAttr("defaultRenderGlobals.imageFormat", format)
         return fileName
 
@@ -359,7 +366,7 @@ class iPipelineActions(object):
         # playblast -startTime 1 -endTime 10  -format iff -filename "/Users/higgsdecay/output/ACR_rig_v02_w03" 
         #-forceOverwrite  -sequenceTime 0 -clearCache 0 -viewer 1 -showOrnaments 1 -fp 4 -percent 50 -widthHeight 1920 1080;
         cmds.playblast(startTime=startFrame, endTime=endFrame, format="image",
-                       filename=os.path.splitext(str(playblastFile))[0], showOrnaments=False, viewer=False, percent= previewScale ,
+                       filename=os.path.splitext(str(playblastFile))[0], showOrnaments=False, viewer=False, percent= previewScale , os=1,
                        sequenceTime=False, forceOverwrite=True,
                        widthHeight=[int(width), int(height)])
         for x in glob.glob( previewFolder+os.sep+'*.*' ):
@@ -373,7 +380,7 @@ class iPipelineActions(object):
         currFrame = cmds.currentTime(query=True)
         format = cmds.getAttr("defaultRenderGlobals.imageFormat")
         cmds.setAttr("defaultRenderGlobals.imageFormat", 8)
-        cmds.playblast(frame=currFrame, format="image", completeFilename=str(fileName), showOrnaments=False, viewer=False, widthHeight=[164, 105], percent=100)
+        cmds.playblast(frame=currFrame, format="image", completeFilename=str(fileName), showOrnaments=False, viewer=False, widthHeight=[164, 105], percent=100 , os=1)
         cmds.setAttr("defaultRenderGlobals.imageFormat", format)
         return fileName
 

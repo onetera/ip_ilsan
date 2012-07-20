@@ -185,7 +185,7 @@ class PublishWindow(QDialog):
             Message( 'd10218' , self.msg_textedit.toPlainText() )
             for x in self.parseUserList():
                 Message( x , self.msg_textedit.toPlainText() )
-            Message( 'd10218@10.0.99.25' , self.msg_textedit.toPlainText() )
+#            Message( 'd10218@10.0.99.25' , self.msg_textedit.toPlainText() )
         
         self.close()
 

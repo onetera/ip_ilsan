@@ -44,6 +44,9 @@ from xml2 import iXML
 from xml_new import XmlNew
 import Core.Note.Note2
 from logs import Logs
+from conndb import *
+
+
 
 import notice
 import userInfo
@@ -797,7 +800,7 @@ class iPipeline(QMainWindow,
                 # 초기화 버전
                 destinationFile = os.path.join(sceneFolder, "%s_%s_v01_w01.mb" % (level2, level3))
 
-        info = Information("Save Current Into Devel", level2, level3, currVer, currWip, subjectName, curLatestVersion, destinationFile, self)
+        info = Information("Save Current Into Devel", tab , level1 , level2, level3, currVer, currWip, subjectName, curLatestVersion, destinationFile, self)
         self.connect(info, SIGNAL("save"),
                      self.saveCurrentIntoDevel)
         info.show()
@@ -832,7 +835,7 @@ class iPipeline(QMainWindow,
             lm.createLMnode()
         else:
             print 'failed create lm node...........'
-
+        
         try:
             theResultPath = os.path.join(sceneFolder , str(destinationFile) )            
             cmds.file(rename=str( theResultPath ) )
@@ -844,13 +847,31 @@ class iPipeline(QMainWindow,
                 type = 'mayaBinary'
                 QMessageBox.warning(self, "warning", "openPipelineSaveWorkshop: Invalid file format ("+ext+") specified: saving to Maya Binary")
             # 씬파일 저장            
-            cmds.file(save=True, type=type)
+            
+            try :
+                cmds.file(save=True, type=type)
+                if tab ==1:                     
+                    AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip ,self.userinfo.num , comment )
+                elif tab ==2:
+                    JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip , self.userinfo.num , comment )
+                self.mssg( 'Database 서버에 성공적으로 등록 되었습니다.' )
+            except :                
+                self.mssg( '치명적 오류가 발생 하였습니다.\n아무것도 만지지 마시고 \nPipeline TD( 오호준 )에게 연락 주세요 ' )
 
-        except:
-            if 'win' in sys.platform:
-                os.system('type NUL>%s' % os.path.join(sceneFolder, str(destinationFile)))                
-            else:
-                os.system('touch %s' % os.path.join(sceneFolder, str(destinationFile)))                
+        except:               
+            try:
+                if 'win' in sys.platform:                        
+                    os.system('type NUL>%s' % os.path.join(sceneFolder, str(destinationFile)))
+                else:
+                    os.system('touch %s' % os.path.join(sceneFolder, str(destinationFile)))  
+                if tab ==1 :
+                    createAsset(self.projNameCombo.currentText() , level1 , level2 , levle3)
+                elif tab ==2:
+                    createJob( self.projNameCombo.currentText() , level1 , level2 , level3)
+                self.mssg( 'Database 서버에 성공적으로 등록 되었습니다.' )              
+            except:
+                self.mssg( '치명적 오류가 발생 하였습니다.\n아무것도 만지지 마시고 \nPipeline TD( 오호준 )에게 연락 주세요 ' )
+                
                          
         # xml 생성
         historyFile = str(self.getFileName(tab, level1, level2, level3, "historyFile", 0, 1))
@@ -898,7 +919,7 @@ class iPipeline(QMainWindow,
         except:
             return True
 
-        
+        self.refreshCurrentlyOpen() 
         
     def createEmptyDev(self):
         print 'createEmptyDev'
@@ -1407,9 +1428,17 @@ class iPipeline(QMainWindow,
         self.taskUI(2, selectedItem[0], selectedItem[1], selectedItem[2])
 
     def taskUI(self, tab, level1, level2, level3):
-        w = WorkcodeManager(tab, level1, level2, level3, self.workcodedata, self.userinfo.num, self)
+        w = WorkcodeManager(tab, level1, level2, level3, self.workcodedata, self.userinfo.name , self)
         w.show()
-
+        
+    def mssg( self,msg ):
+        messageBox = QMessageBox(self)
+        messageBox.setText( unicode( msg ) )
+        messageBox.setWindowModality(Qt.WindowModal)
+        messageBox.setIcon(QMessageBox.Information)
+        closeButton = messageBox.addButton('Close', QMessageBox.AcceptRole)
+        messageBox.exec_()
+        
     def saveDevelSelected(self):
         level1 = self.currOpenLevel1Field.text()
         level2 = self.currOpenLevel2Field.text()
@@ -1477,7 +1506,7 @@ class iPipeline(QMainWindow,
                 # 초기화 버전
                 destinationFile = os.path.join(sceneFolder, "%s_%s_v01_w01.mb" % (level2, level3))
 
-        info = Information("Save Devel", level2, level3, currVer, currWip, subjectName, curLatestVersion, destinationFile, self)
+        info = Information("Save Devel", tab , level1 , level2, level3, currVer, currWip, subjectName, curLatestVersion, destinationFile, self)
         self.connect(info, SIGNAL("save"),
                      self.saveDevel)
         info.show()
@@ -1502,7 +1531,8 @@ class iPipeline(QMainWindow,
             lm.createLMnode()
         else:
             print 'failed create lm node...........'
-
+        
+        JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip , self.userinfo.num ,  comment )
         try:
             cmds.file(rename=str(destinationFile))
             if ext == 'ma':
@@ -1512,19 +1542,27 @@ class iPipeline(QMainWindow,
             else:
                 type = 'mayaBinary'
                 QMessageBox.warning(self, "warning", "openPipelineSaveWorkshop: Invalid file format ("+ext+") specified: saving to Maya Binary")
-            # 씬파일 저장
-            
+            # 씬파일 저장           
+#            try :
             cmds.file(save=True, type=type)
+            if tab ==1:            
+                AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip ,self.userinfo.num , comment )
+            elif tab ==2:                
+                JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip , self.userinfo.num ,  comment )
+            self.mssg( 'Database 서버에 성공적으로 등록 되었습니다.' )
 
-        except:
-            if 'win' in sys.platform:
-                os.system('type NUL>%s' % os.path.join(sceneFolder, str(destinationFile)))                
+        except:                       
+#            try:
+            if 'win' in sys.platform:                        
+                os.system('type NUL>%s' % os.path.join(sceneFolder, str(destinationFile)))
             else:
-                os.system('touch %s' % os.path.join(sceneFolder, str(destinationFile)))                
+                os.system('touch %s' % os.path.join(sceneFolder, str(destinationFile)))  
+     
 
-#        if str( level3 ) == 'model':
-#            lm = layerManager()
-#            lm.writeXML( os.path.join(sceneFolder, str( level2 ) + '_' + str( level3 ) + '.layml' ) )
+
+        if str( level3 ) == 'model':
+            lm = layerManager()
+            lm.writeXML( os.path.join(sceneFolder, str( level2 ) + '_' + str( level3 ) + '.layml' ) )
                          
         # xml 생성
         historyFile = str(self.getFileName(tab, level1, level2, level3, "historyFile", 0, 1))
@@ -1787,11 +1825,19 @@ class iPipeline(QMainWindow,
         else:
             # 저장된 파일을 publish 폴더로 복사            
             if 'win' in sys.platform:
-                cmds.file(rename=publishFile)
-                cmds.file(save=True, type=type)
-                cmds.file(rename=develFile)
+                try:
+                    cmds.file(rename=publishFile)
+                    cmds.file(save=True, type=type)
+                    cmds.file(rename=develFile)
+                    success = 1
+                except:
+                    success = 0
             else:
-                os.system('cp -rfv %s %s' % (develFile, publishFile))
+                try:
+                    os.system('cp -rfv %s %s' % (develFile, publishFile))
+                    success = 1
+                except : 
+                    success = 0
             
 
 
@@ -1889,6 +1935,17 @@ class iPipeline(QMainWindow,
             
         QMessageBox.information(self, QString.fromLocal8Bit("Success"),
                             QString.fromLocal8Bit("%s\n completed publish." % publishFile))
+        
+        if success == 1:
+            if tab ==1:            
+                AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , develVer , 0 ,self.userinfo.num , comment )
+#                self.mssg( '어셋이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.\n수고 하셨습니다.' )
+            elif tab ==2:
+                JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , develVer , 0 ,self.userinfo.num ,comment )
+#                self.mssg( '샷이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.\n수고 하셨습니다.' )
+            
+        else :
+            self.mssg( '치명적 오류가 발생 하였습니다.\n아무것도 만지지 마시고 \nPipeline TD( 오호준 )에게 연락 주세요 ' )
 
         if closeSceneFile:
             self.closeFile2()
@@ -2062,7 +2119,8 @@ class iPipeline(QMainWindow,
         for item in devFiles:
             self.assetDevelList.addItem(os.path.basename(item))
         for item in pubFiles:
-            self.assetPublishList.addItem(os.path.basename(item))
+            if not '.ini' in item: 
+                self.assetPublishList.addItem(os.path.basename(item))
 
     def loadShotBrowse(self):
         currSelected = self.getCurrentlySelectedItem(2, 3)
@@ -2076,7 +2134,8 @@ class iPipeline(QMainWindow,
         for item in devFiles:
             self.shotDevelList.addItem(os.path.basename(item))
         for item in pubFiles:
-            self.shotPublishList.addItem(os.path.basename(item))
+            if not '.ini' in item:
+                self.shotPublishList.addItem(os.path.basename(item))
 
     def clearCurrentHistory(self):
         self.currOpenHistoryTable.clear()
@@ -2163,9 +2222,12 @@ class iPipeline(QMainWindow,
             if len(buffer) == 1:
                 sp = QListWidgetItem(buffer[0])
                 self.componentOpened(devFolder, sceneFile, mode, tab, currSelected, selected, previewImage, path, sp)
+                
             elif len(buffer) == 0:
-                self.componentOpened(devFolder, sceneFile, mode, tab, currSelected, selected, previewImage, path)
+                self.componentOpened(devFolder, sceneFile, mode, tab, currSelected, selected, previewImage, path)                       
+                    
             else:
+               
                 self.componentFileUI = QDialog(self)
                 self.componentFileUI.setWindowTitle("Open")
                 fileList = QListWidget()
@@ -2177,6 +2239,9 @@ class iPipeline(QMainWindow,
                 self.componentFileUI.setLayout(layout)
                 self.componentFileUI.resize(480,240)
                 self.componentFileUI.show()
+            
+
+
 
     def componentOpened(self, devFolder, sceneFile, mode, tab, currSelected, selected, previewImage, path, sp=None):        
         if sp is not None:
@@ -2230,6 +2295,8 @@ class iPipeline(QMainWindow,
         elif tab == 2:
             tabName = "Shot"
             location = self.shotLocationField.text()
+
+        
 
         self.currOpenFileNameLabel.setText(os.path.basename(str(sceneFile)))
         self.currOpenProjectField.setText(self.currOpenProjectName)

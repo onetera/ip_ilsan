@@ -8,7 +8,7 @@ import ConfigParser
 #        print self.inifile
         
 def Logs( name , num ,  date , time , shot , sframe , eframe , mayafile , preview , comment ):
-    filepath = mayafile[:-2]+'ini'
+    filepath = mayafile[:-2]+'ini'    
 #    f = open(filepath , 'w')
     config = ConfigParser.RawConfigParser()
     config.add_section("publish")
