@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import MySQLdb
-import time
 import os
+
+try :
+    import MySQLdb
+except ImportError:    
+        os.system('./lustre/INHouse/CentOS/bin/mysql_inst.exe')
+        import MySQLdb
+        
+import time
+
 import re
 
 if 'd10218' in os.getenv('LOGNAME'):

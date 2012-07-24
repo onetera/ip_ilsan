@@ -58,6 +58,7 @@ class PublishWindow(QDialog):
         self.Devel1_radioButton.setChecked(True)
         self.Wip_radioButton.setChecked(True)
         self.Maya_radioButton.setChecked(True)
+        self.recordPreview_chk.setChecked( True )
 
         self.Devel1_lineEdit.setText(os.path.basename(devel1))
         self.Devel2_lineEdit.setText(os.path.basename(devel2))
@@ -85,7 +86,7 @@ class PublishWindow(QDialog):
 
         self.userinfo = UserInformation()
         if os.path.basename(publishFile) != '' :
-            self.msg_textedit.setText( u'%s님이 %s를 업로드 하였습니다.' % (self.userinfo.name , os.path.basename(publishFile) ))
+            self.msg_textedit.setText( u'%s님이 %s를 Publih 하였습니다.' % (self.userinfo.name , os.path.basename(publishFile) ))
 #            self.msg_textedit.setText( u' %s를 업로드 하였습니다.' % os.path.basename(publishFile) )
         self.loadSettings()
 

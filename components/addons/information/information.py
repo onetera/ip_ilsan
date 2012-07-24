@@ -106,7 +106,7 @@ class Information(QDialog):
 #        self.buttonBox.button(QDialogButtonBox.Save).clicked.connect(self.saveas)
             
         if os.path.basename(currentlyFilename) != '' :
-            self.msg_textedit.setText( u'%s님이 %s를 업로드 하였습니다.' % (self.userinfo.name , os.path.basename(currentlyFilename) ))
+            self.msg_textedit.setText( u'%s님이 %s를 Devel에 저장 하였습니다.' % (self.userinfo.name , os.path.basename(currentlyFilename) ))
         self.loadSettings()      
         self.setWindowTitle(title)
 #        self.result = 0
@@ -186,7 +186,7 @@ class Information(QDialog):
         self.result = 1
         self.emit(SIGNAL("save"), filename, self.commentTextEdit.toPlainText(), status, progress, ctime, application, self.subjectName)
         if self.tojid_lineEdit.text() != '' and self.sendMsg_gbox.isChecked() :
-            Message( 'd10218' , self.msg_textedit.toPlainText() )
+#            Message( 'd10218' , self.msg_textedit.toPlainText() )
             for x in self.parseUserList():
                 Message( x , self.msg_textedit.toPlainText() ) 
         self.close()

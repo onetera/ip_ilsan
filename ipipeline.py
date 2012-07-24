@@ -37,25 +37,24 @@ from components.tools.animation.multipleImportReference.multipleImportReference 
     MultipleImportReference
 from components.tools.animation.selectionTool.selectionTool import SelectionTool
 from components.tools.finalize.geoBake.geoBake import GeoBake # new mel script
+from conndb import *
 from foundations.globals.constants import Constants
 from foundations.tractor import Tractor
 from lib.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
+from logs import Logs, Logs
 from xml2 import iXML
 from xml_new import XmlNew
 import Core.Note.Note2
-from logs import Logs
-from conndb import *
-
-
-
-import notice
-import userInfo
-from logs import Logs
 import glob
+import notice
 import os
 import re
 import sys
 import ui.common
+import userInfo
+
+
+
 
 try:
     import maya.cmds as cmds
@@ -165,9 +164,16 @@ class iPipeline(QMainWindow,
             self.label_15.hide()                 
             self.userNameLineEdit.hide()
             
-            # 바꿔야 할부분 self.userinfo 변수를 사용 할것.            
+            # 바꿔야 할부분 self.userinfo 변수를 사용 할것.
+            try : 
+                import MySQLdb
+                self.db = MySQLdb.connect(host = '10.0.201.15' , user = 'idea' , passwd='idea' ,port=3366, db= 'wd' , charset='utf8')                
+                DBconn = 'connected'
+                self.db.close()
+            except : 
+                DBconn = 'disconnected'
             self.userName = self.userinfo.num
-            theMessage = u' 사번 : %s   이름 : %s   Department : %s' % (self.userinfo.num , self.userinfo.name , self.userinfo.dept  )
+            theMessage = u' 사번 : %s   이름 : %s   Department : %s  DB server : %s' % (self.userinfo.num , self.userinfo.name , self.userinfo.dept ,DBconn )
             self.ip_statusBar.showMessage( theMessage ) 
         else:
             self.ip_statusBar.showMessage( u'개인 계정으로 로그인 바랍니다. 조만간 개인 계정이 막혀 마야 사용이 불가능 해집니다.')
@@ -304,8 +310,8 @@ class iPipeline(QMainWindow,
                      self.setUsername)
         self.connect(self.projNameCombo, SIGNAL("currentIndexChanged(const QString&)"),
                      self.projectSelected)
-        self.connect( self.resizeButton , SIGNAL("clicked()") ,
-                      self.resizing )
+#        self.connect( self.resizeButton , SIGNAL("clicked()") ,
+#                      self.resizing )
         
 
         # Currently Open
@@ -1035,26 +1041,26 @@ class iPipeline(QMainWindow,
             self.resizeButton.setText( '>>>')
             self.updateSequenceList()
     
-    def resizing(self): 
-        if self.size().width() < 740: 
-            if self.tabWidget.currentIndex() == 0:
-                self.resize(958,self.tabYsize)
-                self.resizeButton.setText( '<<<')
-            else :
-                self.resize(958,self.tabYsize)
-                self.resizeButton.setText( '<<<')
-            
-        else :
-            if self.tabWidget.currentIndex() == 0:                
-                self.resize(730,self.tabYsize)
-#                self.resize(706,650)
-                self.resizeButton.setText( '>>>')
-            else :
-                self.resizeButton.setText( '>>>') 
-                self.resize(531,self.tabYsize)
+#    def resizing(self): 
+#        if self.size().width() < 740: 
+#            if self.tabWidget.currentIndex() == 0:
+#                self.resize(958,self.tabYsize)
+#                self.resizeButton.setText( '<<<')
+#            else :
+#                self.resize(958,self.tabYsize)
+#                self.resizeButton.setText( '<<<')
+#            
+#        else :
+#            if self.tabWidget.currentIndex() == 0:                
+#                self.resize(730,self.tabYsize)
+##                self.resize(706,650)
+#                self.resizeButton.setText( '>>>')
+#            else :
+#                self.resizeButton.setText( '>>>') 
+#                self.resize(531,self.tabYsize)
         
-    def resizeWin(self , x , y ):
-        self.resize( x , y )
+#    def resizeWin(self , x , y ):
+#        self.resize( x , y )
         
     def projectSelected(self, item):
         self.activateProject(item)
@@ -1374,7 +1380,7 @@ class iPipeline(QMainWindow,
         if messageBox.clickedButton() == closeButton:
             pass
         playblastFile = playblastFile.replace( '/show/' , '' )
-        return [ os.path.dirname(playblastFile), startFrame, endFrame ] 
+        return os.path.dirname(playblastFile) 
         
     def viewPlayblastSelected(self, tab):
         selectedItem = self.getCurrentlySelectedItem(tab, 3)
@@ -1911,12 +1917,12 @@ class iPipeline(QMainWindow,
             os.system("cp -rf %s %s" % (devImage, pubImage))
           
 #        loginifile = Logs()
-        playblastFile = ''
-        startFrame = ''
-        endFrame = ''
+        playblastFile = ''        
+        startFrame = cmds.getAttr("defaultRenderGlobals.startFrame")
+        endFrame = cmds.getAttr("defaultRenderGlobals.endFrame")
         
         if recordPreview : 
-              playblastFile, startFrame, endFrame = self.recordPubPlayblast()
+              playblastFile = self.recordPubPlayblast()
 
         print '============================================================================================'      
         print  "date : " , self.getDate().toString() 
@@ -1939,10 +1945,11 @@ class iPipeline(QMainWindow,
         if success == 1:
             if tab ==1:            
                 AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , develVer , 0 ,self.userinfo.num , comment )
-#                self.mssg( '어셋이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.\n수고 하셨습니다.' )
+                self.mssg( '어셋이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.\n수고 하셨습니다.' )
+
             elif tab ==2:
                 JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , develVer , 0 ,self.userinfo.num ,comment )
-#                self.mssg( '샷이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.\n수고 하셨습니다.' )
+                self.mssg( '샷이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.\n수고 하셨습니다.' )
             
         else :
             self.mssg( '치명적 오류가 발생 하였습니다.\n아무것도 만지지 마시고 \nPipeline TD( 오호준 )에게 연락 주세요 ' )
