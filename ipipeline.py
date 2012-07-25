@@ -773,9 +773,9 @@ class iPipeline(QMainWindow,
             try :
                 cmds.file(save=True, type=type)
                 if tab ==1:                     
-                    AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip ,self.userinfo.num , comment )
+                    AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip ,self.userinfo.num,self.userinfo.name , comment )
                 elif tab ==2:
-                    JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip , self.userinfo.num , comment )
+                    JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip , self.userinfo.num ,self.userinfo.name, comment )
                 self.mssg( 'Database 서버에 성공적으로 등록 되었습니다.' )
             except :                
                 self.mssg( '치명적 오류가 발생 하였습니다.\n아무것도 만지지 마시고 \nPipeline TD( 오호준 )에게 연락 주세요 ' )
@@ -1457,9 +1457,9 @@ class iPipeline(QMainWindow,
 #            try :
             cmds.file(save=True, type=type)
             if tab ==1:            
-                AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip ,self.userinfo.num , comment )
+                AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip ,self.userinfo.num,self.userinfo.name , comment )
             elif tab ==2:                
-                JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip , self.userinfo.num ,  comment )
+                JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip , self.userinfo.num,self.userinfo.name ,  comment )
             self.mssg( 'Database 서버에 성공적으로 등록 되었습니다.' )
 
         except:                       
@@ -1849,11 +1849,11 @@ class iPipeline(QMainWindow,
         
         if success == 1:
             if tab ==1:            
-                AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , develVer , 0 ,self.userinfo.num , comment )
+                AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , develVer , 0 ,self.userinfo.num ,self.userinfo.name , comment )
                 self.mssg( '어셋이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.' )
 
             elif tab ==2:
-                JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , develVer , 0 ,self.userinfo.num ,comment )
+                JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , develVer , 0 ,self.userinfo.num , self.userinfo.name,comment )
                 self.mssg( '샷이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.' )
             
         else :

@@ -172,7 +172,7 @@ def createAssetJob( project , assetType , assetName , workcode ):
     return assetJobID
         
         
-def AssetRegister(project , assetType , assetName , workcode , ver , wip , usernum , comment ):
+def AssetRegister(project , assetType , assetName , workcode , ver , wip , usernum , username , comment ):
     ASSET = tableInfo( 'ASSET' )
     ASSET_JOB = tableInfo( 'ASSET_JOB' )
     ASSET_JOB_VERSION = tableInfo('ASSET_JOB_VERSION')
@@ -182,10 +182,10 @@ def AssetRegister(project , assetType , assetName , workcode , ver , wip , usern
     assetJobVerID = ASSET_JOB_VERSION.search( 'id' , ver=ver , wip=wip , assetJobID = assetJobID[-1] , usernum = usernum)
     
     if  assetJobVerID == []:        
-        assetJobVerID = ASSET_JOB_VERSION.register( ver , wip , assetJobID[-1] , usernum )
+        assetJobVerID = ASSET_JOB_VERSION.register( ver , wip , assetJobID[-1] , usernum , username )
         ASSET_JOB.update( assetID[-1] , status = 'WIP' ) 
     else :             
-        assetJobVerID = ASSET_JOB_VERSION.update( assetJobVerID[-1]  , ver=ver , wip=wip , assetJobID = assetJobID[-1] , usernum=usernum )
+        assetJobVerID = ASSET_JOB_VERSION.update( assetJobVerID[-1]  , ver=ver , wip=wip , assetJobID = assetJobID[-1] , usernum=usernum , username= username )
         ASSET_JOB.update( assetID[-1] , status = 'WIP' ) 
       
     ASSET_JOB_CMMT = tableInfo( 'ASSET_JOB_CMMT' )    
@@ -196,7 +196,7 @@ def AssetRegister(project , assetType , assetName , workcode , ver , wip , usern
         assetJobCmmtID = ASSET_JOB_CMMT.register( comment , assetJobVerID[-1] )
 
 
-def JobRegister(project , seq , shot , workcode , ver , wip ,  usernum ,  comment ):
+def JobRegister(project , seq , shot , workcode , ver , wip ,  usernum , username, comment ):
     JOB_INFO = tableInfo( 'JOB_INFO' ) 
     JOB_VERSION = tableInfo( 'JOB_VERSION' )
     JOB_CMMNT = tableInfo( 'JOB_CMMNT' )
@@ -207,7 +207,7 @@ def JobRegister(project , seq , shot , workcode , ver , wip ,  usernum ,  commen
         jobVerID = JOB_VERSION.register( jobInfoID[-1] , ver ,wip  , usernum )
         JOB_INFO.update( jobInfoID[-1] , status = 'WIP' )
     else:         
-        jobVerID = JOB_VERSION.update( jobVerID[-1] , ver=ver , wip=wip  ,jobInfoID = jobInfoID[-1] ,  usernum=usernum )
+        jobVerID = JOB_VERSION.update( jobVerID[-1] , ver=ver , wip=wip  ,jobInfoID = jobInfoID[-1] ,  usernum=usernum , username= username)
         JOB_INFO.update( jobInfoID[-1] , status = 'WIP' )
 
     if comment != '' and jobVerID != [] :        

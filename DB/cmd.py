@@ -3,9 +3,12 @@ import sys
 import os
 import pprint
 
+
 if os.path.isdir('/home/d10218'):
     sys.path.append( '/home/d10218/work/ipipeline' )
     from conndb import *
+    
+from userInfo import findUserName
 
 mysqlhost = '10.0.201.15'    
 
@@ -14,7 +17,8 @@ cr = db.cursor()
 def deldb():
     db = MySQLdb.connect(host = mysqlhost , user = 'idea' , port = 3366 , passwd='idea' , db= 'wd' , charset='utf8')
     cr = db.cursor()
-    cr.execute( 'delete from ASSET' )    
+    cr.execute( 'delete from ASSET' )
+    db.commit()    
     cr.execute( 'alter table ASSET auto_increment = 1')
     cr.execute( 'alter table ASSET_JOB auto_increment = 1' )
     cr.execute( 'alter table ASSET_JOB_VERSION auto_increment = 1' )
@@ -53,26 +57,18 @@ def insertdb():
     db.close()
 
 #deldb()
-insertdb()
+#insertdb()
 
+def changeName():
+    cr.execute( "select usernum from ASSET_JOB_VERSION" )
+    theList = cr.fetchall()
+    for x in theList:
+        theName = findUserName(x[0])
+#        print theName[0]
+        cr.execute( "UPDATE ASSET_JOB_VERSION SET username='%s' WHERE usernum='%s'" % (theName[0] , x[0]) )
+    db.commit()
+    db.close()
 
-
-    
-    
-
- 
-
-#pprint.pprint(result)
-#for x in result:
-#    cr.execute( "select ASSET.id from ASSET where type='%s' and name='%s' and showcode='%s'" % (x[5] , x[6] ,x[7] ) )
-#    theID = [ str(int(x[0])) for x in cr.fetchall() ]    
-#    query = 'insert into ASSET_JOB( workcode ,status,deadline,assetID,created) values("%s","%s","%s","%s","%s")' % ( x[0],x[1],x[2],str(int(x[3])),x[4] )
-#    cr.execute( query )
-#    db.commit()
-#db.close() 
-
-
-
-  
+changeName()  
 
  
