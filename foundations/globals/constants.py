@@ -18,6 +18,8 @@
 #***********************************************************************************************
 import sys
 import os
+import glob
+
 #***********************************************************************************************
 #***    Module attributes.
 #***********************************************************************************************
@@ -30,7 +32,7 @@ import os
 #***********************************************************************************************
 #***    Module classes and definitions.
 #***********************************************************************************************
-DEVEL = os.path.isfile('/home/d10218/work/develop.py')
+DEVEL = True if os.path.isdir( '/home/d10218' ) else False
 
 
 
@@ -40,7 +42,7 @@ class Constants():
     """
     
     debugMode = False
-    applicationName = "iPipeline v0.3.1.0"
+    applicationName = "iPipeline v0.3.1.1"
 #    if sys.platform == "darwin":
 #        applicationDirectory = "/Users/higgsdecay/work/release/ipipeline/"
     if 'linux' in sys.platform :
@@ -51,12 +53,10 @@ class Constants():
     else:
         applicationDirectory = "//10.0.200.100/_lustre_INHouse/MAYA/common/file/ipipeline/"
     
-    if DEVEL:
-        frameworkUIFile = "/lustre/INHouse/MAYA/common/file/ipipeline/ui/ipipeline_GUI07.ui"
-    else :
-        frameworkUIFile = applicationDirectory+"ui/ipipeline_GUI07.ui"
+  
+    frameworkUIFile = sorted( glob.glob( applicationDirectory+"ui/ipipeline_GUI*.ui" ) )[-1]
         
-    deptTreeUI = applicationDirectory+"ui/deptTree_01.ui"
+    deptTreeUI = sorted( glob.glob( applicationDirectory+"ui/deptTree_*.ui" ) )[-1]
     ldapAddress = '10.0.99.10'
         
     DI_animTransfer = applicationDirectory+"Gui/DI_animTransfer/DI_animTransfer02.ui"
@@ -76,5 +76,5 @@ class Constants():
 
 
 if __name__ == '__main__' : 
-    print os.path.isfile('/hsme/idea/work/develop.py')
+    print Constants().frameworkUIFile
     

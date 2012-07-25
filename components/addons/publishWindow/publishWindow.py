@@ -86,12 +86,12 @@ class PublishWindow(QDialog):
 
         self.userinfo = UserInformation()
         if os.path.basename(publishFile) != '' :
-            self.msg_textedit.setText( u'%s님이 %s를 Publih 하였습니다.' % (self.userinfo.name , os.path.basename(publishFile) ))
+            self.msg_textedit.setText( u'%s님이 %s를 Publish 하였습니다.' % (self.userinfo.name , os.path.basename(publishFile) ))
 #            self.msg_textedit.setText( u' %s를 업로드 하였습니다.' % os.path.basename(publishFile) )
         self.loadSettings()
 
         self.setWindowTitle("Save Publish")
-        print self.size()
+                
 
     def addUser(self):
         touserList = DeptTree( self )
@@ -131,7 +131,7 @@ class PublishWindow(QDialog):
         ''' [ dxxxxxx , dxxxxx , dxxxxx ] '''
         thetxt = str( self.tojid_lineEdit.text() ) 
         if thetxt == '' : return
-        return [ re.search( 'd\d{5}' , x).group() for x in thetxt.split(',') ]
+        return [ re.search( 'd\d{5}' , x).group() for x in thetxt.split(',') ] if re.search( 'd\d{5}' , x) != None else []
 
     def accept(self):       
 #        if self.level3 == 'model':      
@@ -183,7 +183,7 @@ class PublishWindow(QDialog):
 #        QCheckBox().
                                      
         if self.tojid_lineEdit.text() != '' and self.sendMsg_gbox.isChecked():
-            Message( 'd10218' , self.msg_textedit.toPlainText() )
+#            Message( 'd10218' , self.msg_textedit.toPlainText() )
             for x in self.parseUserList():
                 Message( x , self.msg_textedit.toPlainText() )
 #            Message( 'd10218@10.0.99.25' , self.msg_textedit.toPlainText() )

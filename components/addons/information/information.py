@@ -59,8 +59,8 @@ class Information(QDialog):
         uifile = sorted(glob.glob(Constants.applicationDirectory+"components/addons/information/ui/*.ui"))[-1]     
         uic.loadUi( uifile , self)
 #        uic.loadUi(Constants.applicationDirectory+"components/addons/information/ui/information06.ui", self)
-
-        self.showname = currentlyFilename.split( os.sep )[1] if currentlyFilename.split( os.sep ) != [''] else 'TEMP'
+#        print 'latestFilename = ' , latestFilename
+#        self.showname = currentlyFilename.split( os.sep )[1] if currentlyFilename.split( os.sep ) != [''] else 'TEMP'
         self.tab = tab
         self.userinfo = UserInformation()
         self.level1 = level1
@@ -99,7 +99,7 @@ class Information(QDialog):
         self.connect(self.Latest_radioButton, SIGNAL("clicked()"), self.radioButtonClicked)
         self.connect(self.Custom_radioButton, SIGNAL("clicked()"), self.radioButtonClicked)
 
-        self.connect(self.Pub_spinBox, SIGNAL("valueChanged(int)"), self.updateCustomField)
+        self.connect(self.Pub_spinBox, SIGNAL("valueChanged(int)"), self.updatePubField)
         self.connect(self.Wip_spinBox, SIGNAL("valueChanged(int)"), self.updateCustomField)
         self.connect(self.Subject_lineEdit, SIGNAL("textChanged(const QString&)"), self.updateCustomField)        
         self.connect(self.touser_btn, SIGNAL("clicked()"), self.addUser )
@@ -122,15 +122,12 @@ class Information(QDialog):
             users = ', '.join( theStr )
             self.tojid_lineEdit.setText( unicode(users ) )
         
-#    def saveas(self):
-#        theFile = cmds.fileDialog2(dialogStyle=2)
-#        if theFile == None : return
-#        cmds.file(rename = theFile[0] )
-#        cmds.file( save = 1  )
-#        self.result = 1
+    def updatePubField(self):
+        self.Wip_spinBox.setValue( 1 )
+        self.updateCustomField()
         
-    def updateCustomField(self):
-        pub = str(self.Pub_spinBox.value()).zfill(2)
+    def updateCustomField(self):        
+        pub = str(self.Pub_spinBox.value()).zfill(2)        
         wip = str(self.Wip_spinBox.value()).zfill(2)
         subject = self.Subject_lineEdit.text()
         if len(subject):
@@ -184,7 +181,7 @@ class Information(QDialog):
 
         ctime = 1
         self.result = 1
-        self.emit(SIGNAL("save"), filename, self.commentTextEdit.toPlainText(), status, progress, ctime, application, self.subjectName)
+        self.emit(SIGNAL("save"), filename, self.commentTextEdit.toPlainText(), status, progress, ctime, application, self.subjectName , self.tab)
         if self.tojid_lineEdit.text() != '' and self.sendMsg_gbox.isChecked() :
 #            Message( 'd10218' , self.msg_textedit.toPlainText() )
             for x in self.parseUserList():

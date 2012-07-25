@@ -97,18 +97,8 @@ DEV_SHOW = 0
 class iPipeline(QMainWindow,
                 iPipelineInit, iPipelineActions, iPipelineInfo,iPipelineUtility,
                 assistantFunctions):
-    """
-    This class is the **iPipeline** class.
-    """
-#    __instance = None
-#    def __new__(cls, *args, **kwargs):        
-#        if not cls.__instance:    
-#            cls.__instance = super(iPipeline, cls).__new__(cls, *args, **kwargs)
-#        return cls.__instance
 
 
-    
-       
     def __init__(self, parent=None):
         """
         This method initializes the class.
@@ -119,16 +109,15 @@ class iPipeline(QMainWindow,
         
         self.userinfo = userInfo.UserInfo()
         
-        
-#        notice.notice     
+
         uic.loadUi(Constants.frameworkUIFile, self)
         print Constants.frameworkUIFile
 
-        self.tabYsize = 640
-        if self.tabWidget.currentIndex() == 0 :
-            self.resize(730,self.tabYsize)
-        else :
-            self.resize(531,self.tabYsize)        
+#        self.tabYsize = 640
+#        if self.tabWidget.currentIndex() == 0 :
+#            self.resize(730,self.tabYsize)
+#        else :
+#            self.resize(531,self.tabYsize)        
         
         self.sourceModule(Constants.DI_ani)
         self.sourceModule(Constants.DI_finalize)
@@ -173,7 +162,7 @@ class iPipeline(QMainWindow,
             except : 
                 DBconn = 'disconnected'
             self.userName = self.userinfo.num
-            theMessage = u' 사번 : %s   이름 : %s   Department : %s  DB server : %s' % (self.userinfo.num , self.userinfo.name , self.userinfo.dept ,DBconn )
+            theMessage = u' 사번 : %s        이름 : %s        Department : %s        DB server : %s' % (self.userinfo.num , self.userinfo.name , self.userinfo.dept ,DBconn )
             self.ip_statusBar.showMessage( theMessage ) 
         else:
             self.ip_statusBar.showMessage( u'개인 계정으로 로그인 바랍니다. 조만간 개인 계정이 막혀 마야 사용이 불가능 해집니다.')
@@ -199,9 +188,6 @@ class iPipeline(QMainWindow,
             historyTable.setColumnWidth(3, 25)
             historyTable.setColumnWidth(4, 70)
 
-#        self.createActions()
-#        self.createToolBars()
-#        self.createMenus()
         
         self.setWindowTitle(Constants.applicationName)
         self.setStyleSheet("font-size: 11px")
@@ -224,77 +210,7 @@ class iPipeline(QMainWindow,
         output = "Shot:"+assetName+":"+scriptFolder
         ui.common.startDrag(output, self)
 
-#    def createMenus(self):
-#        pass
-#
-#    def createActions(self):
-#        
-#        self.ani_createGroupControlAct = self.createAction("ani_createGroupControl", self.ani_createGroupControl)
-#        self.ani_replaceReferenceAct = self.createAction("ani_replaceReference", self.ani_replaceReference)
-#        self.ani_animTransferAct = self.createAction("ani_animTransfer", self.ani_animTransfer)
-#        self.mod_layerInfoAct = self.createAction("mod_layerInfo", self.mod_layerInfo )
-    
 
-#    def createToolBars(self):
-#        shelfToolBar = QToolBar("Shelf")
-#        shelfToolBar.addAction(self.ani_createGroupControlAct)
-#        shelfToolBar.addAction(self.ani_replaceReferenceAct)        
-##        shelfToolBar.addAction(self.finalize_geoBakeAct)
-##        shelfToolBar.addAction(self.finalize_cacheFileLoaderAct)
-##        shelfToolBar.addAction(self.finalize_importToolAct)
-#        shelfToolBar.addAction(self.ani_animTransferAct)
-#        shelfToolBar.addAction(self.mod_layerInfoAct)
-#        self.addToolBar(shelfToolBar)
-
-#    def mod_layerInfo(self):
-#        if cmds.ls( 'model_layerInfo' ) == []:
-#            return
-#        lm = cmds.ls( 'model_layerInfo' )[0]
-#        layerData = cmds.getAttr( lm + '.notes')
-#        LM= layerManager()
-#        LM.inLayer( eval( layerData ) )
-        
-#    def ani_animTransfer(self):
-##        if self.currOpenLevel3 == "ani":
-#        at = AnimTransfer("alone", self)
-#        self.connect(at, SIGNAL("run"), self.ani_animTransfer2)
-#        at.show()
-#
-#    def ani_animTransfer2(self, animFile, txtFile, selectedAsset):
-#        if standAlone : return
-#        mel.eval('DI_animTransfer "%s" "%s" %s' % (animFile, txtFile, selectedAsset))
-
-#    def ani_createGroupControl(self):
-#        if standAlone : return   
-#        mel.eval("DI_createGroupControl")
-#
-#    def ani_replaceReference(self):
-#        if standAlone : return
-#        mel.eval("kis_replaceReference")
-#
-#    def finalize_geoBake(self):
-#        if standAlone : return
-#        startFrame = 70
-#        endFrame = int(cmds.playbackOptions(q=True, maxTime=True)) + 1 # florat
-#        location = cmds.workspace(q=True, fullName=True) # unicode
-#
-#        sceneFileName = str(self.currOpenFileNameLabel.text())
-#        if len(sceneFileName) == 0:
-#            geoCachePath = os.path.join(location, "data", "geoCache")
-#        else:
-#            geoCachePath = os.path.join(location, "data", "geoCache", os.path.splitext(sceneFileName)[0])
-#
-#        geoBake = GeoBake(startFrame, endFrame, geoCachePath, self)
-#        geoBake.setModal(True)
-#        geoBake.show()
-#
-#    def finalize_cacheFileLoader(self):
-#        if standAlone : return
-#        mrgo_CacheDialog()
-#
-#    def finalize_importTool(self):
-#        if standAlone : return
-#        mrgoImportTool()
 
 #------------------------------------------------------------------------------ 
 #------------------------------------------------------------------------------ 
@@ -304,8 +220,8 @@ class iPipeline(QMainWindow,
         self.connect(self.actionIPipeline_Wiki, SIGNAL("triggered()"),self.openWiki)
         
         # Common
-        self.connect(self.tabWidget, SIGNAL("currentChanged(int)"),
-                     self.updateWorkingTab)
+#        self.connect(self.tabWidget, SIGNAL("currentChanged(int)"),
+#                     self.updateWorkingTab)                     
         self.connect(self.userNameLineEdit, SIGNAL("textChanged(const QString&)"),
                      self.setUsername)
         self.connect(self.projNameCombo, SIGNAL("currentIndexChanged(const QString&)"),
@@ -1027,19 +943,8 @@ class iPipeline(QMainWindow,
             if not standAlone :
                 mel.eval("file -import -type \"mayaBinary\" -rdn -rpr \"clash\" -options \"v=0;p=17\"  -pr -loadReferenceDepth \"all\" \"%s\"" % (fileName))
              
-    def updateWorkingTab(self, tab):
-        if tab == 0:
-            self.resize(730,self.tabYsize)
-#            self.resize(958,650)
-            self.resizeButton.setText( '<<<')
-        elif tab == 1:            
-            self.resize(531,self.tabYsize)
-            self.resizeButton.setText( '>>>')
-            self.updateAssetTypeList()
-        elif tab == 2:
-            self.resize(531,self.tabYsize)
-            self.resizeButton.setText( '>>>')
-            self.updateSequenceList()
+#    def updateWorkingTab(self, tab):
+#        self.currOpenTab = tab
     
 #    def resizing(self): 
 #        if self.size().width() < 740: 
@@ -1517,12 +1422,13 @@ class iPipeline(QMainWindow,
                      self.saveDevel)
         info.show()
 
-    def saveDevel(self, destinationFile, comment, status, progress, ctime, application, subjectName):
+    def saveDevel(self, destinationFile, comment, status, progress, ctime, application, subjectName , tab ):
         ext = 'mb'
         level1 = self.currOpenLevel1Field.text()
         level2 = self.currOpenLevel2Field.text()
         level3 = self.currOpenLevel3Field.text()
-        tab = self.currOpenTab
+#        tab = self.currOpenTab
+        
 
         sceneFolder = str(self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1))
 
@@ -1536,9 +1442,8 @@ class iPipeline(QMainWindow,
             lm = layerManager()
             lm.createLMnode()
         else:
-            print 'failed create lm node...........'
+            print 'failed create lm node...........'        
         
-        JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip , self.userinfo.num ,  comment )
         try:
             cmds.file(rename=str(destinationFile))
             if ext == 'ma':
@@ -1695,7 +1600,7 @@ class iPipeline(QMainWindow,
                 publishFile = os.path.join(pubScenesFolder, "%s_%s_v%s.mb" % ( level2, level3, str(currVer).zfill(2)))
             else:
                 #develFile2 = os.path.join(devSceneFolder, "%s_%s_v01.mb" % (level2, level3))
-                print '[debug] no file'
+                
                 return
 
         if self.currOpenLevel3 == "ani" and self.projNameCombo.currentText() == "mrgo":
@@ -1945,11 +1850,11 @@ class iPipeline(QMainWindow,
         if success == 1:
             if tab ==1:            
                 AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , develVer , 0 ,self.userinfo.num , comment )
-                self.mssg( '어셋이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.\n수고 하셨습니다.' )
+                self.mssg( '어셋이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.' )
 
             elif tab ==2:
                 JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , develVer , 0 ,self.userinfo.num ,comment )
-                self.mssg( '샷이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.\n수고 하셨습니다.' )
+                self.mssg( '샷이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.' )
             
         else :
             self.mssg( '치명적 오류가 발생 하였습니다.\n아무것도 만지지 마시고 \nPipeline TD( 오호준 )에게 연락 주세요 ' )
@@ -1999,7 +1904,7 @@ class iPipeline(QMainWindow,
         level2 = self.currOpenLevel2
         level3 = self.currOpenLevel3
         tab = self.currOpenTab       
-        print ' self.currOpenTab : ' , self.currOpenTab
+        
         historyObj =  self.getEventNotes(tab, level1, level2, level3, 0, 1)
         
         # 아이템 갯수 정의
@@ -2071,6 +1976,7 @@ class iPipeline(QMainWindow,
             self.assetHistoryTable.setItem(row, 3, wip)
             self.assetHistoryTable.setItem(row, 4, subject)
             self.assetHistoryTable.setItem(row, 5, date)
+            self.assetHistoryTable.setRowHeight( row , 20 )
         self.assetHistories = historyObj
         #if len(historyObj):
         #    self.assetCommentField.setPlainText(historyObj[0].comment)
@@ -2110,6 +2016,7 @@ class iPipeline(QMainWindow,
             self.shotHistoryTable.setItem(row, 3, wip)
             self.shotHistoryTable.setItem(row, 4, subject)
             self.shotHistoryTable.setItem(row, 5, date)
+            self.shotHistoryTable.setRowHeight( row , 20 )
         self.shotHistories = historyObj
         #if len(historyObj):
         #    self.shotCommentField.setPlainText(historyObj[0].comment)

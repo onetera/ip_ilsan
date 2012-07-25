@@ -182,9 +182,11 @@ def AssetRegister(project , assetType , assetName , workcode , ver , wip , usern
     assetJobVerID = ASSET_JOB_VERSION.search( 'id' , ver=ver , wip=wip , assetJobID = assetJobID[-1] , usernum = usernum)
     
     if  assetJobVerID == []:        
-        assetJobVerID = ASSET_JOB_VERSION.register( ver , wip , assetJobID[-1] , usernum ) 
-    else :        
+        assetJobVerID = ASSET_JOB_VERSION.register( ver , wip , assetJobID[-1] , usernum )
+        ASSET_JOB.update( assetID[-1] , status = 'WIP' ) 
+    else :             
         assetJobVerID = ASSET_JOB_VERSION.update( assetJobVerID[-1]  , ver=ver , wip=wip , assetJobID = assetJobID[-1] , usernum=usernum )
+        ASSET_JOB.update( assetID[-1] , status = 'WIP' ) 
       
     ASSET_JOB_CMMT = tableInfo( 'ASSET_JOB_CMMT' )    
     assetJobCmmtID = ASSET_JOB_CMMT.search( 'id' , assetJobVerID = assetJobVerID[-1] )
@@ -195,6 +197,7 @@ def AssetRegister(project , assetType , assetName , workcode , ver , wip , usern
 
 
 def JobRegister(project , seq , shot , workcode , ver , wip ,  usernum ,  comment ):
+    JOB_INFO = tableInfo( 'JOB_INFO' ) 
     JOB_VERSION = tableInfo( 'JOB_VERSION' )
     JOB_CMMNT = tableInfo( 'JOB_CMMNT' )
     jobInfoID = createJob(  project , seq , shot , workcode )        
@@ -202,8 +205,10 @@ def JobRegister(project , seq , shot , workcode , ver , wip ,  usernum ,  commen
 
     if jobVerID == []:
         jobVerID = JOB_VERSION.register( jobInfoID[-1] , ver ,wip  , usernum )
+        JOB_INFO.update( jobInfoID[-1] , status = 'WIP' )
     else:         
         jobVerID = JOB_VERSION.update( jobVerID[-1] , ver=ver , wip=wip  ,jobInfoID = jobInfoID[-1] ,  usernum=usernum )
+        JOB_INFO.update( jobInfoID[-1] , status = 'WIP' )
 
     if comment != '' and jobVerID != [] :        
         JOB_CMMNT.register( comment , jobVerID[-1] )
