@@ -1,17 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""
-**ipipeline.py**
 
-**Platform:**
-    Linux, Mac Os X.
-
-**Description:**
-    iPipeline Framework Module.
-
-**Others:**
-
-"""
 
 #***********************************************************************************************
 #***    External imports.
@@ -33,8 +22,7 @@ from components.addons.publishWindowAni.publishWindowAni import PublishWindowAni
 from components.addons.workcodeManager.workcodeManager import WorkcodeManager
 from components.tools.animation.animImport.animImport import AnimImport
 from components.tools.animation.animTransfer.animTransfer import AnimTransfer
-from components.tools.animation.multipleImportReference.multipleImportReference import \
-    MultipleImportReference
+from components.tools.animation.multipleImportReference.multipleImportReference import MultipleImportReference
 from components.tools.animation.selectionTool.selectionTool import SelectionTool
 from components.tools.finalize.geoBake.geoBake import GeoBake # new mel script
 from conndb import *
@@ -85,6 +73,8 @@ SCENEFILE_WITH_SUBJECT_RE = re.compile("v[0-9]{2}_w[0-9]{2}_[\w]+.mb")
 VER_WIP_RE = re.compile("v[0-9]{2}_w[0-9]{2}")
 VER_RE = re.compile("_v[0-9]{2}")
 WIP_RE = re.compile("_w[0-9]{2}")
+
+applicationName = "iPipeline v0.3.1.1"
 
 #***********************************************************************************************
 #***    Module classes and definitions.
@@ -678,7 +668,7 @@ class iPipeline(QMainWindow,
             currWip = 1
             sceneFileName = str(level2) +'_'+ str(level3) + '_v01_w01.mb'                   
             curLatestVersion = os.path.join(sceneFolder, sceneFileName)
-        print 'error2 curLatestVersion : ' , curLatestVersion
+            print 'error2 curLatestVersion : ' , curLatestVersion
         
 
         # 서브젝트가 존재할 때
@@ -698,9 +688,15 @@ class iPipeline(QMainWindow,
                 subjectLists[subject] = sorted(subjectLists[subject])
 
             if len(subjectLists):
-                #try:
+                #try:                
+                if subjectLists.get(subjectName) == None :
+                    _ver_wip = VER_WIP_RE.findall(sceneFileName)[0]
+                    fileName = sceneFileName.split(_ver_wip)[-1][1:] # remove underscore
+                    basename = os.path.splitext(fileName)[0]                    
+                    subjectLists[subjectName] =[ os.path.join(sceneFolder, sceneFileName.replace( basename , subjectName  )) ]
                 subjects = subjectLists[subjectName]
                 subjects = sorted(subjects, reverse=True)
+                print 'subjectLists : ' , subjectLists
                 destinationFile = subjects[0]
                 ver = VER_WIP_RE.findall( os.path.basename(str(destinationFile)))[0]
                 nVer = ver[:-2]+str(int(ver[-2:])+1).zfill(2)
@@ -773,9 +769,9 @@ class iPipeline(QMainWindow,
             try :
                 cmds.file(save=True, type=type)
                 if tab ==1:                     
-                    AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip ,self.userinfo.num,self.userinfo.name , comment )
+                    AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 ,subjectName, ver , wip ,self.userinfo.num,self.userinfo.name , comment )
                 elif tab ==2:
-                    JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip , self.userinfo.num ,self.userinfo.name, comment )
+                    JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 ,subjectName, ver , wip , self.userinfo.num ,self.userinfo.name, comment )
                 self.mssg( 'Database 서버에 성공적으로 등록 되었습니다.' )
             except :                
                 self.mssg( '치명적 오류가 발생 하였습니다.\n아무것도 만지지 마시고 \nPipeline TD( 오호준 )에게 연락 주세요 ' )
@@ -1457,9 +1453,9 @@ class iPipeline(QMainWindow,
 #            try :
             cmds.file(save=True, type=type)
             if tab ==1:            
-                AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip ,self.userinfo.num,self.userinfo.name , comment )
+                AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 ,subjectName, ver , wip ,self.userinfo.num,self.userinfo.name , comment )
             elif tab ==2:                
-                JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , ver , wip , self.userinfo.num,self.userinfo.name ,  comment )
+                JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 ,subjectName, ver , wip , self.userinfo.num,self.userinfo.name ,  comment )
             self.mssg( 'Database 서버에 성공적으로 등록 되었습니다.' )
 
         except:                       
@@ -1849,11 +1845,11 @@ class iPipeline(QMainWindow,
         
         if success == 1:
             if tab ==1:            
-                AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , develVer , 0 ,self.userinfo.num ,self.userinfo.name , comment )
+                AssetRegister( self.projNameCombo.currentText() , level1 , level2 , level3 ,subjectName, develVer , 0 ,self.userinfo.num ,self.userinfo.name , comment )
                 self.mssg( '어셋이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.' )
 
             elif tab ==2:
-                JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 , develVer , 0 ,self.userinfo.num , self.userinfo.name,comment )
+                JobRegister( self.projNameCombo.currentText() , level1 , level2 , level3 ,subjectName, develVer , 0 ,self.userinfo.num , self.userinfo.name,comment )
                 self.mssg( '샷이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.' )
             
         else :

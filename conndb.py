@@ -9,14 +9,20 @@ except ImportError:
         import MySQLdb
         
 import time
-
 import re
+
 
 if 'd10218' in os.getenv('LOGNAME'):
     mysqlhost = 'localhost'
 else :
     mysqlhost = '10.0.201.15'
 theLogFile = '/lustre/INHouse/INI/'
+
+
+
+
+
+
 
 class tableInfo:
     def __init__(self , table ): 
@@ -30,8 +36,7 @@ class tableInfo:
         else :
             self.db = MySQLdb.connect(host = mysqlhost , user = 'idea' , passwd='idea' ,port=3366, db= 'wd' , charset='utf8')
         self.cr = self.db.cursor()
-        return True
-       
+        return True       
     
     def getlastid(self):
         self.dbConn()
@@ -47,22 +52,30 @@ class tableInfo:
         '''여러 아이템을 리턴하는 값들과 통일하기 위해 lastid를 리스트로 리턴 시킴.
         '''
         self.dbConn()
-        success = 0
-        try : 
-            self.querytext = query
-            self.cr.execute(query )
-            self.db.commit()
-            lastid =  self.cr.lastrowid if self.cr.lastrowid != None else ''
-            self.dbclose()
-            lasetid = int(lastid) if type(lastid) == type(1L) else lastid 
-            success = 1            
-        except :            
-            success = 0
-        if success == 1 :            
-            return [ lastid ]
-        else :   
-            writelogs( self.querytext )
-            return False
+        self.querytext = query
+        self.cr.execute(query )
+        self.db.commit()
+        lastid =  self.cr.lastrowid if self.cr.lastrowid != None else ''
+        self.dbclose()
+        lasetid = int(lastid) if type(lastid) == type(1L) else lastid
+        return [ lastid ]
+    
+#        success = 0
+#        try : 
+#            self.querytext = query
+#            self.cr.execute(query )
+#            self.db.commit()
+#            lastid =  self.cr.lastrowid if self.cr.lastrowid != None else ''
+#            self.dbclose()
+#            lasetid = int(lastid) if type(lastid) == type(1L) else lastid 
+#            success = 1            
+#        except :            
+#            success = 0
+#        if success == 1 :            
+#            return [ lastid ]
+#        else :   
+#            writelogs( self.querytext )
+#            return False
         
     def getFetch(self , query ): 
         self.dbConn()                         
@@ -76,16 +89,17 @@ class tableInfo:
         self.dbConn()
         temp = []
         for x in self.getFetch('desc %s' % self.table ):
-            if not 'auto_increment' in x and not 'timestamp' in  x  and not 'status' in x :                
+            if not 'auto_increment' in x and not 'status' in x :
+#            if not 'auto_increment' in x and not 'timestamp' in  x  and not 'status' in x :                
                 temp.append( x[0] )        
         return temp  
 
     def register(self , *arg ):
         self.dbConn()
         attr = self.getAttr()
-                    
+        print 'attr = ' , attr
         setAttr = len(arg)*'%s,'
-        setValues = len(arg)*'"%s",'
+        setValues = len(arg)*'"%s",'        
         query = 'insert into %s ('+setAttr[:-1]+') values('+setValues[:-1]+')'           
         format = tuple( [self.table]+attr + list(arg) )
         query = query % format  
@@ -98,7 +112,8 @@ class tableInfo:
         values = ''
         for x in keys:
             values += x + '="' + str(keys[x]) + '",'
-        query = "UPDATE %(table)s SET %(values)s , uploadDate=NOW() WHERE id = %(id)s " % {'table':self.table , 'id':id , 'values':values[:-1] }
+        query = "UPDATE %(table)s SET %(values)s WHERE id = %(id)s " % {'table':self.table , 'id':id , 'values':values[:-1] }
+        print query
         self.querytext = query       
         self.query( query )
         return [ id ] 
@@ -143,15 +158,14 @@ def writelogs( querytxt ):
     f.write( querytxt )
     f.close()
 
-
 def createAsset(project , assetType , assetName , workcode ):
     
     ASSET = tableInfo( 'ASSET' )    
-    assetID = ASSET.search('id' , type = assetType , name = assetName )
+    assetID = ASSET.search('id' , type = assetType , aname = assetName )
     
     writelogs( ASSET.querytext )
     if assetID == []:
-        assetID = ASSET.register( assetType , assetName , '' , 'TEMP' )        
+        assetID = ASSET.register( assetType , assetName , '' , project )        
     return assetID
         
 
@@ -159,7 +173,7 @@ def createJob(  project , seq , shot , workcode):
     JOB_INFO = tableInfo( 'JOB_INFO' ) 
     jobInfoID = JOB_INFO.search( 'id' , workcode=workcode ,  showcode=project , seqname=seq , shotname=shot )
     if jobInfoID == []:    
-        jobInfoID = JOB_INFO.register( workcode , '' , '' , project , seq , shot)              
+        jobInfoID = JOB_INFO.register( workcode , '' , '' , project , seq , shot , time.strftime('%Y-%m-%d %H:%M:%S',time.localtime()) )              
     return jobInfoID
         
 
@@ -168,11 +182,11 @@ def createAssetJob( project , assetType , assetName , workcode ):
     assetID = createAsset(project , assetType , assetName , workcode )    
     assetJobID = ASSET_JOB.search( 'id' , workcode = workcode , assetID = assetID[-1] )   
     if assetJobID == []:        
-        assetJobID = ASSET_JOB.register( workcode , '' , assetID[-1] )            
+        assetJobID = ASSET_JOB.register( workcode , '' , assetID[-1] , time.strftime('%Y-%m-%d %H:%M:%S',time.localtime()) )
     return assetJobID
         
         
-def AssetRegister(project , assetType , assetName , workcode , ver , wip , usernum , username , comment ):
+def AssetRegister(project , assetType , assetName , workcode ,subjectName, ver , wip , usernum , username , comment ):
     ASSET = tableInfo( 'ASSET' )
     ASSET_JOB = tableInfo( 'ASSET_JOB' )
     ASSET_JOB_VERSION = tableInfo('ASSET_JOB_VERSION')
@@ -182,21 +196,27 @@ def AssetRegister(project , assetType , assetName , workcode , ver , wip , usern
     assetJobVerID = ASSET_JOB_VERSION.search( 'id' , ver=ver , wip=wip , assetJobID = assetJobID[-1] , usernum = usernum)
     
     if  assetJobVerID == []:        
-        assetJobVerID = ASSET_JOB_VERSION.register( ver , wip , assetJobID[-1] , usernum , username )
-        ASSET_JOB.update( assetID[-1] , status = 'WIP' ) 
-    else :             
-        assetJobVerID = ASSET_JOB_VERSION.update( assetJobVerID[-1]  , ver=ver , wip=wip , assetJobID = assetJobID[-1] , usernum=usernum , username= username )
-        ASSET_JOB.update( assetID[-1] , status = 'WIP' ) 
+        assetJobVerID = ASSET_JOB_VERSION.register( ver , wip , assetJobID[-1] , usernum , username , time.strftime('%Y-%m-%d %H:%M:%S',time.localtime()) )
+        ASSET_JOB.update( assetJobID[-1] , status = 'WIP' ) 
+#    else :             
+#        assetJobVerID = ASSET_JOB_VERSION.update( assetJobVerID[-1]  , ver=ver , wip=wip , assetJobID = assetJobID[-1] , usernum=usernum , username= username ,uploadDate=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime()) )
+#        ASSET_JOB.update( assetJobID[-1] , status = 'WIP' ) 
       
     ASSET_JOB_CMMT = tableInfo( 'ASSET_JOB_CMMT' )    
-    assetJobCmmtID = ASSET_JOB_CMMT.search( 'id' , assetJobVerID = assetJobVerID[-1] )
-    
+    assetJobCmmtID = ASSET_JOB_CMMT.search( 'id' , assetJobVerID = assetJobVerID[-1] )    
    
     if comment != '' and assetJobCmmtID == []:  
         assetJobCmmtID = ASSET_JOB_CMMT.register( comment , assetJobVerID[-1] )
+    
+    ASSET_SUBJECT = tableInfo( 'ASSET_SUBJECT' )    
+    if subjectName != '' :
+        assetSubjectID = ASSET_SUBJECT.register( subjectName , assetJobVerID[-1] )
+        
+    
+    
 
 
-def JobRegister(project , seq , shot , workcode , ver , wip ,  usernum , username, comment ):
+def JobRegister(project , seq , shot , workcode ,subjectName, ver , wip ,  usernum , username, comment ):
     JOB_INFO = tableInfo( 'JOB_INFO' ) 
     JOB_VERSION = tableInfo( 'JOB_VERSION' )
     JOB_CMMNT = tableInfo( 'JOB_CMMNT' )
@@ -204,118 +224,34 @@ def JobRegister(project , seq , shot , workcode , ver , wip ,  usernum , usernam
     jobVerID = JOB_VERSION.search( 'id' , jobInfoID = jobInfoID[-1] , ver = ver , wip = wip )
 
     if jobVerID == []:
-        jobVerID = JOB_VERSION.register( jobInfoID[-1] , ver ,wip  , usernum )
+        jobVerID = JOB_VERSION.register( jobInfoID[-1] , ver ,wip  , usernum , username ,time.strftime('%Y-%m-%d %H:%M:%S',time.localtime()) )
         JOB_INFO.update( jobInfoID[-1] , status = 'WIP' )
-    else:         
-        jobVerID = JOB_VERSION.update( jobVerID[-1] , ver=ver , wip=wip  ,jobInfoID = jobInfoID[-1] ,  usernum=usernum , username= username)
-        JOB_INFO.update( jobInfoID[-1] , status = 'WIP' )
+#    else:         
+#        jobVerID = JOB_VERSION.update( jobVerID[-1] , ver=ver , wip=wip  ,jobInfoID = jobInfoID[-1] ,  usernum=usernum , username= username , uploadDate=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime()) )
+#        JOB_INFO.update( jobInfoID[-1] , status = 'WIP' )
 
     if comment != '' and jobVerID != [] :        
         JOB_CMMNT.register( comment , jobVerID[-1] )
         
+    JOB_SUBJECT = tableInfo( 'JOB_SUBJECT' )    
+    if subjectName != '' :
+        jobSubjectID = JOB_SUBJECT.register( subjectName , jobVerID[-1] )
 
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':    
 #    ASSET_JOB_VERSION = tableInfo('ASSET_JOB_VERSION')
+    ASSET_JOB = tableInfo('ASSET_JOB')
 #    print ASSET_JOB_VERSION.search( 'id' , ver=6 , wip=0 , assetJobID = 2 , usernum = 'd10218')
 #    print ASSET_JOB_VERSION.update( 16 , ver=6 , wip=0 , assetJobID = 2 , usernum = 'd10218')
-#    AssetRegister('TEMP' , 'char2' , 'krocop' , 'model' , 6 , 1  ,'d10218' , '' )
-#    JOB_INFO = tableInfo( 'JOB_INFO' )
-#    print JOB_INFO.search( 'id' , workcode='comp' ,  showcode='TEMP' , seqname='lego' , shotname='002' )
-    writelogs( 'ohho' )
-    # 어셋 등록 
-#    tb = tableInfo( 'ASSET' )
-#    theLastID = tb.register( 'vehicle' , 'bus' , '', 'TEMP' )
-#    print theLastID
-
-
-    # 워크코드 등록 
-#    tjob = tableInfo( 'ASSET_JOB' )    
-#    jobID = tjob.register( 'rig' , '' , 2  )
-
-    # 버전 컨트
-#    jobVer = tableInfo( 'ASSET_JOB_VERSION' )
-#    jobVerID = jobVer.register('2','1' , '1' , 'd10218'  )
-
-    # 커멘
-#    jobCommt = tableInfo('ASSET_JOB_CMMT')
-#    jobCommt.register('수고하셨습니다' , jobVerID )
-
-#    project = 'TEMP'
-#    assetType = 'char'
-#    assetName = 'karasC'
-#    workcode = 'rig'
-#    ver = 1
-#    wip = 1
-#    comment = '테스트중입니다 '
-#
-#    ASSET = tableInfo( 'ASSET' )
-#    ASSET_JOB = tableInfo( 'ASSET_JOB' )
-#    ASSET_JOB_VERSION = tableInfo('ASSET_JOB_VERSION')
-    
-    
-    #asset job version을 코멘트와 같이 등록할때 
-#    assetID = ASSET.search('id' , type = assetType , name = assetName )
-#    if assetID == []:
-#        print 'There was no such asset'
-#        assetID = ASSET.register( assetType , assetName , '' , 'TEMP' )
-#    elif assetID == False:        
-#        print ASSET.logs
-#        
-#    assetJobID = ASSET_JOB.search( 'id' , workcode = workcode , assetID = assetID[0] )
-#    if assetJobID == []:
-#        print 'There was no such asset job'
-#        print 'assetID = ' , assetID
-#        assetJobID = ASSET_JOB.register( workcode , '' , assetID[0] )
-#
-#    assetJobVerID = ASSET_JOB_VERSION.search( 'id' , ver=ver , wip=wip , assetJobID = assetJobID[0] , usernum = 'd10218')
-#    if  assetJobVerID == []:       
-#        assetJobVerID = ASSET_JOB_VERSION.register( ver , wip , assetJobID[0] , 'd10218' )
-#    print assetJobVerID
-#   
-#    ASSET_JOB_CMMT = tableInfo( 'ASSET_JOB_CMMT' )
-#    assetJobCmmtID = ASSET_JOB_CMMT.search( 'id' , assetJobVerID = assetJobVerID[0] )
-#    if comment != '' and assetJobCmmtID == []:
-#        assetJobCmmtID = ASSET_JOB_CMMT.register( comment , assetJobVerID[0] )
-#    print assetJobCmmtID
-        
-        
-    
-#    ASSET_JOB_VERSION.register(  )
-    
-#    assetID = ASSET.search('id' , type = assetType , name = assetName )
-#    if assetID == []:
-#        ASSET.register( assetType , assetName , '' , 'TEMP' )
-
-    
-    # Task 등록할때 
-#    project = 'TEMP'
-#    seq = 'R7'
-#    shot = '0034'
-#    workcode = 'ani'
+#    assetID = createAsset( project , assetType , assetName , workcode )     
+#    assetJobID = createAssetJob(project , assetType , assetName , workcode)
+#    AssetRegister('TEMP' , 'char2' , 'krocop' , 'model' , 6 , 1  ,'d10218' , u'오호준' ,'' )
+#    JobRegister('TEMP' , 'char2' , 'krocop' , 'anim' , 'simulation', 3 , 4 ,  'd10218' , '오호준', 'good' )
+#    assetID = createAsset( 'TEMP' , 'char2' , 'ogre' , 'model' )  
+#    ASSET_JOB.register( 'model' , '' , assetID[-1] , time.strftime('%Y-%m-%d %H:%M:%S',time.localtime()) )
 #    
-#
-#    ver = 1
-#    wip = 1
-#    comment = '에니메이션 테스트중입니다 '
-#
-#    JOB_INFO = tableInfo( 'JOB_INFO' )
-#    JOB_VERSION = tableInfo( 'JOB_VERSION' )
-#    JOB_CMMNT = tableInfo( 'JOB_CMMNT' )
-#    
-#    jobInfoID = JOB_INFO.register( workcode , '' , '' , project , seq , shot)
-#
-#    if jobInfoID == []:
-#        jobInfoID = JOB_INFO.register( workcode , '' , '' , project , seq , shot)
-#    
-#    jobVerID = JOB_VERSION.search( 'id' , jobInfoID = jobInfoID[0] , ver = ver , wip = wip )
-#    if jobVerID == []:
-#        jobVerID = JOB_VERSION.register( jobInfoID[0] , ver , wip  , 'd10218' )
-#    
-#    if comment != '' and jobVerID != [] :
-#        JOB_CMMNT.register( comment , jobVerID[0] ) 
-        
+  
   
 
 

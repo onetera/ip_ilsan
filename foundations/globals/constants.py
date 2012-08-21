@@ -20,14 +20,7 @@ import sys
 import os
 import glob
 
-#***********************************************************************************************
-#***    Module attributes.
-#***********************************************************************************************
-#__author__ = "Seo Jungwook"
-#__copyright__ = "Copyright (C) 2011 - Seo Jungwook"
-#__maintainer__ = "Seo Jungwook"
-#__email__ = "rndvfx@gmail.com"
-#__status__ = "Production"
+
 
 #***********************************************************************************************
 #***    Module classes and definitions.
