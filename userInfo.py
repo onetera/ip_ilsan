@@ -30,12 +30,14 @@ class UserInformation:
             self.num = self.id.split('\\')[1]                 
             self.name =  self.getLdapUser()[0]
             self.dept = self.getLdapUser()[1]
+            self.cn = self.getLdapUser()[2]
             
         else : 
             self.id = 'idea'
             self.num = 'd00000'
             self.name = 'idea'
             self.dept = 'Intern'
+            self.cn = 'idea'
 
     def __repr__(self):
         return  self.name 
@@ -65,9 +67,9 @@ class UserInformation:
         
         base_dn = 'CN=Users,DC=digitalidea,DC=co,DC=kr'
         filter = 'sAMAccountNAME=%s' % self.num
-        attr = ['info','sAMAccountNAME' , 'mail' ]        
+        attr = ['info','sAMAccountNAME' , 'mail' , 'cn' ]        
         result = l.search_s(base_dn,ldap.SCOPE_SUBTREE,filter,attr)
-        return result[0][1]['info'][0] , result[0][1]['mail'][0]
+        return result[0][1]['info'][0] , result[0][1]['mail'][0] , result[0][1]['cn'][0]
 #        return result[0][1]['info'][0] , re.search( '(?<=CN=).*?(?=,)' , result[0][1]['memberOf'][0] ).group()
 
 def findUserNum( name ):
@@ -94,9 +96,9 @@ def findUserName( num ):
     
     base_dn = 'CN=Users,DC=digitalidea,DC=co,DC=kr'
     filter = 'sAMAccountName=%s' % num
-    attr = [ 'info' , 'mail' ]        
+    attr = [ 'info' , 'mail' , 'cn']        
     result = l.search_s(base_dn,ldap.SCOPE_SUBTREE,filter,attr)
-    return result[0][1]['info'][0] , result[0][1]['mail'][0]
+    return result[0][1]['info'][0] , result[0][1]['mail'][0] , result[0][1]['cn'][0]
 
 def UserInfo():
     return UserInformation()
@@ -117,8 +119,11 @@ def getCurrentIP():
 
 
 if __name__ == '__main__':    
-#    print findUserName('d90127')
-    print findUserNum('김혁')
+#    print findUserName('d10221')[0]
+    print findUserName('d10221')[2]
+#    print findUserNum('박기도')
+
+    
 #    for x in result[0][1]:   
 #        if x == 'memberOf':
 #            print result[0][1][x][0]

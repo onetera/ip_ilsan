@@ -1,17 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""
-**ipipeline.py**
 
-**Platform:**
-    Linux, Mac Os X.
-
-**Description:**
-    iPipeline Framework Module.
-
-**Others:**
-
-"""
 
 #***********************************************************************************************
 #***    External imports.
@@ -33,27 +22,27 @@ from components.addons.publishWindowAni.publishWindowAni import PublishWindowAni
 from components.addons.workcodeManager.workcodeManager import WorkcodeManager
 from components.tools.animation.animImport.animImport import AnimImport
 from components.tools.animation.animTransfer.animTransfer import AnimTransfer
-from components.tools.animation.multipleImportReference.multipleImportReference import \
-    MultipleImportReference
+from components.tools.animation.multipleImportReference.multipleImportReference import MultipleImportReference
 from components.tools.animation.selectionTool.selectionTool import SelectionTool
 from components.tools.finalize.geoBake.geoBake import GeoBake # new mel script
+from conndb import *
 from foundations.globals.constants import Constants
 from foundations.tractor import Tractor
 from lib.finalize.ShowCase.ShowCase import mrgo_CacheDialog, mrgoImportTool
-from lib.checkUp.modelingCheckUp import modelingCheckUp
+from logs import Logs
 from xml2 import iXML
 from xml_new import XmlNew
 import Core.Note.Note2
-
-
-import notice
-import userInfo
-
 import glob
+import notice
 import os
 import re
 import sys
 import ui.common
+import userInfo
+
+
+
 
 try:
     import maya.cmds as cmds
@@ -78,12 +67,14 @@ except ImportError:
 #***    Global Variables.
 #***********************************************************************************************
 APPLICATION_PATH = Constants.applicationDirectory
-NO_PREVIEW_FILENAME = APPLICATION_PATH+"resources/noPreview.jpg"
+NO_PREVIEW_FILENAME = APPLICATION_PATH + "resources/noPreview.jpg"
 SCENEFILE_RE = re.compile("v[0-9]{2}_w[0-9]{2}.mb")
 SCENEFILE_WITH_SUBJECT_RE = re.compile("v[0-9]{2}_w[0-9]{2}_[\w]+.mb")
 VER_WIP_RE = re.compile("v[0-9]{2}_w[0-9]{2}")
 VER_RE = re.compile("_v[0-9]{2}")
 WIP_RE = re.compile("_w[0-9]{2}")
+
+APPLICATION_NAME = "iPipeline v0.3.2.0"
 
 #***********************************************************************************************
 #***    Module classes and definitions.
@@ -94,46 +85,21 @@ DEV_SHOW = 0
 
 
 class iPipeline(QMainWindow,
-                iPipelineInit, iPipelineActions, iPipelineInfo,iPipelineUtility,
+                iPipelineInit, iPipelineActions, iPipelineInfo, iPipelineUtility,
                 assistantFunctions):
-    """
-    This class is the **iPipeline** class.
-    """
-#    __instance = None
-#    def __new__(cls, *args, **kwargs):        
-#        if not cls.__instance:    
-#            cls.__instance = super(iPipeline, cls).__new__(cls, *args, **kwargs)
-#        return cls.__instance
 
 
-    
-       
     def __init__(self, parent=None):
-        """
-        This method initializes the class.
-        
-        :param parent: ( QWidget )
-        """        
+
         QMainWindow.__init__(self, parent)
         
-        self.userinfo = userInfo.UserInfo()
-        
-        
-#        notice.notice     
-        uic.loadUi(Constants.frameworkUIFile, self)
-        self.ModCheck = modelingCheckUp()
+        self.userinfo = userInfo.UserInfo()        
 
-#        self.tabYsize = 640
-#        if self.tabWidget.currentIndex() == 0 :
-#            self.resize(730,self.tabYsize)
-#        else :
-#            self.resize(531,self.tabYsize)        
-        
+        uic.loadUi(Constants.frameworkUIFile, self)        
         self.sourceModule(Constants.DI_ani)
         self.sourceModule(Constants.DI_finalize)
         self.initialize()
         self.loadSettings()        
-
 
         if 'win' in sys.platform:
              self.showPath = r"\\10.0.200.100"
@@ -161,21 +127,25 @@ class iPipeline(QMainWindow,
         
         if self.userinfo.checkAccount():
             self.label_15.hide()                 
-            self.userNameLineEdit.hide()
+            self.userNameLineEdit.hide()            
             
-            # 바꿔야 할부분 self.userinfo 변수를 사용 할것.            
+            try : 
+                import MySQLdb
+                self.db = MySQLdb.connect(host=Constants.wdSQLaddress , user='idea' , passwd='idea' , port=3366, db='wd' , charset='utf8')                
+                DBconn = 'connected'
+                self.db.close()
+            except : 
+                DBconn = 'disconnected'
             self.userName = self.userinfo.num
-            theMessage = u' 사번 : %s   이름 : %s   Department : %s' % (self.userinfo.num , self.userinfo.name , self.userinfo.dept  )
-            self.ip_statusBar.showMessage( theMessage ) 
+            theMessage = u' 사번 : %s        이름 : %s        Department : %s        DB server : %s' % (self.userinfo.num , self.userinfo.name , self.userinfo.dept , DBconn)
+            self.ip_statusBar.showMessage(theMessage) 
         else:
-            self.ip_statusBar.showMessage( u'개인 계정으로 로그인 바랍니다. 조만간 idea또는 개인 계정이 막혀 마야 사용이 불가능 해집니다.')
-            self.userNameLineEdit.setText( self.userName )
+            self.ip_statusBar.showMessage(u'개인 계정으로 로그인 바랍니다. 조만간 개인 계정이 막혀 마야 사용이 불가능 해집니다.')
+            self.userNameLineEdit.setText(self.userName)
                     
         self.projNameCombo.addItems(self.getDirectoryList(self.showPath))
         try:
-            self.projNameCombo.setCurrentIndex(
-                self.projNameCombo.findText(self.projectName)
-            )
+            self.projNameCombo.setCurrentIndex(self.projNameCombo.findText(self.projectName))
         except:
             pass
 
@@ -190,121 +160,44 @@ class iPipeline(QMainWindow,
             historyTable.setColumnWidth(2, 25)
             historyTable.setColumnWidth(3, 25)
             historyTable.setColumnWidth(4, 70)
-
-#        self.createActions()
-#        self.createToolBars()
-#        self.createMenus()
         
-        self.setWindowTitle(Constants.applicationName)
+        self.setWindowTitle(APPLICATION_NAME) 
         self.setStyleSheet("font-size: 11px")
-
         
 
     def assetMouseMoveEvent(self, event):
         currSelected = self.getCurrentlySelectedItem(1, 2)
         fileName = self.getFileName(1, currSelected[0], currSelected[1], "rig", "pubFolder")
         assetName = currSelected[1]
-        scriptFolder = fileName+"/"+"script"
-        output = "Asset:"+assetName+":"+scriptFolder
+        scriptFolder = fileName + "/" + "script"
+        output = "Asset:" + assetName + ":" + scriptFolder
         ui.common.startDrag(output, self)
+        
 
     def shotMouseMoveEvent(self, event):
         currSelected = self.getCurrentlySelectedItem(2, 2)
         fileName = self.getFileName(2, currSelected[0], currSelected[1], "rig", "pubFolder")
         assetName = currSelected[1]
-        scriptFolder = fileName+"/"+"script"
-        output = "Shot:"+assetName+":"+scriptFolder
+        scriptFolder = fileName + "/" + "script"
+        output = "Shot:" + assetName + ":" + scriptFolder
         ui.common.startDrag(output, self)
 
-#    def createMenus(self):
-#        pass
-#
-#    def createActions(self):
-#        
-#        self.ani_createGroupControlAct = self.createAction("ani_createGroupControl", self.ani_createGroupControl)
-#        self.ani_replaceReferenceAct = self.createAction("ani_replaceReference", self.ani_replaceReference)
-#        self.ani_animTransferAct = self.createAction("ani_animTransfer", self.ani_animTransfer)
-#        self.mod_layerInfoAct = self.createAction("mod_layerInfo", self.mod_layerInfo )
-    
 
-#    def createToolBars(self):
-#        shelfToolBar = QToolBar("Shelf")
-#        shelfToolBar.addAction(self.ani_createGroupControlAct)
-#        shelfToolBar.addAction(self.ani_replaceReferenceAct)        
-##        shelfToolBar.addAction(self.finalize_geoBakeAct)
-##        shelfToolBar.addAction(self.finalize_cacheFileLoaderAct)
-##        shelfToolBar.addAction(self.finalize_importToolAct)
-#        shelfToolBar.addAction(self.ani_animTransferAct)
-#        shelfToolBar.addAction(self.mod_layerInfoAct)
-#        self.addToolBar(shelfToolBar)
-
-#    def mod_layerInfo(self):
-#        if cmds.ls( 'model_layerInfo' ) == []:
-#            return
-#        lm = cmds.ls( 'model_layerInfo' )[0]
-#        layerData = cmds.getAttr( lm + '.notes')
-#        LM= layerManager()
-#        LM.inLayer( eval( layerData ) )
-        
-#    def ani_animTransfer(self):
-##        if self.currOpenLevel3 == "ani":
-#        at = AnimTransfer("alone", self)
-#        self.connect(at, SIGNAL("run"), self.ani_animTransfer2)
-#        at.show()
-#
-#    def ani_animTransfer2(self, animFile, txtFile, selectedAsset):
-#        if standAlone : return
-#        mel.eval('DI_animTransfer "%s" "%s" %s' % (animFile, txtFile, selectedAsset))
-
-#    def ani_createGroupControl(self):
-#        if standAlone : return   
-#        mel.eval("DI_createGroupControl")
-#
-#    def ani_replaceReference(self):
-#        if standAlone : return
-#        mel.eval("kis_replaceReference")
-#
-#    def finalize_geoBake(self):
-#        if standAlone : return
-#        startFrame = 70
-#        endFrame = int(cmds.playbackOptions(q=True, maxTime=True)) + 1 # florat
-#        location = cmds.workspace(q=True, fullName=True) # unicode
-#
-#        sceneFileName = str(self.currOpenFileNameLabel.text())
-#        if len(sceneFileName) == 0:
-#            geoCachePath = os.path.join(location, "data", "geoCache")
-#        else:
-#            geoCachePath = os.path.join(location, "data", "geoCache", os.path.splitext(sceneFileName)[0])
-#
-#        geoBake = GeoBake(startFrame, endFrame, geoCachePath, self)
-#        geoBake.setModal(True)
-#        geoBake.show()
-#
-#    def finalize_cacheFileLoader(self):
-#        if standAlone : return
-#        mrgo_CacheDialog()
-#
-#    def finalize_importTool(self):
-#        if standAlone : return
-#        mrgoImportTool()
 
 #------------------------------------------------------------------------------ 
 #------------------------------------------------------------------------------ 
 
     def createConnections(self):
         # Menu
-        self.connect(self.actionIPipeline_Wiki, SIGNAL("triggered()"),self.openWiki)
+        self.connect(self.actionIPipeline_Wiki, SIGNAL("triggered()"), self.openWiki)
         
         # Common
 #        self.connect(self.tabWidget, SIGNAL("currentChanged(int)"),
-#                     self.updateWorkingTab)
+#                     self.updateWorkingTab)                     
         self.connect(self.userNameLineEdit, SIGNAL("textChanged(const QString&)"),
                      self.setUsername)
         self.connect(self.projNameCombo, SIGNAL("currentIndexChanged(const QString&)"),
                      self.projectSelected)
-#        self.connect( self.resizeButton , SIGNAL("clicked()") ,
-#                      self.resizing )
-        
 
         # Currently Open
         self.connect(self.currOpenSaveDevelButton, SIGNAL("clicked()"),
@@ -320,22 +213,22 @@ class iPipeline(QMainWindow,
                      self.recordCurrentPlayblast)
         self.connect(self.currOpenViewPlayblastButton, SIGNAL("clicked()"),
                      lambda: self.viewPlayblastSelected(self.currOpenTab))
-        self.connect(self.currOpenClearCommentButton, SIGNAL("clicked()"),
-                     self.clearComment)
-        self.connect(self.currOpenSaveCommentButton, SIGNAL("clicked()"),
-                     self.saveComment)
+#        self.connect(self.currOpenClearCommentButton, SIGNAL("clicked()"),
+#                     self.clearComment)
+#        self.connect(self.currOpenSaveCommentButton, SIGNAL("clicked()"),
+#                     self.saveComment)
 
-        self.connect(self.currOpenClearSelectedCommentButton, SIGNAL("clicked()"),
-                     self.selectedClearComment)
-        self.connect(self.currOpenSaveSelectedCommentButton, SIGNAL("clicked()"),
-                     self.selectedSaveComment)
+#        self.connect(self.currOpenClearSelectedCommentButton, SIGNAL("clicked()"),
+#                     self.selectedClearComment)
+#        self.connect(self.currOpenSaveSelectedCommentButton, SIGNAL("clicked()"),
+#                     self.selectedSaveComment)
 
         self.connect(self.currOpenExploreButton, SIGNAL("clicked()"),
                      self.exploreCurrent)
         self.connect(self.currOpenHistoryTable, SIGNAL("itemClicked(QTableWidgetItem*)"),
                      self.updateCurrentlyComment)
-        self.connect( self.refreshOpenedButton , SIGNAL("clicked()") ,
-                      self.refreshCurrentlyOpen )        
+        self.connect(self.refreshOpenedButton , SIGNAL("clicked()") ,
+                      self.refreshCurrentlyOpen)        
 
 
         # Asset Browser
@@ -359,16 +252,16 @@ class iPipeline(QMainWindow,
                      self.newAssetComponentUI)
         self.connect(self.componentRemoveButton, SIGNAL("clicked()"),
                      lambda: self.removeProcess(1, 3))
-        self.connect(self.assetViewPlayblastButton, SIGNAL("clicked()"),
-                     lambda: self.viewPlayblastSelected(1))
+#        self.connect(self.assetViewPlayblastButton, SIGNAL("clicked()"),
+#                     lambda: self.viewPlayblastSelected(1))
         self.connect(self.exploreAssetButton, SIGNAL("clicked()"),
                      lambda: self.exploreSelectd(1))
-        self.connect(self.assetHistoryTable, SIGNAL("itemClicked(QTableWidgetItem*)"),
-                     self.updateAssetComment)
-        self.connect(self.assetDevelList, SIGNAL("itemDoubleClicked(QListWidgetItem*)"),
-                     lambda value: self.componentDoubleClicked(1, "devel", value))
-        self.connect(self.assetPublishList, SIGNAL("itemDoubleClicked(QListWidgetItem*)"),
-                     lambda value: self.componentDoubleClicked(1, "publish", value))
+#        self.connect(self.assetHistoryTable, SIGNAL("itemClicked(QTableWidgetItem*)"),
+#                     self.updateAssetComment)
+#        self.connect(self.assetDevelList, SIGNAL("itemDoubleClicked(QListWidgetItem*)"),
+#                     lambda value: self.componentDoubleClicked(1, "devel", value))
+#        self.connect(self.assetPublishList, SIGNAL("itemDoubleClicked(QListWidgetItem*)"),
+#                     lambda value: self.componentDoubleClicked(1, "publish", value))
 
         # Shot Browser
         self.connect(self.sequenceScrollList, SIGNAL("itemClicked(QListWidgetItem*)"),
@@ -391,34 +284,34 @@ class iPipeline(QMainWindow,
                      self.newShotComponentUI)
         self.connect(self.shotComponentRemoveButton, SIGNAL("clicked()"),
                      lambda: self.removeProcess(2, 3))
-        self.connect(self.showViewPlayblastButton, SIGNAL("clicked()"),
-                     lambda: self.viewPlayblastSelected(2))
+#        self.connect(self.showViewPlayblastButton, SIGNAL("clicked()"),
+#                     lambda: self.viewPlayblastSelected(2))
         self.connect(self.exploreShotButton, SIGNAL("clicked()"),
                      lambda: self.exploreSelectd(2))
-        self.connect(self.shotHistoryTable, SIGNAL("itemClicked(QTableWidgetItem*)"),
-                     self.updateShotComment)
-        self.connect(self.shotDevelList, SIGNAL("itemDoubleClicked(QListWidgetItem*)"),
-                     lambda value: self.componentDoubleClicked(2, "devel", value))
-        self.connect(self.shotPublishList, SIGNAL("itemDoubleClicked(QListWidgetItem*)"),
-                     lambda value: self.componentDoubleClicked(2, "publish", value))
-        self.connect(self.assetDevelList, SIGNAL("itemClicked(QListWidgetItem*)"),
-                     lambda value: self.sceneFileSelected(value, 1, "devel"))
-        self.connect(self.assetPublishList, SIGNAL("itemClicked(QListWidgetItem*)"),
-                     lambda value: self.sceneFileSelected(value, 1, "publish"))
-        self.connect(self.shotDevelList, SIGNAL("itemClicked(QListWidgetItem*)"),
-                     lambda value: self.sceneFileSelected(value, 2, "devel"))
-        self.connect(self.shotPublishList, SIGNAL("itemClicked(QListWidgetItem*)"),
-                     lambda value: self.sceneFileSelected(value, 2, "publish"))
+#        self.connect(self.shotHistoryTable, SIGNAL("itemClicked(QTableWidgetItem*)"),
+#                     self.updateShotComment)
+#        self.connect(self.shotDevelList, SIGNAL("itemDoubleClicked(QListWidgetItem*)"),
+#                     lambda value: self.componentDoubleClicked(2, "devel", value))
+#        self.connect(self.shotPublishList, SIGNAL("itemDoubleClicked(QListWidgetItem*)"),
+#                     lambda value: self.componentDoubleClicked(2, "publish", value))
+#        self.connect(self.assetDevelList, SIGNAL("itemClicked(QListWidgetItem*)"),
+#                     lambda value: self.sceneFileSelected(value, 1, "devel"))
+#        self.connect(self.assetPublishList, SIGNAL("itemClicked(QListWidgetItem*)"),
+#                     lambda value: self.sceneFileSelected(value, 1, "publish"))
+#        self.connect(self.shotDevelList, SIGNAL("itemClicked(QListWidgetItem*)"),
+#                     lambda value: self.sceneFileSelected(value, 2, "devel"))
+#        self.connect(self.shotPublishList, SIGNAL("itemClicked(QListWidgetItem*)"),
+#                     lambda value: self.sceneFileSelected(value, 2, "publish"))
 
         # context menu
-        self.connect(self.assetDevelList, SIGNAL("customContextMenuRequested(const QPoint&)"),
-                     lambda value: self.componentMenu(value, 1, "devel"))
-        self.connect(self.assetPublishList, SIGNAL("customContextMenuRequested(const QPoint&)"),
-                     lambda value: self.componentMenu(value, 1, "publish"))
-        self.connect(self.shotDevelList, SIGNAL("customContextMenuRequested(const QPoint&)"),
-                     lambda value: self.componentMenu(value, 2, "devel"))
-        self.connect(self.shotPublishList, SIGNAL("customContextMenuRequested(const QPoint&)"),
-                     lambda value: self.componentMenu(value, 2, "publish"))
+#        self.connect(self.assetDevelList, SIGNAL("customContextMenuRequested(const QPoint&)"),
+#                     lambda value: self.componentMenu(value, 1, "devel"))
+#        self.connect(self.assetPublishList, SIGNAL("customContextMenuRequested(const QPoint&)"),
+#                     lambda value: self.componentMenu(value, 1, "publish"))
+#        self.connect(self.shotDevelList, SIGNAL("customContextMenuRequested(const QPoint&)"),
+#                     lambda value: self.componentMenu(value, 2, "devel"))
+#        self.connect(self.shotPublishList, SIGNAL("customContextMenuRequested(const QPoint&)"),
+#                     lambda value: self.componentMenu(value, 2, "publish"))
         self.connect(self.assetScrollList, SIGNAL("customContextMenuRequested(const QPoint&)"),
                      lambda value: self.assetShotListMenu("asset", value))
         self.connect(self.shotScrollList, SIGNAL("customContextMenuRequested(const QPoint&)"),
@@ -427,64 +320,64 @@ class iPipeline(QMainWindow,
 
 
     def openWiki(self):
-        os.system( 'firefox http://10.0.98.11:8080/display/GBL/Home' )
+        os.system('firefox http://10.0.98.11:8080/display/GBL/Home')
      
-     
-        
-    def clearComment(self):
-        self.currOpenCommentField.clear()
-
-    def saveComment(self):
-        level1 = self.currOpenLevel1Field.text()
-        level2 = self.currOpenLevel2Field.text()
-        level3 = self.currOpenLevel3Field.text()
-        tab = self.currOpenTab
-
-        sceneFolder = str(self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1))
-        if len(self.currOpenSubjectField.text()) == 0:
-            filename = level2 + "_" + level3 + "_" + self.currOpenVerField.text() + "_" + self.currOpenWipField.text() + ".mb"
-        else:
-            filename = level2 + "_" + level3 + "_" + self.currOpenVerField.text() + "_" + self.currOpenWipField.text() + "_" + self.currOpenSubjectField.text() + ".mb" 
-
-        filename = str(filename)
-        _xmlfile = os.path.join(sceneFolder, '.%s.xml' % filename)
-        if os.path.exists(_xmlfile):
-            xmlfile = QFile( QString(_xmlfile))
-            xml = iXML()
-            xml.read(xmlfile)
     
-            comment = self.currOpenCommentField.toPlainText()
-            xml.updateDomElement("comment", comment)
+#     def clearComment(self):
+#       self.currOpenCommentField.clear()
     
-            outFile = QFile(QString(_xmlfile))
-            outFile.open(QFile.WriteOnly | QFile.Text)
-    
-            xml.write_test(outFile)
-            QMessageBox.information(self, "Info", "Success")
 
-    def selectedClearComment(self):
-        self.currOpenCommentHistoryField.clear()
+#    def saveComment(self):
+#        level1 = self.currOpenLevel1Field.text()
+#        level2 = self.currOpenLevel2Field.text()
+#        level3 = self.currOpenLevel3Field.text()
+#        tab = self.currOpenTab
+#
+#        sceneFolder = str(self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1))
+#        if len(self.currOpenSubjectField.text()) == 0:
+#            filename = level2 + "_" + level3 + "_" + self.currOpenVerField.text() + "_" + self.currOpenWipField.text() + ".mb"
+#        else:
+#            filename = level2 + "_" + level3 + "_" + self.currOpenVerField.text() + "_" + self.currOpenWipField.text() + "_" + self.currOpenSubjectField.text() + ".mb" 
+#
+#        filename = str(filename)
+#        _xmlfile = os.path.join(sceneFolder, '.%s.xml' % filename)
+#        if os.path.exists(_xmlfile):
+#            xmlfile = QFile( QString(_xmlfile))
+#            xml = iXML()
+#            xml.read(xmlfile)
+#    
+#            comment = self.currOpenCommentField.toPlainText()
+#            xml.updateDomElement("comment", comment)
+#    
+#            outFile = QFile(QString(_xmlfile))
+#            outFile.open(QFile.WriteOnly | QFile.Text)
+#    
+#            xml.write_test(outFile)
+#            QMessageBox.information(self, "Info", "Success")
 
-    def selectedSaveComment(self):
-        if self.selected_comment_item is None:
-            return
+#    def selectedClearComment(self):
+#        self.currOpenCommentHistoryField.clear()
 
-        comment = self.currOpenCommentHistoryField.toPlainText()
-        self.selected_comment_item.updateDomElement("comment", comment)
-
-        outFile = QFile(QString(self.selected_comment_xml))
-        outFile.open(QFile.WriteOnly | QFile.Text)
-        self.selected_comment_item.write_test(outFile)
-
-        localFile = "." + os.path.basename(cmds.file(q=True, sn=True)) + ".xml"
-        if localFile == os.path.basename(self.selected_comment_xml):
-            self.currOpenCommentField.setPlainText(comment)
-        QMessageBox.information(self, "Info", "Success")
+#    def selectedSaveComment(self):
+#        if self.selected_comment_item is None:
+#            return
+#
+#        comment = self.currOpenCommentHistoryField.toPlainText()
+#        self.selected_comment_item.updateDomElement("comment", comment)
+#
+#        outFile = QFile(QString(self.selected_comment_xml))
+#        outFile.open(QFile.WriteOnly | QFile.Text)
+#        self.selected_comment_item.write_test(outFile)
+#
+#        localFile = "." + os.path.basename(cmds.file(q=True, sn=True)) + ".xml"
+#        if localFile == os.path.basename(self.selected_comment_xml):
+#            self.currOpenCommentField.setPlainText(comment)
+#        QMessageBox.information(self, "Info", "Success")
 
     def openSaveAs(self):
         theFile = cmds.fileDialog2(dialogStyle=2)[0]
-        cmds.file(rename = theFile )
-        cmds.file( save = 1  )
+        cmds.file(rename=theFile)
+        cmds.file(save=1)
         
     def sceneFileSelected(self, item, tab, mode):
         currSelected = self.getCurrentlySelectedItem(tab, 3)
@@ -492,159 +385,159 @@ class iPipeline(QMainWindow,
         level2 = currSelected[1]
         level3 = currSelected[2]
 
-        if tab == 1: # asset
-            previewObject = self.assetPreviewImage
-            commentObject = self.assetCommentField
-        elif tab == 2: # shot
-            previewObject = self.shotPreviewImage
-            commentObject = self.shotCommentField
+#        if tab == 1: # asset
+#            previewObject = self.assetPreviewImage
+#            commentObject = self.assetCommentField
+#        elif tab == 2: # shot
+#            previewObject = self.shotPreviewImage
+#            commentObject = self.shotCommentField
         if mode == "devel":
             fileName = self.getFileName(tab, level1, level2, level3, "devFolder")
         elif mode == "publish":
             fileName = self.getFileName(tab, level1, level2, level3, "pubFolder")
 
-        image = fileName+"/scenes/."+item.text()+".thumb.jpg"
-        xmlFile = fileName+"/scenes/."+item.text()+".xml"
+#        image = fileName+"/scenes/."+item.text()+".thumb.jpg"
+#        xmlFile = fileName+"/scenes/."+item.text()+".xml"
 
-        if QFileInfo(image).isFile():
-            previewObject.setPixmap(QPixmap(image))
-        else:
-            previewObject.setPixmap(QPixmap(NO_PREVIEW_FILENAME))
+#        if QFileInfo(image).isFile():
+#            previewObject.setPixmap(QPixmap(image))
+#        else:
+#            previewObject.setPixmap(QPixmap(NO_PREVIEW_FILENAME))
 
-        if QFileInfo(xmlFile).isFile():
-            n = Core.Note.Note2.NoteContainer()
-            n.importSAX(str(xmlFile))
-            comment = n.getNotes()[0].comment
-            commentObject.setPlainText(comment)
-        else:
-            commentObject.clear()
+#        if QFileInfo(xmlFile).isFile():
+#            n = Core.Note.Note2.NoteContainer()
+#            n.importSAX(str(xmlFile))
+#            comment = n.getNotes()[0].comment
+#            commentObject.setPlainText(comment)
+#        else:
+#            commentObject.clear()
 
-        self.currOpenFile = fileName+"/scenes/."+item.text()
+        self.currOpenFile = fileName + "/scenes/." + item.text()
 
     def setUsername(self, name):
         self.userinfo.name = name
 
-    def updateCurrentlyComment(self, item):
-        self.selected_comment_item = None
-        self.selected_comment_xml = None
-        self.currOpenClearSelectedCommentButton.setEnabled(False)
-        self.currOpenSaveSelectedCommentButton.setEnabled(False)
-        index = item.row()
-        current_item = self.currOpenHistories[index]
+#    def updateCurrentlyComment(self, item):
+#        self.selected_comment_item = None
+#        self.selected_comment_xml = None
+#        self.currOpenClearSelectedCommentButton.setEnabled(False)
+#        self.currOpenSaveSelectedCommentButton.setEnabled(False)
+#        index = item.row()
+#        current_item = self.currOpenHistories[index]
+#
+#        level1 = self.currOpenLevel1Field.text()
+#        level2 = self.currOpenLevel2Field.text()
+#        level3 = self.currOpenLevel3Field.text()
+#        tab = self.currOpenTab
+#
+#        if current_item.event == "devel":
+#            fileName = self.getFileName(tab, level1, level2, level3, "devFolder")
+#        elif current_item.event == "publish":
+#            fileName = self.getFileName(tab, level1, level2, level3, "pubFolder")
+#        else:
+#            self.currOpenCommentHistoryField.setPlainText("")
+#            return
+#
+#        sceneFolder = os.path.join(str(fileName), 'scenes')
+#        subject = str(current_item.subject).strip()
+#        if len(subject) == 0:
+#            if current_item.event == "devel":
+#                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_w" + str(current_item.wipversion).zfill(2) + ".mb"
+#            elif current_item.event == "publish":
+#                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + ".mb"
+#        else:
+#            if current_item.event == "devel":
+#                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_w" + str(current_item.wipversion).zfill(2) + "_" + subject + ".mb"
+#            elif current_item.event == "publish":
+#                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_" + subject + ".mb"
+#
+#        filename = str(filename)
+#        self.selected_comment_xml = os.path.join(sceneFolder, '.%s.xml' % filename)
+#        if os.path.exists(self.selected_comment_xml):
+#            xmlfile = QFile( QString(self.selected_comment_xml))
+#            self.selected_comment_item = iXML()
+#            self.selected_comment_item.read(xmlfile)
+#            self.currOpenCommentHistoryField.setPlainText(self.selected_comment_item.findElement("comment"))
+#            self.currOpenClearSelectedCommentButton.setEnabled(True)
+#            self.currOpenSaveSelectedCommentButton.setEnabled(True)
 
-        level1 = self.currOpenLevel1Field.text()
-        level2 = self.currOpenLevel2Field.text()
-        level3 = self.currOpenLevel3Field.text()
-        tab = self.currOpenTab
+#    def updateAssetComment(self, item):
+#        index = item.row()
+#        current_item = self.assetHistories[index]
+#
+#        tab = self.tabWidget.currentIndex()
+#        currSelected = self.getCurrentlySelectedItem(tab, 3)
+#        level1 = currSelected[0]
+#        level2 = currSelected[1]
+#        level3 = currSelected[2]
+#
+#        if current_item.event == "devel":
+#            fileName = self.getFileName(tab, level1, level2, level3, "devFolder")
+#        elif current_item.event == "publish":
+#            fileName = self.getFileName(tab, level1, level2, level3, "pubFolder")
+#        else:
+#            self.assetCommentField.setPlainText("")
+#            return
+#
+#        sceneFolder = os.path.join(str(fileName), 'scenes')
+#        subject = str(current_item.subject).strip()
+#        if len(subject) == 0:
+#            if current_item.event == "devel":
+#                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_w" + str(current_item.wipversion).zfill(2) + ".mb"
+#            elif current_item.event == "publish":
+#                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + ".mb"
+#        else:
+#            if current_item.event == "devel":
+#                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_w" + str(current_item.wipversion).zfill(2) + "_" + subject + ".mb"
+#            elif current_item.event == "publish":
+#                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_" + subject + ".mb"
+#
+#        filename = str(filename)
+#        _xmlfile = os.path.join(sceneFolder, '.%s.xml' % filename)
+#        if os.path.exists(_xmlfile):
+#            xmlfile = QFile( QString(_xmlfile))
+#            xml = iXML()
+#            xml.read(xmlfile)
+#            self.assetCommentField.setPlainText(xml.findElement("comment"))
 
-        if current_item.event == "devel":
-            fileName = self.getFileName(tab, level1, level2, level3, "devFolder")
-        #elif current_item.event == "publish":
-        #    fileName = self.getFileName(tab, level1, level2, level3, "pubFolder")
-        else:
-            self.currOpenCommentHistoryField.setPlainText("")
-            return
-
-        sceneFolder = os.path.join(str(fileName), 'scenes')
-        subject = str(current_item.subject).strip()
-        if len(subject) == 0:
-            if current_item.event == "devel":
-                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_w" + str(current_item.wipversion).zfill(2) + ".mb"
-            elif current_item.event == "publish":
-                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + ".mb"
-        else:
-            if current_item.event == "devel":
-                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_w" + str(current_item.wipversion).zfill(2) + "_" + subject + ".mb"
-            elif current_item.event == "publish":
-                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_" + subject + ".mb"
-
-        filename = str(filename)
-        self.selected_comment_xml = os.path.join(sceneFolder, '.%s.xml' % filename)
-        if os.path.exists(self.selected_comment_xml):
-            xmlfile = QFile( QString(self.selected_comment_xml))
-            self.selected_comment_item = iXML()
-            self.selected_comment_item.read(xmlfile)
-            self.currOpenCommentHistoryField.setPlainText(self.selected_comment_item.findElement("comment"))
-            self.currOpenClearSelectedCommentButton.setEnabled(True)
-            self.currOpenSaveSelectedCommentButton.setEnabled(True)
-
-    def updateAssetComment(self, item):
-        index = item.row()
-        current_item = self.assetHistories[index]
-
-        tab = self.tabWidget.currentIndex()
-        currSelected = self.getCurrentlySelectedItem(tab, 3)
-        level1 = currSelected[0]
-        level2 = currSelected[1]
-        level3 = currSelected[2]
-
-        if current_item.event == "devel":
-            fileName = self.getFileName(tab, level1, level2, level3, "devFolder")
-        elif current_item.event == "publish":
-            fileName = self.getFileName(tab, level1, level2, level3, "pubFolder")
-        else:
-            self.assetCommentField.setPlainText("")
-            return
-
-        sceneFolder = os.path.join(str(fileName), 'scenes')
-        subject = str(current_item.subject).strip()
-        if len(subject) == 0:
-            if current_item.event == "devel":
-                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_w" + str(current_item.wipversion).zfill(2) + ".mb"
-            elif current_item.event == "publish":
-                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + ".mb"
-        else:
-            if current_item.event == "devel":
-                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_w" + str(current_item.wipversion).zfill(2) + "_" + subject + ".mb"
-            elif current_item.event == "publish":
-                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_" + subject + ".mb"
-
-        filename = str(filename)
-        _xmlfile = os.path.join(sceneFolder, '.%s.xml' % filename)
-        if os.path.exists(_xmlfile):
-            xmlfile = QFile( QString(_xmlfile))
-            xml = iXML()
-            xml.read(xmlfile)
-            self.assetCommentField.setPlainText(xml.findElement("comment"))
-
-    def updateShotComment(self, item):
-        index = item.row()
-        current_item = self.shotHistories[index]
-
-        tab = self.tabWidget.currentIndex()
-        currSelected = self.getCurrentlySelectedItem(tab, 3)
-        level1 = currSelected[0]
-        level2 = currSelected[1]
-        level3 = currSelected[2]
-
-        if current_item.event == "devel":
-            fileName = self.getFileName(tab, level1, level2, level3, "devFolder")
-        elif current_item.event == "publish":
-            fileName = self.getFileName(tab, level1, level2, level3, "pubFolder")
-        else:
-            self.shotCommentField.setPlainText("")
-            return
-
-        sceneFolder = os.path.join(str(fileName), 'scenes')
-        subject = str(current_item.subject).strip()
-        if len(subject) == 0:
-            if current_item.event == "devel":
-                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_w" + str(current_item.wipversion).zfill(2) + ".mb"
-            elif current_item.event == "publish":
-                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + ".mb"
-        else:
-            if current_item.event == "devel":
-                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_w" + str(current_item.wipversion).zfill(2) + "_" + subject + ".mb"
-            elif current_item.event == "publish":
-                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_" + subject + ".mb"
-
-        filename = str(filename)
-        _xmlfile = os.path.join(sceneFolder, '.%s.xml' % filename)
-        if os.path.exists(_xmlfile):
-            xmlfile = QFile( QString(_xmlfile))
-            xml = iXML()
-            xml.read(xmlfile)
-            self.shotCommentField.setPlainText(xml.findElement("comment"))
+#    def updateShotComment(self, item):
+#        index = item.row()
+#        current_item = self.shotHistories[index]
+#
+#        tab = self.tabWidget.currentIndex()
+#        currSelected = self.getCurrentlySelectedItem(tab, 3)
+#        level1 = currSelected[0]
+#        level2 = currSelected[1]
+#        level3 = currSelected[2]
+#
+#        if current_item.event == "devel":
+#            fileName = self.getFileName(tab, level1, level2, level3, "devFolder")
+#        elif current_item.event == "publish":
+#            fileName = self.getFileName(tab, level1, level2, level3, "pubFolder")
+#        else:
+#            self.shotCommentField.setPlainText("")
+#            return
+#
+#        sceneFolder = os.path.join(str(fileName), 'scenes')
+#        subject = str(current_item.subject).strip()
+#        if len(subject) == 0:
+#            if current_item.event == "devel":
+#                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_w" + str(current_item.wipversion).zfill(2) + ".mb"
+#            elif current_item.event == "publish":
+#                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + ".mb"
+#        else:
+#            if current_item.event == "devel":
+#                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_w" + str(current_item.wipversion).zfill(2) + "_" + subject + ".mb"
+#            elif current_item.event == "publish":
+#                filename = level2 + "_" + level3 + "_v" + str(current_item.version).zfill(2) + "_" + subject + ".mb"
+#
+#        filename = str(filename)
+#        _xmlfile = os.path.join(sceneFolder, '.%s.xml' % filename)
+#        if os.path.exists(_xmlfile):
+#            xmlfile = QFile( QString(_xmlfile))
+#            xml = iXML()
+#            xml.read(xmlfile)
+#            self.shotCommentField.setPlainText(xml.findElement("comment"))
 
     def assetShotListMenu(self, mode, pos):
         if mode == "asset":
@@ -692,7 +585,7 @@ class iPipeline(QMainWindow,
         st.show()
 
     def componentMenu(self, pos, tab, mode):
-        saveAsCurrentDevAct = self.createAction( "Create Current Scene into Devel" , lambda : self.saveAsCurrentDev(tab) )
+        saveAsCurrentDevAct = self.createAction("Create Current Scene into Devel" , lambda : self.saveAsCurrentDev(tab))
 #        createEmptyDevAct = self.createAction( "Create empty scnene" , self.createEmptyDev )
         refAssetAct = self.createAction("reference (assetName:)", lambda: self.importReference(tab, "reference (assetName:)", mode, 0))
         importAssetAct = self.createAction("import (assetName:)", lambda: self.importReference(tab, "import (assetName:)", mode, 0))
@@ -712,28 +605,28 @@ class iPipeline(QMainWindow,
         menu.addAction(multipleImportAct)
         menu.exec_(self.assetDevelList.mapToGlobal(pos))
 
-    def saveAsCurrentDev(self , tab ):       
+    def saveAsCurrentDev(self , tab):       
         self.currOpenTab = tab
         subjectName = str(self.currOpenSubjectField.text())
          # destination file information   
-        if tab ==1 :     
+        if tab == 1 :     
             level1 = self.assetTypeScrollList.currentItem().text()
             level2 = self.assetScrollList.currentItem().text()
             level3 = self.componentScrollList.currentItem().text() 
-            sceneFileName = str( self.assetDevelList.currentItem().text() ) if self.assetDevelList.currentItem() != None else '' 
+            sceneFileName = str(self.assetDevelList.currentItem().text()) if self.assetDevelList.currentItem() != None else '' 
 
-        elif tab ==2:
+        elif tab == 2:
             level1 = self.sequenceScrollList.currentItem().text()
             level2 = self.shotScrollList.currentItem().text()
             level3 = self.shotComponentScrollList.currentItem().text()  
-            sceneFileName = str( self.shotDevelList.currentItem().text() ) if self.shotDevelList.currentItem() != None else ''
+            sceneFileName = str(self.shotDevelList.currentItem().text()) if self.shotDevelList.currentItem() != None else ''
 
         self.currOpenProjectName = self.projNameCombo.currentText()
         sceneFolder = str(self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1))
         
-        sceneFiles = glob.glob(sceneFolder+"*.mb")
-        if len( sceneFiles ):        
-            ver_wip = VER_WIP_RE.findall( sceneFileName )[0] # return v01_w02
+        sceneFiles = glob.glob(sceneFolder + "*.mb")
+        if len(sceneFiles):        
+            ver_wip = VER_WIP_RE.findall(sceneFileName)[0] # return v01_w02
             currVer = int(ver_wip[1:3])
             currWip = int(ver_wip[-2:])        
         
@@ -742,7 +635,7 @@ class iPipeline(QMainWindow,
             if QFileInfo(os.path.join(sceneFolder, sceneFileName)).isFile():                
                 while True:
                     currWip += 1
-                    curLatestVersion = os.path.join(sceneFolder, sceneFileName.replace(ver_wip, ver_wip[:-2]+str(currWip).zfill(2)))
+                    curLatestVersion = os.path.join(sceneFolder, sceneFileName.replace(ver_wip, ver_wip[:-2] + str(currWip).zfill(2)))
                     if not QFileInfo(curLatestVersion).isFile(): 
                         print 'correct curLatestVersion : ' , curLatestVersion                       
                         break
@@ -752,9 +645,9 @@ class iPipeline(QMainWindow,
         else :
             currVer = 1
             currWip = 1
-            sceneFileName = str(level2) +'_'+ str(level3) + '_v01_w01.mb'                   
+            sceneFileName = str(level2) + '_' + str(level3) + '_v01_w01.mb'                   
             curLatestVersion = os.path.join(sceneFolder, sceneFileName)
-        print 'error2 curLatestVersion : ' , curLatestVersion
+            print 'error2 curLatestVersion : ' , curLatestVersion
         
 
         # 서브젝트가 존재할 때
@@ -768,18 +661,24 @@ class iPipeline(QMainWindow,
                 basename = os.path.splitext(fileName)[0]
                 if subjectLists.get(basename) is None:
                     subjectLists[basename] = []
-                subjectLists[basename].append( i )
+                subjectLists[basename].append(i)
 
             for subject in subjectLists.keys():
                 subjectLists[subject] = sorted(subjectLists[subject])
 
             if len(subjectLists):
-                #try:
+                #try:                
+                if subjectLists.get(subjectName) == None :
+                    _ver_wip = VER_WIP_RE.findall(sceneFileName)[0]
+                    fileName = sceneFileName.split(_ver_wip)[-1][1:] # remove underscore
+                    basename = os.path.splitext(fileName)[0]                    
+                    subjectLists[subjectName] = [ os.path.join(sceneFolder, sceneFileName.replace(basename , subjectName)) ]
                 subjects = subjectLists[subjectName]
                 subjects = sorted(subjects, reverse=True)
+                print 'subjectLists : ' , subjectLists
                 destinationFile = subjects[0]
-                ver = VER_WIP_RE.findall( os.path.basename(str(destinationFile)))[0]
-                nVer = ver[:-2]+str(int(ver[-2:])+1).zfill(2)
+                ver = VER_WIP_RE.findall(os.path.basename(str(destinationFile)))[0]
+                nVer = ver[:-2] + str(int(ver[-2:]) + 1).zfill(2)
                 destinationFile = destinationFile.replace(ver, nVer)
                 #except KeyError:
                 #    destinationFile = os.path.join(sceneFolder, "%s_%s_v01_w01_%s.mb" % (level2, level3, str(self.currOpenSubjectField.text())))
@@ -791,67 +690,85 @@ class iPipeline(QMainWindow,
             defaultFiles = filter(SCENEFILE_RE.search, sceneFiles)
             if len(defaultFiles):
                 destinationFile = defaultFiles[-1]
-                ver = VER_WIP_RE.findall( os.path.basename(str(destinationFile)))[0]
-                nVer = ver[:-2]+str(int(ver[-2:])+1).zfill(2)
+                ver = VER_WIP_RE.findall(os.path.basename(str(destinationFile)))[0]
+                nVer = ver[:-2] + str(int(ver[-2:]) + 1).zfill(2)
                 destinationFile = destinationFile.replace(ver, nVer)
             else:
                 # 초기화 버전
                 destinationFile = os.path.join(sceneFolder, "%s_%s_v01_w01.mb" % (level2, level3))
 
-        info = Information("Save Current Into Devel", level2, level3, currVer, currWip, subjectName, curLatestVersion, destinationFile, self)
+        info = Information("Save Current Into Devel", tab , level1 , level2, level3, currVer, currWip, subjectName, curLatestVersion, destinationFile, self)
         self.connect(info, SIGNAL("save"),
                      self.saveCurrentIntoDevel)
         info.show()
         
-    def saveCurrentIntoDevel(self ,destinationFile, comment, status, progress, ctime, application, subjectName):               
+    def saveCurrentIntoDevel(self , destinationFile, comment, status, progress, ctime, application, subjectName):               
         ext = 'mb'
         tab = self.currOpenTab
-        if tab ==1 :     
+        if tab == 1 :     
             level1 = self.assetTypeScrollList.currentItem().text()
             level2 = self.assetScrollList.currentItem().text()
             level3 = self.componentScrollList.currentItem().text() 
-            sceneFileName = str( self.assetDevelList.currentItem().text() ) if self.assetDevelList.currentItem() != None else ''
+            sceneFileName = str(self.assetDevelList.currentItem().text()) if self.assetDevelList.currentItem() != None else ''
 
-        elif tab ==2:
+        elif tab == 2:
             level1 = self.sequenceScrollList.currentItem().text()
             level2 = self.shotScrollList.currentItem().text()
             level3 = self.shotComponentScrollList.currentItem().text()  
-            sceneFileName = str( self.shotDevelList.currentItem().text() ) if self.shotDevelList.currentItem() != None else ''
+            sceneFileName = str(self.shotDevelList.currentItem().text()) if self.shotDevelList.currentItem() != None else ''
         
         
-        sceneFolder = str( self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1) )
+        sceneFolder = str(self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1))
         print 'sceneFolder : ' , sceneFolder
         
         fileName = os.path.basename(str(destinationFile))
         print 'fileName : ' , fileName
-        ver = int(VER_RE.findall( fileName )[0][2:])
-        wip = int(WIP_RE.findall( fileName )[0][2:])        
+        ver = int(VER_RE.findall(fileName)[0][2:])
+        wip = int(WIP_RE.findall(fileName)[0][2:])        
         # model layer information
-        if str( level3 ) == 'model' and cmds.ls( 'model_layerInfo' ) == [] :
+        if str(level3) == 'model' and cmds.ls('model_layerInfo') == [] :
             print' creating model layer information'
             lm = layerManager()
             lm.createLMnode()
         else:
             print 'failed create lm node...........'
-
+        
         try:
-            theResultPath = os.path.join(sceneFolder , str(destinationFile) )            
-            cmds.file(rename=str( theResultPath ) )
+            theResultPath = os.path.join(sceneFolder , str(destinationFile))            
+            cmds.file(rename=str(theResultPath))
             if ext == 'ma':
                 type = 'mayaAscii'
             elif ext == 'mb':
                 type = 'mayaBinary'
             else:
                 type = 'mayaBinary'
-                QMessageBox.warning(self, "warning", "openPipelineSaveWorkshop: Invalid file format ("+ext+") specified: saving to Maya Binary")
+                QMessageBox.warning(self, "warning", "openPipelineSaveWorkshop: Invalid file format (" + ext + ") specified: saving to Maya Binary")
             # 씬파일 저장            
-            cmds.file(save=True, type=type)
+            
+            try :
+                cmds.file(save=True, type=type)
+                if tab == 1:                     
+                    AssetRegister(self.projNameCombo.currentText() , level1 , level2 , level3 , subjectName, ver , wip , self.userinfo.num, self.userinfo.name , comment)
+                elif tab == 2:
+                    JobRegister(self.projNameCombo.currentText() , level1 , level2 , level3 , subjectName, ver , wip , self.userinfo.num , self.userinfo.name, comment)
+                self.mssg('Database 서버에 성공적으로 등록 되었습니다.')
+            except :                
+                self.mssg('치명적 오류가 발생 하였습니다.\n아무것도 만지지 마시고 \nPipeline TD( 오호준 )에게 연락 주세요 ')
 
-        except:
-            if 'win' in sys.platform:
-                os.system('type NUL>%s' % os.path.join(sceneFolder, str(destinationFile)))                
-            else:
-                os.system('touch %s' % os.path.join(sceneFolder, str(destinationFile)))                
+        except:               
+            try:
+                if 'win' in sys.platform:                        
+                    os.system('type NUL>%s' % os.path.join(sceneFolder, str(destinationFile)))
+                else:
+                    os.system('touch %s' % os.path.join(sceneFolder, str(destinationFile)))  
+                if tab == 1 :
+                    createAsset(self.projNameCombo.currentText() , level1 , level2 , levle3)
+                elif tab == 2:
+                    createJob(self.projNameCombo.currentText() , level1 , level2 , level3)
+                self.mssg('Database 서버에 성공적으로 등록 되었습니다.')              
+            except:
+                self.mssg('치명적 오류가 발생 하였습니다.\n아무것도 만지지 마시고 \nPipeline TD( 오호준 )에게 연락 주세요 ')
+                
                          
         # xml 생성
         historyFile = str(self.getFileName(tab, level1, level2, level3, "historyFile", 0, 1))
@@ -860,14 +777,14 @@ class iPipeline(QMainWindow,
             nc.importSAX(historyFile)
         else:
             open(historyFile, 'w')
-        nc.addN(Note(self.userinfo.name,  # author
+        nc.addN(Note(self.userinfo.name, # author
                     self.getDate(), # date
                     self.getTime(), # time
-                    "devel",        # event
-                    ver,            # version
-                    wip,            # wipversion
-                    subjectName,    # subject
-                    unicode(comment),    # comment
+                    "devel", # event
+                    ver, # version
+                    wip, # wipversion
+                    subjectName, # subject
+                    unicode(comment), # comment
                     fileName,
                     sceneFolder[:-1],
                     status,
@@ -877,16 +794,16 @@ class iPipeline(QMainWindow,
                     application
                     ))
         nc.exportXML(historyFile)
-        nc.ibXML(os.path.join(str(sceneFolder),   ".%s.xml" % fileName)   )
+        nc.ibXML(os.path.join(str(sceneFolder), ".%s.xml" % fileName))
 
         self.loadCurrentHistory()
-        self.currOpenVerField.setText("v"+str(ver).zfill(2))
-        self.currOpenWipField.setText("w"+str(wip).zfill(2))
+        self.currOpenVerField.setText("v" + str(ver).zfill(2))
+        self.currOpenWipField.setText("w" + str(wip).zfill(2))
         self.currOpenCommentField.setText(comment)
         #self.currOpenFileNameLabel.setText(os.path.join(str(sceneFolder), str(destinationFile)))
         self.currOpenFileNameLabel.setText(destinationFile)
         self.currOpenSubjectField.setText(subjectName)
-        if tab ==1:
+        if tab == 1:
             self.loadAssetBrowse()
         elif tab == 2:
             self.loadShotBrowse()            
@@ -899,7 +816,7 @@ class iPipeline(QMainWindow,
         except:
             return True
 
-        
+        self.refreshCurrentlyOpen() 
         
     def createEmptyDev(self):
         print 'createEmptyDev'
@@ -945,7 +862,7 @@ class iPipeline(QMainWindow,
             return
         itemName = item.text()
         assetName = str(currSelected[1])
-        fileName = path+"/scenes/"+itemName
+        fileName = path + "/scenes/" + itemName
 
         if sel:
             name = "multiple import (assetname:)"
@@ -981,7 +898,7 @@ class iPipeline(QMainWindow,
             return
         itemName = item.text()
         assetName = currSelected[1]
-        fileName = path+"/scenes/"+itemName
+        fileName = path + "/scenes/" + itemName
         if type: # filename
             namespace = os.path.splitext(str(itemName))[0]
         else: # assetName
@@ -991,9 +908,7 @@ class iPipeline(QMainWindow,
             if not standAlone :
                 commd = "file -r -gl -shd \"shadingNetworks\" -namespace \"%s\" -lrd \"all\" -options \"v=0\" \"%s\"" % (namespace, fileName)
                 print commd
-                mel.eval(commd)
-                
-                
+                mel.eval(commd)                
         elif ex == "import (assetName:)":
             if not standAlone :
                 mel.eval("file -import -namespace \"%s\" -ra true -options \"v=0\"  -pr -loadReferenceDepth \"all\" \"%s\"" % (namespace, fileName))
@@ -1002,19 +917,8 @@ class iPipeline(QMainWindow,
                 mel.eval("file -import -type \"mayaBinary\" -rdn -rpr \"clash\" -options \"v=0;p=17\"  -pr -loadReferenceDepth \"all\" \"%s\"" % (fileName))
              
 #    def updateWorkingTab(self, tab):
-#        if tab == 0:
-#            self.resize(730,self.tabYsize)
-##            self.resize(958,650)
-#            self.resizeButton.setText( '<<<')
-#        elif tab == 1:            
-#            self.resize(531,self.tabYsize)
-#            self.resizeButton.setText( '>>>')
-#            self.updateAssetTypeList()
-#        elif tab == 2:
-#            self.resize(531,self.tabYsize)
-#            self.resizeButton.setText( '>>>')
-#            self.updateSequenceList()
-#    
+#        self.currOpenTab = tab
+    
 #    def resizing(self): 
 #        if self.size().width() < 740: 
 #            if self.tabWidget.currentIndex() == 0:
@@ -1283,9 +1187,9 @@ class iPipeline(QMainWindow,
         ver = self.currOpenVerField.text()
         wip = self.currOpenWipField.text()
         if len(subject):
-            fileName = "."+self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+wip+"_"+subject+".mb.thumb.jpg"
+            fileName = "." + self.currOpenLevel2 + "_" + self.currOpenLevel3 + "_" + ver + "_" + wip + "_" + subject + ".mb.thumb.jpg"
         else:
-            fileName = "."+self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+wip+".mb.thumb.jpg"        
+            fileName = "." + self.currOpenLevel2 + "_" + self.currOpenLevel3 + "_" + ver + "_" + wip + ".mb.thumb.jpg"        
         image = self.createThumbnailN(tab, level1, level2, level3, fileName)
         if QFile.exists(image):
             self.currOpenPreviewImage.setPixmap(QPixmap(image))
@@ -1304,14 +1208,14 @@ class iPipeline(QMainWindow,
         wip = self.currOpenWipField.text()
 
         if len(subject):
-            fileName = self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+wip+"_"+subject+".mov"
+            fileName = self.currOpenLevel2 + "_" + self.currOpenLevel3 + "_" + ver + "_" + wip + "_" + subject + ".mov"
         else:
-            fileName = self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+wip+".mov"
+            fileName = self.currOpenLevel2 + "_" + self.currOpenLevel3 + "_" + ver + "_" + wip + ".mov"
 
         previewScale = self.previewScale_spinBox.value() 
         playblastFile, startFrame, endFrame, width, height, ratio = self.recordPlayblastForSequenceN(tab, level1, level2, level3, fileName , previewScale)
         priority = self.tracPriority_spinBox.value()        
-        Tractor(self.userinfo.num, level2, level3, playblastFile, startFrame, endFrame, width, height, ratio , priority )
+        Tractor(self.userinfo.num, level2, level3, playblastFile, startFrame, endFrame, width, height, ratio , priority)
 
         messageBox = QMessageBox(self)
         messageBox.setText('Success')
@@ -1327,6 +1231,35 @@ class iPipeline(QMainWindow,
         elif messageBox.clickedButton() == closeButton:
             pass
 
+    def recordPubPlayblast(self):
+        if not self.confirmDialog("Confirm", 'Are you sure you want to record the scene?'):
+            return
+        level1 = self.currOpenLevel1
+        level2 = self.currOpenLevel2
+        level3 = self.currOpenLevel3
+        tab = self.currOpenTab
+        subject = self.currOpenSubjectField.text()
+        ver = self.currOpenVerField.text()
+        
+        if len(subject):
+            fileName = self.currOpenLevel2 + "_" + self.currOpenLevel3 + "_" + ver + "_" + subject + ".mov"            
+        else:
+            fileName = self.currOpenLevel2 + "_" + self.currOpenLevel3 + "_" + ver + ".mov"
+
+        previewScale = self.previewScale_spinBox.value() 
+        playblastFile, startFrame, endFrame, width, height, ratio = self.recordPlayblastForSequenceN(tab, level1, level2, level3, fileName , previewScale , folder='pubFolder')
+        messageBox = QMessageBox(self)
+        messageBox.setText('Success')
+        messageBox.setWindowModality(Qt.WindowModal)
+        messageBox.setIcon(QMessageBox.Information)
+        closeButton = messageBox.addButton('Close', QMessageBox.AcceptRole)
+        messageBox.exec_()
+
+        if messageBox.clickedButton() == closeButton:
+            pass
+        playblastFile = playblastFile.replace('/show/' , '')
+        return os.path.dirname(playblastFile) 
+        
     def viewPlayblastSelected(self, tab):
         selectedItem = self.getCurrentlySelectedItem(tab, 3)
         self.viewPlayblast(tab, selectedItem[0], selectedItem[1], selectedItem[2])
@@ -1379,14 +1312,18 @@ class iPipeline(QMainWindow,
         self.taskUI(2, selectedItem[0], selectedItem[1], selectedItem[2])
 
     def taskUI(self, tab, level1, level2, level3):
-        w = WorkcodeManager(tab, level1, level2, level3, self.workcodedata, self.userinfo.num, self)
+        w = WorkcodeManager(tab, level1, level2, level3, self.workcodedata, self.userinfo.name , self)
         w.show()
-
+        
+    def mssg(self, msg):
+        messageBox = QMessageBox(self)
+        messageBox.setText(unicode(msg))
+        messageBox.setWindowModality(Qt.WindowModal)
+        messageBox.setIcon(QMessageBox.Information)
+        closeButton = messageBox.addButton('Close', QMessageBox.AcceptRole)
+        messageBox.exec_()
+        
     def saveDevelSelected(self):
-        if not self.ModCheck.allModCheck():
-            return  
-        
-        
         level1 = self.currOpenLevel1Field.text()
         level2 = self.currOpenLevel2Field.text()
         level3 = self.currOpenLevel3Field.text()
@@ -1396,16 +1333,16 @@ class iPipeline(QMainWindow,
         sceneFileName = str(self.currOpenFileNameLabel.text())
 
         sceneFolder = str(self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1))
-        sceneFiles = glob.glob(sceneFolder+"*.mb")
+        sceneFiles = glob.glob(sceneFolder + "*.mb")
         
-        ver_wip = VER_WIP_RE.findall( sceneFileName )[0] # return v01_w02
+        ver_wip = VER_WIP_RE.findall(sceneFileName)[0] # return v01_w02
         currVer = int(ver_wip[1:3])
         currWip = int(ver_wip[-2:])
 
         if QFileInfo(os.path.join(sceneFolder, sceneFileName)).isFile():
             while True:
                 currWip += 1
-                curLatestVersion = os.path.join(sceneFolder, sceneFileName.replace(ver_wip, ver_wip[:-2]+str(currWip).zfill(2)))
+                curLatestVersion = os.path.join(sceneFolder, sceneFileName.replace(ver_wip, ver_wip[:-2] + str(currWip).zfill(2)))
                 if not QFileInfo(curLatestVersion).isFile():
                     break
         else:
@@ -1422,7 +1359,7 @@ class iPipeline(QMainWindow,
                 basename = os.path.splitext(fileName)[0]
                 if subjectLists.get(basename) is None:
                     subjectLists[basename] = []
-                subjectLists[basename].append( i )
+                subjectLists[basename].append(i)
 
             for subject in subjectLists.keys():
                 subjectLists[subject] = sorted(subjectLists[subject])
@@ -1432,8 +1369,8 @@ class iPipeline(QMainWindow,
                 subjects = subjectLists[subjectName]
                 subjects = sorted(subjects, reverse=True)
                 destinationFile = subjects[0]
-                ver = VER_WIP_RE.findall( os.path.basename(str(destinationFile)))[0]
-                nVer = ver[:-2]+str(int(ver[-2:])+1).zfill(2)
+                ver = VER_WIP_RE.findall(os.path.basename(str(destinationFile)))[0]
+                nVer = ver[:-2] + str(int(ver[-2:]) + 1).zfill(2)
                 destinationFile = destinationFile.replace(ver, nVer)
                 #except KeyError:
                 #    destinationFile = os.path.join(sceneFolder, "%s_%s_v01_w01_%s.mb" % (level2, level3, str(self.currOpenSubjectField.text())))
@@ -1446,39 +1383,40 @@ class iPipeline(QMainWindow,
             defaultFiles = filter(SCENEFILE_RE.search, sceneFiles)
             if len(defaultFiles):
                 destinationFile = defaultFiles[-1]
-                ver = VER_WIP_RE.findall( os.path.basename(str(destinationFile)))[0]
-                nVer = ver[:-2]+str(int(ver[-2:])+1).zfill(2)
+                ver = VER_WIP_RE.findall(os.path.basename(str(destinationFile)))[0]
+                nVer = ver[:-2] + str(int(ver[-2:]) + 1).zfill(2)
                 destinationFile = destinationFile.replace(ver, nVer)
             else:
                 # 초기화 버전
                 destinationFile = os.path.join(sceneFolder, "%s_%s_v01_w01.mb" % (level2, level3))
 
-        info = Information("Save Devel", level2, level3, currVer, currWip, subjectName, curLatestVersion, destinationFile, self)
+        info = Information("Save Devel", tab , level1 , level2, level3, currVer, currWip, subjectName, curLatestVersion, destinationFile, self)
         self.connect(info, SIGNAL("save"),
                      self.saveDevel)
         info.show()
 
-    def saveDevel(self, destinationFile, comment, status, progress, ctime, application, subjectName):
+    def saveDevel(self, destinationFile, comment, status, progress, ctime, application, subjectName , tab):
         ext = 'mb'
         level1 = self.currOpenLevel1Field.text()
         level2 = self.currOpenLevel2Field.text()
         level3 = self.currOpenLevel3Field.text()
-        tab = self.currOpenTab
+#        tab = self.currOpenTab
+        
 
         sceneFolder = str(self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1))
 
         fileName = os.path.basename(str(destinationFile))
-        ver = int(VER_RE.findall( fileName )[0][2:])
-        wip = int(WIP_RE.findall( fileName )[0][2:])
+        ver = int(VER_RE.findall(fileName)[0][2:])
+        wip = int(WIP_RE.findall(fileName)[0][2:])
 
         # model layer information
-        if str( level3 ) == 'model' and cmds.ls( 'model_layerInfo' ) == [] :
+        if str(level3) == 'model' and cmds.ls('model_layerInfo') == [] :
             print' creating model layer information'
             lm = layerManager()
             lm.createLMnode()
         else:
-            print 'failed create lm node...........'
-
+            print 'failed create lm node...........'        
+        
         try:
             cmds.file(rename=str(destinationFile))
             if ext == 'ma':
@@ -1487,20 +1425,28 @@ class iPipeline(QMainWindow,
                 type = 'mayaBinary'
             else:
                 type = 'mayaBinary'
-                QMessageBox.warning(self, "warning", "openPipelineSaveWorkshop: Invalid file format ("+ext+") specified: saving to Maya Binary")
-            # 씬파일 저장
-            
+                QMessageBox.warning(self, "warning", "openPipelineSaveWorkshop: Invalid file format (" + ext + ") specified: saving to Maya Binary")
+            # 씬파일 저장           
+#            try :
             cmds.file(save=True, type=type)
+            if tab == 1:            
+                AssetRegister(self.projNameCombo.currentText() , level1 , level2 , level3 , subjectName, ver , wip , self.userinfo.num, self.userinfo.name , comment)
+            elif tab == 2:                
+                JobRegister(self.projNameCombo.currentText() , level1 , level2 , level3 , subjectName, ver , wip , self.userinfo.num, self.userinfo.name , comment)
+            self.mssg('Database 서버에 성공적으로 등록 되었습니다.')
 
-        except:
-            if 'win' in sys.platform:
-                os.system('type NUL>%s' % os.path.join(sceneFolder, str(destinationFile)))                
+        except:                       
+#            try:
+            if 'win' in sys.platform:                        
+                os.system('type NUL>%s' % os.path.join(sceneFolder, str(destinationFile)))
             else:
-                os.system('touch %s' % os.path.join(sceneFolder, str(destinationFile)))                
+                os.system('touch %s' % os.path.join(sceneFolder, str(destinationFile)))  
+     
 
-#        if str( level3 ) == 'model':
-#            lm = layerManager()
-#            lm.writeXML( os.path.join(sceneFolder, str( level2 ) + '_' + str( level3 ) + '.layml' ) )
+
+        if str(level3) == 'model':
+            lm = layerManager()
+            lm.writeXML(os.path.join(sceneFolder, str(level2) + '_' + str(level3) + '.layml'))
                          
         # xml 생성
         historyFile = str(self.getFileName(tab, level1, level2, level3, "historyFile", 0, 1))
@@ -1509,14 +1455,14 @@ class iPipeline(QMainWindow,
             nc.importSAX(historyFile)
         else:
             open(historyFile, 'w')
-        nc.addN(Note(self.userinfo.name,  # author
+        nc.addN(Note(self.userinfo.name, # author
                     self.getDate(), # date
                     self.getTime(), # time
-                    "devel",        # event
-                    ver,            # version
-                    wip,            # wipversion
-                    subjectName,    # subject
-                    unicode(comment),    # comment
+                    "devel", # event
+                    ver, # version
+                    wip, # wipversion
+                    subjectName, # subject
+                    unicode(comment), # comment
                     fileName,
                     sceneFolder[:-1],
                     status,
@@ -1526,12 +1472,12 @@ class iPipeline(QMainWindow,
                     application
                     ))
         nc.exportXML(historyFile)
-        nc.ibXML(os.path.join(str(sceneFolder),   ".%s.xml" % fileName)   )
+        nc.ibXML(os.path.join(str(sceneFolder), ".%s.xml" % fileName))
 
         self.loadCurrentHistory()
 
-        self.currOpenVerField.setText("v"+str(ver).zfill(2))
-        self.currOpenWipField.setText("w"+str(wip).zfill(2))
+        self.currOpenVerField.setText("v" + str(ver).zfill(2))
+        self.currOpenWipField.setText("w" + str(wip).zfill(2))
         self.currOpenCommentField.setText(comment)
         #self.currOpenFileNameLabel.setText(os.path.join(str(sceneFolder), str(destinationFile)))
         self.currOpenFileNameLabel.setText(destinationFile)
@@ -1555,18 +1501,18 @@ class iPipeline(QMainWindow,
         o_filename = os.path.join(devSceneFolder, sceneFileName)
 
         # new
-        mayaFiles = glob.glob(devSceneFolder+"*.mb")
+        mayaFiles = glob.glob(devSceneFolder + "*.mb")
         develVer = 1
         develWip = 1
 
-        ver_wip = VER_WIP_RE.findall( sceneFileName )[0] # return v01_w02
+        ver_wip = VER_WIP_RE.findall(sceneFileName)[0] # return v01_w02
         currVer = int(ver_wip[1:3])
         currWip = int(ver_wip[-2:])
 
         if QFileInfo(os.path.join(devSceneFolder, sceneFileName)).isFile():
             while True:
                 currWip += 1
-                develFile = os.path.join(devSceneFolder, sceneFileName.replace(ver_wip, ver_wip[:-2]+str(currWip).zfill(2)))
+                develFile = os.path.join(devSceneFolder, sceneFileName.replace(ver_wip, ver_wip[:-2] + str(currWip).zfill(2)))
                 if not QFileInfo(develFile).isFile():
                     break
         else:
@@ -1583,7 +1529,7 @@ class iPipeline(QMainWindow,
                 basename = os.path.splitext(fileName)[0]
                 if subjectLists.get(basename) is None:
                     subjectLists[basename] = []
-                subjectLists[basename].append( i )
+                subjectLists[basename].append(i)
 
             for subject in subjectLists.keys():
                 subjectLists[subject] = sorted(subjectLists[subject])
@@ -1596,14 +1542,14 @@ class iPipeline(QMainWindow,
                 #    return
                 subjects = sorted(subjects, reverse=True)
                 develFile2Latest = subjects[0]
-                ver = VER_WIP_RE.findall( os.path.basename(str(develFile2Latest)))[0]
-                nVer = ver[:-2]+str(int(ver[-2:])+1).zfill(2)
+                ver = VER_WIP_RE.findall(os.path.basename(str(develFile2Latest)))[0]
+                nVer = ver[:-2] + str(int(ver[-2:]) + 1).zfill(2)
                 develFile2 = develFile2Latest.replace(ver, nVer)
                 if develFile == develFile2:
-                    nVer = "v%s_w01" % (str(int(ver[1:3])+1).zfill(2))
+                    nVer = "v%s_w01" % (str(int(ver[1:3]) + 1).zfill(2))
                     develFile2 = develFile2Latest.replace(ver, nVer)
                 #develVer = int(ver[1:3])+1
-                publishFile = os.path.join(pubScenesFolder, "%s_%s_v%s_%s.mb" % ( level2, level3, str(currVer).zfill(2), str(self.currOpenSubjectField.text())))
+                publishFile = os.path.join(pubScenesFolder, "%s_%s_v%s_%s.mb" % (level2, level3, str(currVer).zfill(2), str(self.currOpenSubjectField.text())))
             else:
                 print '[debug] no file'
                 return
@@ -1616,18 +1562,18 @@ class iPipeline(QMainWindow,
                 # 마지막 버전 선택
                 develFile2Latest = defaultFiles[-1]
                 # 선택된 파일을 버전 파싱
-                ver = VER_WIP_RE.findall( os.path.basename(str(develFile2Latest)))[0]
+                ver = VER_WIP_RE.findall(os.path.basename(str(develFile2Latest)))[0]
                 # 버전 카운트
-                nVer = ver[:-2]+str(int(ver[-2:])+1).zfill(2)
+                nVer = ver[:-2] + str(int(ver[-2:]) + 1).zfill(2)
                 develFile2 = develFile2Latest.replace(ver, nVer)
                 if develFile == develFile2:
-                    nVer = "v%s_w01" % (str(int(ver[1:3])+1).zfill(2))
+                    nVer = "v%s_w01" % (str(int(ver[1:3]) + 1).zfill(2))
                     develFile2 = develFile2Latest.replace(ver, nVer)
                 #develVer = int(ver[1:3])+1
-                publishFile = os.path.join(pubScenesFolder, "%s_%s_v%s.mb" % ( level2, level3, str(currVer).zfill(2)))
+                publishFile = os.path.join(pubScenesFolder, "%s_%s_v%s.mb" % (level2, level3, str(currVer).zfill(2)))
             else:
                 #develFile2 = os.path.join(devSceneFolder, "%s_%s_v01.mb" % (level2, level3))
-                print '[debug] no file'
+                
                 return
 
         if self.currOpenLevel3 == "ani" and self.projNameCombo.currentText() == "mrgo":
@@ -1638,19 +1584,21 @@ class iPipeline(QMainWindow,
             self.connect(info, SIGNAL("save"),
                          self.savePublish)
             info.show()
-
-    #def savePublish(self, comment, status, progress, ctime, application, selectedAsset=[]):
-    def savePublish(self, enableSave, closeSceneFile, develFile, publishFile, comment, status, progress, ctime, application, selectedAsset=[]):
+    
+    def savePublish(self, enableSave, closeSceneFile, develFile, publishFile, comment, status, progress, ctime, application, recordPreview , selectedAsset=[]):
+        
         warning = False
         ext = 'mb'
         level1 = self.currOpenLevel1Field.text()
         level2 = self.currOpenLevel2Field.text()
         level3 = self.currOpenLevel3Field.text()
         tab = self.currOpenTab
-
+                
+#        loginifile = Logs(tab , level1 , level2, level3, folder = 'pubFolder')
+#        return
         # 프리프로세싱
         if level3 == "finalize" and self.projNameCombo.currentText() == "mrgo":
-            if cmds.namespace( exists='mrgo' ):
+            if cmds.namespace(exists='mrgo'):
                 refFileName = cmds.referenceQuery("mrgo:mrgo_worldz_CON", filename=True, shortName=True)
                 if refFileName != "mrgo_facial_v05.mb" and refFileName != "mrgo_facial_v06.mb":
                     QMessageBox.warning(self, QString.fromLocal8Bit("Warning"),
@@ -1684,7 +1632,7 @@ class iPipeline(QMainWindow,
         basename = os.path.basename(str(publishFile))
         base, ext = os.path.splitext(basename)
 
-        verString = VER_RE.findall( basename )[0]
+        verString = VER_RE.findall(basename)[0]
         publishVer = int(verString[2:])
         publishWip = 0
 
@@ -1693,8 +1641,8 @@ class iPipeline(QMainWindow,
         develWip = int(devVerString[5:7])
 
         # ani 워크코드만을 위한 경로
-        txtFile = str(os.path.join(scriptFolder, publishBasename+'.txt'))
-        animFile = str(os.path.join(animFolder, publishBasename+'.anim'))
+        txtFile = str(os.path.join(scriptFolder, publishBasename + '.txt'))
+        animFile = str(os.path.join(animFolder, publishBasename + '.anim'))
 
         geoCacheFolder = os.path.join(pubFolder, "data", "geoCache", publishBasename)
 
@@ -1704,7 +1652,7 @@ class iPipeline(QMainWindow,
             type = 'mayaBinary'
         else:
             type = 'mayaBinary'
-            print "savePublish: Invalid file format ("+ext+") specified: saving to Maya Binary"
+            print "savePublish: Invalid file format (" + ext + ") specified: saving to Maya Binary"
 
         # devel file 저장
         if enableSave:
@@ -1760,18 +1708,26 @@ class iPipeline(QMainWindow,
         else:
             # 저장된 파일을 publish 폴더로 복사            
             if 'win' in sys.platform:
-                cmds.file(rename=publishFile)
-                cmds.file(save=True, type=type)
-                cmds.file(rename=develFile)
+                try:
+                    cmds.file(rename=publishFile)
+                    cmds.file(save=True, type=type)
+                    cmds.file(rename=develFile)
+                    success = 1
+                except:
+                    success = 0
             else:
-                os.system('cp -rfv %s %s' % (develFile, publishFile))
+                try:
+                    os.system('cp -rfv %s %s' % (develFile, publishFile))
+                    success = 1
+                except : 
+                    success = 0
             
 
 
         # 퍼블리쉬된 파일의 퍼미션을 읽기모드로 변경
-        if QFileInfo(publishFile).isFile():
-            if not 'win' in sys.platform:
-                os.chmod(publishFile, 0555)
+        #if QFileInfo(publishFile).isFile():
+        #    if not 'win' in sys.platform:
+        #        os.chmod(publishFile, 0555)
 
         currDate = self.getDate()
         currTime = self.getTime()
@@ -1783,25 +1739,25 @@ class iPipeline(QMainWindow,
         else:
             open(historyFile, 'w')
         # publish 추가
-        nc.add(Note(self.userinfo.name,       # author
-                    currDate,            # date
-                    currTime,            # time
-                    "publish",           # event
-                    publishVer,          # version
-                    publishWip,          # wipversion
-                    subjectName,         # subject
+        nc.add(Note(self.userinfo.name, # author
+                    currDate, # date
+                    currTime, # time
+                    "publish", # event
+                    publishVer, # version
+                    publishWip, # wipversion
+                    subjectName, # subject
                     unicode(comment)     # comment
                     ))
         if enableSave:
             # devel 추가
-            nc.addN(Note(self.userinfo.name,      # author
-                        currDate,            # date
-                        currTime,            # time
-                        "devel",             # event
-                        develVer,            # version
-                        develWip,            # wipversion
-                        subjectName,         # subject
-                        unicode(comment),     # comment
+            nc.addN(Note(self.userinfo.name, # author
+                        currDate, # date
+                        currTime, # time
+                        "devel", # event
+                        develVer, # version
+                        develWip, # wipversion
+                        subjectName, # subject
+                        unicode(comment), # comment
                         os.path.basename(develFile),
                         str(devSceneFolder)[:-1],
                         status,
@@ -1813,22 +1769,22 @@ class iPipeline(QMainWindow,
         # xml 저장
         nc.exportXML(historyFile)
         if enableSave:
-            nc.ibXML(os.path.join(str(devSceneFolder),   ".%s.xml" % os.path.basename(develFile))   )
+            nc.ibXML(os.path.join(str(devSceneFolder), ".%s.xml" % os.path.basename(develFile)))
 
         devXML = os.path.join(str(devSceneFolder), ".%s.xml" % os.path.basename(develFile))
         pubXML = os.path.join(os.path.dirname(publishFile), ".%s.xml" % os.path.basename(publishFile))
 
         self.loadCurrentHistory()
 
-        self.currOpenVerField.setText("v"+str(develVer).zfill(2))
-        self.currOpenWipField.setText("v"+str(develWip).zfill(2))
+        self.currOpenVerField.setText("v" + str(develVer).zfill(2))
+        self.currOpenWipField.setText("v" + str(develWip).zfill(2))
         #self.currOpenWipField.setText("w01")
         self.currOpenFileNameLabel.setText(os.path.basename(develFile))
 
         self.currOpenCommentField.setPlainText(comment)
 
         devImage = self.takeSnapshot()
-        pubImage = os.path.join(pubSceneFolder, ".%s.thumb.jpg" % os.path.basename(publishFile)   )
+        pubImage = os.path.join(pubSceneFolder, ".%s.thumb.jpg" % os.path.basename(publishFile))
 
         if 'win' in sys.platform:
             os.system("copy %s %s" % (devXML, pubXML))
@@ -1836,10 +1792,44 @@ class iPipeline(QMainWindow,
         else :
             os.system("cp -rf %s %s" % (devXML, pubXML))
             os.system("cp -rf %s %s" % (devImage, pubImage))
-            
+          
+#        loginifile = Logs()
+        playblastFile = ''        
+        startFrame = cmds.getAttr("defaultRenderGlobals.startFrame")
+        endFrame = cmds.getAttr("defaultRenderGlobals.endFrame")
+        
+        if recordPreview : 
+              playblastFile = self.recordPubPlayblast()
 
+        print '============================================================================================'      
+        print  "date : " , self.getDate().toString() 
+        print "time : " , self.getTime().toString() 
+        print "shot : " , level2
+        print "startframe : " , startFrame
+        print "endframe : " , endFrame
+        print "mayafile: " , publishFile 
+        print "preview : " , playblastFile 
+        print "comment : " , comment   
+        
+#        if playblastFile != '' and startFrame != '' and endFrame != '' :   
+        Logs(self.userinfo.name , self.userinfo.num , self.getDate().toString() ,
+              self.getTime().toString() , level2 , startFrame ,
+              endFrame , publishFile , playblastFile , comment)
+            
         QMessageBox.information(self, QString.fromLocal8Bit("Success"),
                             QString.fromLocal8Bit("%s\n completed publish." % publishFile))
+        
+        if success == 1:
+            if tab == 1:            
+                AssetRegister(self.projNameCombo.currentText() , level1 , level2 , level3 , subjectName, develVer , 0 , self.userinfo.num , self.userinfo.name , comment)
+                self.mssg('어셋이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.')
+
+            elif tab == 2:
+                JobRegister(self.projNameCombo.currentText() , level1 , level2 , level3 , subjectName, develVer , 0 , self.userinfo.num , self.userinfo.name, comment)
+                self.mssg('샷이 Database 서버에 성공적으로 퍼블리쉬 되었습니다.')
+            
+        else :
+            self.mssg('치명적 오류가 발생 하였습니다.\n아무것도 만지지 마시고 \nPipeline TD( 오호준 )에게 연락 주세요 ')
 
         if closeSceneFile:
             self.closeFile2()
@@ -1860,7 +1850,7 @@ class iPipeline(QMainWindow,
                 for i in range(numVersions):
                     version = self.getVersionFromFile(develFiles[i])
                     versionCombo.addItem(version)
-                versionCombo.setCurrentIndex(numVersions-1)
+                versionCombo.setCurrentIndex(numVersions - 1)
                 rollbackDevelNotes = QTextEdit()
                 rollbackDevelNotes.setReadOnly(True)
                 rollback = QPushButton('Rollback')
@@ -1886,8 +1876,8 @@ class iPipeline(QMainWindow,
         level2 = self.currOpenLevel2
         level3 = self.currOpenLevel3
         tab = self.currOpenTab       
-        print ' self.currOpenTab : ' , self.currOpenTab
-        historyObj =  self.getEventNotes(tab, level1, level2, level3, 0, 1)
+        
+        historyObj = self.getEventNotes(tab, level1, level2, level3, 0, 1)
         
         # 아이템 갯수 정의
         self.currOpenHistoryTable.setRowCount(len(historyObj))
@@ -1895,7 +1885,7 @@ class iPipeline(QMainWindow,
         for row, note in enumerate(historyObj):
             author = QTableWidgetItem(note.author)
             event = QTableWidgetItem(note.event)
-            date = QTableWidgetItem(note.date.toString("MM/dd/yy")+" "+note.time.toString("hh:mm"))
+            date = QTableWidgetItem(note.date.toString("MM/dd/yy") + " " + note.time.toString("hh:mm"))
             subject = QTableWidgetItem(note.subject)
             if note.event == "created":
                 pub = QTableWidgetItem("")
@@ -1918,14 +1908,14 @@ class iPipeline(QMainWindow,
             self.currOpenHistoryTable.setItem(row, 3, wip)
             self.currOpenHistoryTable.setItem(row, 4, subject)
             self.currOpenHistoryTable.setItem(row, 5, date)
-            self.currOpenHistoryTable.setRowHeight( row , 20 )
+            self.currOpenHistoryTable.setRowHeight(row , 20)
             
         self.currOpenHistories = historyObj
 
 
     def loadAssetHistory(self):
         currSelected = self.getCurrentlySelectedItem(1, 3)
-        historyObj =  self.getEventNotes(1, currSelected[0], currSelected[1], currSelected[2])
+        historyObj = self.getEventNotes(1, currSelected[0], currSelected[1], currSelected[2])
         # 아이템 갯수 정의
         self.assetHistoryTable.setRowCount(len(historyObj))
         # 히스토리 존재 유무 체크
@@ -1935,7 +1925,7 @@ class iPipeline(QMainWindow,
         for row, note in enumerate(historyObj):
             author = QTableWidgetItem(note.author)
             event = QTableWidgetItem(note.event)
-            date = QTableWidgetItem(note.date.toString("MM/dd/yy")+" "+note.time.toString("hh:mm"))
+            date = QTableWidgetItem(note.date.toString("MM/dd/yy") + " " + note.time.toString("hh:mm"))
             subject = QTableWidgetItem(note.subject)
             if note.event == "created":
                 pub = QTableWidgetItem("")
@@ -1958,13 +1948,14 @@ class iPipeline(QMainWindow,
             self.assetHistoryTable.setItem(row, 3, wip)
             self.assetHistoryTable.setItem(row, 4, subject)
             self.assetHistoryTable.setItem(row, 5, date)
+            self.assetHistoryTable.setRowHeight(row , 20)
         self.assetHistories = historyObj
         #if len(historyObj):
         #    self.assetCommentField.setPlainText(historyObj[0].comment)
 
     def loadShotHistory(self):
         currSelected = self.getCurrentlySelectedItem(2, 3)
-        historyObj =  self.getEventNotes(2, currSelected[0], currSelected[1], currSelected[2])
+        historyObj = self.getEventNotes(2, currSelected[0], currSelected[1], currSelected[2])
         # 아이템 갯수 정의
         self.shotHistoryTable.setRowCount(len(historyObj))
         # 히스토리 존재 유무 체크
@@ -1974,7 +1965,7 @@ class iPipeline(QMainWindow,
         for row, note in enumerate(historyObj):
             author = QTableWidgetItem(note.author)
             event = QTableWidgetItem(note.event)
-            date = QTableWidgetItem(note.date.toString("MM/dd/yy")+" "+note.time.toString("hh:mm"))
+            date = QTableWidgetItem(note.date.toString("MM/dd/yy") + " " + note.time.toString("hh:mm"))
             subject = QTableWidgetItem(note.subject)
             if note.event == "created":
                 pub = QTableWidgetItem()
@@ -1997,14 +1988,15 @@ class iPipeline(QMainWindow,
             self.shotHistoryTable.setItem(row, 3, wip)
             self.shotHistoryTable.setItem(row, 4, subject)
             self.shotHistoryTable.setItem(row, 5, date)
+            self.shotHistoryTable.setRowHeight(row , 20)
         self.shotHistories = historyObj
         #if len(historyObj):
         #    self.shotCommentField.setPlainText(historyObj[0].comment)
 
     def loadAssetBrowse(self):
         currSelected = self.getCurrentlySelectedItem(1, 3)
-        devPath =  self.getFileName(1, currSelected[0], currSelected[1], currSelected[2], "devFolder")
-        pubPath =  self.getFileName(1, currSelected[0], currSelected[1], currSelected[2], "pubFolder")
+        devPath = self.getFileName(1, currSelected[0], currSelected[1], currSelected[2], "devFolder")
+        pubPath = self.getFileName(1, currSelected[0], currSelected[1], currSelected[2], "pubFolder")
         devFiles = self.getFiles(devPath, "devel", True)
         pubFiles = self.getFiles(pubPath, "publish", True)
 
@@ -2013,12 +2005,13 @@ class iPipeline(QMainWindow,
         for item in devFiles:
             self.assetDevelList.addItem(os.path.basename(item))
         for item in pubFiles:
-            self.assetPublishList.addItem(os.path.basename(item))
+            if not '.ini' in item: 
+                self.assetPublishList.addItem(os.path.basename(item))
 
     def loadShotBrowse(self):
         currSelected = self.getCurrentlySelectedItem(2, 3)
-        devPath =  self.getFileName(2, currSelected[0], currSelected[1], currSelected[2], "devFolder")
-        pubPath =  self.getFileName(2, currSelected[0], currSelected[1], currSelected[2], "pubFolder")
+        devPath = self.getFileName(2, currSelected[0], currSelected[1], currSelected[2], "devFolder")
+        pubPath = self.getFileName(2, currSelected[0], currSelected[1], currSelected[2], "pubFolder")
         devFiles = self.getFiles(devPath, "devel", True)
         pubFiles = self.getFiles(pubPath, "publish", True)
 
@@ -2027,7 +2020,8 @@ class iPipeline(QMainWindow,
         for item in devFiles:
             self.shotDevelList.addItem(os.path.basename(item))
         for item in pubFiles:
-            self.shotPublishList.addItem(os.path.basename(item))
+            if not '.ini' in item:
+                self.shotPublishList.addItem(os.path.basename(item))
 
     def clearCurrentHistory(self):
         self.currOpenHistoryTable.clear()
@@ -2077,8 +2071,8 @@ class iPipeline(QMainWindow,
             path = str(self.getFileName(self.currOpenTab, self.currOpenLevel1, self.currOpenLevel2, self.currOpenLevel3, "pubFolder"))
 
         if item is not None:            
-            sceneFile = path+"/scenes/"+item.text()
-            previewImage = path+("/scenes/.%s.thumb.jpg" % item.text())
+            sceneFile = path + "/scenes/" + item.text()
+            previewImage = path + ("/scenes/.%s.thumb.jpg" % item.text())
             if not QFileInfo(previewImage).isFile():
                 previewImage = NO_PREVIEW_FILENAME
             self.componentOpened(devFolder, sceneFile, mode, tab, currSelected, selected, previewImage, path)
@@ -2086,7 +2080,7 @@ class iPipeline(QMainWindow,
         else: # item is None
             # 버전별 씬파일 보여주는 다이얼로그            
             sceneFolder = str(self.getFileName(tab, currSelected[0], currSelected[1], currSelected[2], "sceneFolder"))
-            mayaFiles = glob.glob(sceneFolder+"*.mb")
+            mayaFiles = glob.glob(sceneFolder + "*.mb")
 
             defaultFiles = filter(SCENEFILE_RE.search, mayaFiles)
             subjectFiles = filter(SCENEFILE_WITH_SUBJECT_RE.search, mayaFiles)
@@ -2097,7 +2091,7 @@ class iPipeline(QMainWindow,
                 basename = os.path.splitext(fileName)[0]
                 if subjectLists.get(basename) is None:
                     subjectLists[basename] = []
-                subjectLists[basename].append( i )
+                subjectLists[basename].append(i)
 
             for subject in subjectLists.keys():
                 subjectLists[subject] = sorted(subjectLists[subject])
@@ -2114,9 +2108,12 @@ class iPipeline(QMainWindow,
             if len(buffer) == 1:
                 sp = QListWidgetItem(buffer[0])
                 self.componentOpened(devFolder, sceneFile, mode, tab, currSelected, selected, previewImage, path, sp)
+                
             elif len(buffer) == 0:
-                self.componentOpened(devFolder, sceneFile, mode, tab, currSelected, selected, previewImage, path)
+                self.componentOpened(devFolder, sceneFile, mode, tab, currSelected, selected, previewImage, path)                       
+                    
             else:
+               
                 self.componentFileUI = QDialog(self)
                 self.componentFileUI.setWindowTitle("Open")
                 fileList = QListWidget()
@@ -2126,20 +2123,23 @@ class iPipeline(QMainWindow,
                 layout = QHBoxLayout()
                 layout.addWidget(fileList)
                 self.componentFileUI.setLayout(layout)
-                self.componentFileUI.resize(480,240)
+                self.componentFileUI.resize(480, 240)
                 self.componentFileUI.show()
+            
+
+
 
     def componentOpened(self, devFolder, sceneFile, mode, tab, currSelected, selected, previewImage, path, sp=None):        
         if sp is not None:
-            sceneFile = path+"/scenes/"+sp.text()
+            sceneFile = path + "/scenes/" + sp.text()
 
         self.currOpenFile = sceneFile
 
-        previewImage = path+("/scenes/.%s.thumb.jpg" % os.path.basename(str(sceneFile)))
+        previewImage = path + ("/scenes/.%s.thumb.jpg" % os.path.basename(str(sceneFile)))
         if not QFileInfo(previewImage).isFile():
             previewImage = NO_PREVIEW_FILENAME
 
-        xmlFile = path+("/scenes/.%s.xml" % os.path.basename(str(sceneFile)))
+        xmlFile = path + ("/scenes/.%s.xml" % os.path.basename(str(sceneFile)))
         if QFileInfo(xmlFile).isFile():
             n = Core.Note.Note2.NoteContainer()
             n.importSAX(str(xmlFile))
@@ -2156,22 +2156,22 @@ class iPipeline(QMainWindow,
             ver = "v01"
             wip = "w01"
             _filename = "%s_%s_%s_%s.mb" % (currSelected[1], currSelected[2], ver, wip)
-            sceneFile = os.path.join( sceneFolder, str(_filename))
+            sceneFile = os.path.join(sceneFolder, str(_filename))
         else:
-            ver = VER_RE.findall( str(sceneFile) )[0][1:]
+            ver = VER_RE.findall(str(sceneFile))[0][1:]
             if mode == "devel":
-                wip = WIP_RE.findall( str(sceneFile) )[0][1:]
+                wip = WIP_RE.findall(str(sceneFile))[0][1:]
             else:
                 wip = ""
 
             if mode == "devel":
                 try:
-                    self.currOpenSubject = os.path.splitext(os.path.basename(str(sceneFile)))[0].split(ver+"_"+wip+"_")[1]
+                    self.currOpenSubject = os.path.splitext(os.path.basename(str(sceneFile)))[0].split(ver + "_" + wip + "_")[1]
                 except:
                     pass
             elif mode == "publish":
                 try:
-                    self.currOpenSubject = os.path.splitext(os.path.basename(str(sceneFile)))[0].split(ver+"_")[1]
+                    self.currOpenSubject = os.path.splitext(os.path.basename(str(sceneFile)))[0].split(ver + "_")[1]
                 except:
                     pass
 
@@ -2181,6 +2181,8 @@ class iPipeline(QMainWindow,
         elif tab == 2:
             tabName = "Shot"
             location = self.shotLocationField.text()
+
+        
 
         self.currOpenFileNameLabel.setText(os.path.basename(str(sceneFile)))
         self.currOpenProjectField.setText(self.currOpenProjectName)
@@ -2219,10 +2221,10 @@ class iPipeline(QMainWindow,
         
     def refreshCurrentlyOpen(self):      
         if standAlone : return        
-        sceneFile = cmds.file(q=1 ,l=1)[0]        
+        sceneFile = cmds.file(q=1 , l=1)[0]        
         if 'untitled' in sceneFile: return 
                
-        sceneFileList = sceneFile.replace( self.showPath , '' )[1:]
+        sceneFileList = sceneFile.replace(self.showPath , '')[1:]
         sceneFileList = sceneFileList.split('/')       
         # ['awesome', 'seq', 'TER', '234', 'ani', 'pub', 'scenes', '234_ani_v01.mb']
         # ['awesome', 'seq', 'TER', '234', 'ani', 'dev', 'scenes', '234_ani_v01_w03.mb']
@@ -2230,7 +2232,7 @@ class iPipeline(QMainWindow,
         self.currOpenProjectName = sceneFileList[0]
         if self.projNameCombo.currentText() != self.currOpenProjectName : 
             thePrjIndex = list(self.getDirectoryList(self.showPath)).index(sceneFileList[0])
-            self.projNameCombo.setCurrentIndex( thePrjIndex )
+            self.projNameCombo.setCurrentIndex(thePrjIndex)
             
 #        QtGui.QComboBox(). 
         tabName = 'Asset' if sceneFileList[1] == 'assets' else "shot"        
@@ -2243,32 +2245,32 @@ class iPipeline(QMainWindow,
         self.currOpenLevel3 = sceneFileList[4]      
         
         if mode == "devel":
-            ver = os.path.basename( sceneFile ).split('_')[2]
-            wip = os.path.basename( sceneFile ).split('_')[3][:-3]            
+            ver = os.path.basename(sceneFile).split('_')[2]
+            wip = os.path.basename(sceneFile).split('_')[3][:-3]            
             
-            path =  str(self.getFileName(tab, self.currOpenLevel1, self.currOpenLevel2, self.currOpenLevel3, "devFolder"))                        
+            path = str(self.getFileName(tab, self.currOpenLevel1, self.currOpenLevel2, self.currOpenLevel3, "devFolder"))                        
             try:
-                self.currOpenSubject = os.path.splitext(os.path.basename(str(sceneFile)))[0].split(ver+"_"+wip+"_")[1]
+                self.currOpenSubject = os.path.splitext(os.path.basename(str(sceneFile)))[0].split(ver + "_" + wip + "_")[1]
             except : 
-                self.currOpenSubject =''
+                self.currOpenSubject = ''
             selected = 1            
         elif mode == "publish":
-            path = str(self.getFileName( tab , self.currOpenLevel1, self.currOpenLevel2, self.currOpenLevel3, "pubFolder"))
-            ver = os.path.basename( sceneFile ).split('_')[2]
+            path = str(self.getFileName(tab , self.currOpenLevel1, self.currOpenLevel2, self.currOpenLevel3, "pubFolder"))
+            ver = os.path.basename(sceneFile).split('_')[2]
             wip = ''  
             try :           
-                self.currOpenSubject = os.path.splitext(os.path.basename(str(sceneFile)))[0].split(ver+"_")[1]
+                self.currOpenSubject = os.path.splitext(os.path.basename(str(sceneFile)))[0].split(ver + "_")[1]
             except : 
-                self.currOpenSubject =''
+                self.currOpenSubject = ''
             selected = 0
            
 
         # preview Image
         subject = self.currOpenSubjectField.text()
         if len(subject):
-            fileName = "."+self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+wip+"_"+subject+".mb.thumb.jpg"
+            fileName = "." + self.currOpenLevel2 + "_" + self.currOpenLevel3 + "_" + ver + "_" + wip + "_" + subject + ".mb.thumb.jpg"
         else:
-            fileName = "."+self.currOpenLevel2+"_"+self.currOpenLevel3+"_"+ver+"_"+wip+".mb.thumb.jpg" 
+            fileName = "." + self.currOpenLevel2 + "_" + self.currOpenLevel3 + "_" + ver + "_" + wip + ".mb.thumb.jpg" 
 #        previewImage = self.createThumbnailN(tab, self.currOpenLevel1, self.currOpenLevel2, self.currOpenLevel3, fileName)
         previewImage = path + ("/scenes/" + fileName)
         print 'previewImage : ' , previewImage        
@@ -2276,8 +2278,8 @@ class iPipeline(QMainWindow,
             previewImage = NO_PREVIEW_FILENAME
             print  'NO_PREVIEW_FILENAME'            
          
-        location = self.showPath + '/' + os.path.dirname( '/'.join( sceneFileList[:-2] ) )
-        xmlFile = path+("/scenes/.%s.xml" % os.path.basename(str(sceneFile)))
+        location = self.showPath + '/' + os.path.dirname('/'.join(sceneFileList[:-2]))
+        xmlFile = path + ("/scenes/.%s.xml" % os.path.basename(str(sceneFile)))
         if QFileInfo(xmlFile).isFile():
             n = Core.Note.Note2.NoteContainer()
             n.importSAX(str(xmlFile))
@@ -2319,7 +2321,7 @@ class iPipeline(QMainWindow,
             # 1. 테이블 클리어
             self.assetHistoryTable.clear()
             # 2. Header 에 라벨 추가
-            self.assetHistoryTable.setHorizontalHeaderLabels( QStringList( ['Author', 'Event', 'V', 'W', 'Subject', 'Date']))
+            self.assetHistoryTable.setHorizontalHeaderLabels(QStringList(['Author', 'Event', 'V', 'W', 'Subject', 'Date']))
             # 3. 칼럼 사이즈 정의
             self.assetHistoryTable.setColumnWidth(0, 80)
             self.assetHistoryTable.setColumnWidth(1, 60)
@@ -2337,7 +2339,7 @@ class iPipeline(QMainWindow,
             # 1. 테이블 클리어
             self.shotHistoryTable.clear()
             # 2. Header 에 라벨 추가
-            self.shotHistoryTable.setHorizontalHeaderLabels( QStringList( ['Author', 'Event', 'V', 'W', 'Subject', 'Date']))
+            self.shotHistoryTable.setHorizontalHeaderLabels(QStringList(['Author', 'Event', 'V', 'W', 'Subject', 'Date']))
             # 3. 칼럼 사이즈 정의
             self.shotHistoryTable.setColumnWidth(0, 80)
             self.shotHistoryTable.setColumnWidth(1, 60)
@@ -2367,21 +2369,21 @@ class iPipeline(QMainWindow,
             self.currOpenSnapshotButton.setEnabled(False)
             self.currOpenRecordPlayblastButton.setEnabled(False)
             self.currOpenViewPlayblastButton.setEnabled(False)
-            self.currOpenClearCommentButton.setEnabled(False)
+#            self.currOpenClearCommentButton.setEnabled(False)
             #self.currOpenSaveCommentButton.setEnabled(False)
             self.currOpenExploreButton.setEnabled(False)
             self.currOpenPreviewImage.setPixmap(QPixmap(NO_PREVIEW_FILENAME))
             self.currOpenLocationField.clear()
             self.currOpenHistoryTable.setRowCount(0)
             self.currOpenHistoryTable.clear()
-            self.currOpenHistoryTable.setHorizontalHeaderLabels( QStringList( ['Author', 'Event', 'V', 'W', 'Subject', 'Date']))
+            self.currOpenHistoryTable.setHorizontalHeaderLabels(QStringList(['Author', 'Event', 'V', 'W', 'Subject', 'Date']))
             self.currOpenHistoryTable.setColumnWidth(0, 80)
             self.currOpenHistoryTable.setColumnWidth(1, 60)
             self.currOpenHistoryTable.setColumnWidth(2, 25)
             self.currOpenHistoryTable.setColumnWidth(3, 25)
             self.currOpenHistoryTable.setColumnWidth(4, 70)
-            self.currOpenCommentField.clear()
-            self.currOpenCommentHistoryField.clear()
+#            self.currOpenCommentField.clear()
+#            self.currOpenCommentHistoryField.clear()
             self.currOpenSaveCommentButton.setEnabled(False)
             self.currOpenClearSelectedCommentButton.setEnabled(False)
             self.currOpenSaveSelectedCommentButton.setEnabled(False)
@@ -2458,7 +2460,7 @@ class iPipeline(QMainWindow,
         return True
 
 def ipipeline():
-    if standAlone ==False :
+    if standAlone == False :
         global app    
         try:        
             app.close()        

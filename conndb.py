@@ -20,33 +20,43 @@ theLogFile = '/lustre/INHouse/INI/'
 
 
 
-
-
-
-
-class tableInfo:
-    def __init__(self , table ): 
-        self.table = table
-        self.logs = ''
-        self.querytext = ''
-        
+class DBhandler:
     def dbConn(self):
         if 'd10218' in os.getenv('LOGNAME'):     
             self.db = MySQLdb.connect(host = mysqlhost , user = 'root' , passwd='studio77' , db= 'wd' , charset='utf8')
         else :
             self.db = MySQLdb.connect(host = mysqlhost , user = 'idea' , passwd='idea' ,port=3366, db= 'wd' , charset='utf8')
+#        self.db = MySQLdb.connect(host = '10.0.201.15' , user = 'idea' , passwd='idea' ,port=3366, db= 'wd' , charset='utf8')
         self.cr = self.db.cursor()
-        return True       
+        return True
+        
+    def dbclose(self):
+        if self.db.open:
+            self.db.close()
+        
+        
+            
+    def getFetch(self , query ): 
+        self.dbConn()                         
+        self.cr.execute(query )
+        data = self.cr.fetchall()
+        self.cr.close()
+        self.dbclose()               
+        return list( data )
+    
+    
+
+class tableInfo( DBhandler ):
+    def __init__(self , table ): 
+        self.table = table
+        self.logs = ''
+        self.querytext = ''           
     
     def getlastid(self):
         self.dbConn()
         lastid =  self.cr.lastrowid if self.cr.lastrowid != None else ''
         self.dbclose()
-        return str( lastid )
-    
-    def dbclose(self):
-        if self.db.open:
-            self.db.close()
+        return str( lastid )    
         
     def query(self , query ):
         '''여러 아이템을 리턴하는 값들과 통일하기 위해 lastid를 리스트로 리턴 시킴.
@@ -59,31 +69,7 @@ class tableInfo:
         self.dbclose()
         lasetid = int(lastid) if type(lastid) == type(1L) else lastid
         return [ lastid ]
-    
-#        success = 0
-#        try : 
-#            self.querytext = query
-#            self.cr.execute(query )
-#            self.db.commit()
-#            lastid =  self.cr.lastrowid if self.cr.lastrowid != None else ''
-#            self.dbclose()
-#            lasetid = int(lastid) if type(lastid) == type(1L) else lastid 
-#            success = 1            
-#        except :            
-#            success = 0
-#        if success == 1 :            
-#            return [ lastid ]
-#        else :   
-#            writelogs( self.querytext )
-#            return False
-        
-    def getFetch(self , query ): 
-        self.dbConn()                         
-        self.cr.execute(query )
-        data = self.cr.fetchall()
-        self.dbclose()               
-        return list( data )
-        
+     
 
     def getAttr(self ):
         self.dbConn()
@@ -150,20 +136,16 @@ class tableInfo:
 
 
 
-def writelogs( querytxt ):
-    print 'querytxt = ', querytxt
+def writelogs( querytxt ):    
     theLogFile = os.path.join( '/lustre/INHouse/INI' ,  re.search('d\d{5}' , os.getenv('LOGNAME' ) ).group() + '_' +time.strftime('%Y%m%d_%H%M_%S')+'.sql' ) 
     
     f = open(theLogFile , 'w')
     f.write( querytxt )
     f.close()
 
-def createAsset(project , assetType , assetName , workcode ):
-    
+def createAsset(project , assetType , assetName , workcode ):    
     ASSET = tableInfo( 'ASSET' )    
     assetID = ASSET.search('id' , type = assetType , aname = assetName )
-    
-    writelogs( ASSET.querytext )
     if assetID == []:
         assetID = ASSET.register( assetType , assetName , '' , project )        
     return assetID
@@ -211,6 +193,7 @@ def AssetRegister(project , assetType , assetName , workcode ,subjectName, ver ,
     ASSET_SUBJECT = tableInfo( 'ASSET_SUBJECT' )    
     if subjectName != '' :
         assetSubjectID = ASSET_SUBJECT.register( subjectName , assetJobVerID[-1] )
+    return True
         
     
     
@@ -236,12 +219,31 @@ def JobRegister(project , seq , shot , workcode ,subjectName, ver , wip ,  usern
     JOB_SUBJECT = tableInfo( 'JOB_SUBJECT' )    
     if subjectName != '' :
         jobSubjectID = JOB_SUBJECT.register( subjectName , jobVerID[-1] )
-
-
+    return True
 
 if __name__ == '__main__':    
+#    db = DBhandler()
+#    db.dbConn()
+##    print db.getFetch("call getcomment('CZ12','R7','R7_012B','ani',2)" )
+#    db.cr.execute( "call getcomment('CZ12','R7','R7_012B','ani',2)" )
+#    data = db.cr.fetchall()
+#    db.dbclose()
+#    print data
+    
+    db = MySQLdb.connect(host = '10.0.201.15' , user = 'idea' , passwd='idea' ,port=3366, db= 'wd' , charset='utf8')
+    cr = db.cursor()
+    
+    cr.execute( "call getcomment('tower','056','056_0350','ani',2)" )
+    data = cr.fetchall()
+    cr.close()
+    db.close()
+    print data
+    
+    
+    
 #    ASSET_JOB_VERSION = tableInfo('ASSET_JOB_VERSION')
-    ASSET_JOB = tableInfo('ASSET_JOB')
+#    db = MySQLdb.connect(host = '10.0.201.15' , user = 'idea' , passwd='idea' , db= 'wd' , charset='utf8')
+#    ASSET_JOB = tableInfo('ASSET_JOB')
 #    print ASSET_JOB_VERSION.search( 'id' , ver=6 , wip=0 , assetJobID = 2 , usernum = 'd10218')
 #    print ASSET_JOB_VERSION.update( 16 , ver=6 , wip=0 , assetJobID = 2 , usernum = 'd10218')
 #    assetID = createAsset( project , assetType , assetName , workcode )     

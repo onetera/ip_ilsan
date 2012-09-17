@@ -129,7 +129,8 @@ class Tractor(object):
     def submit(self, arg, checked):
         (job,username,notes,first,last,scenefile,alffile,nukefile,movefile,tempdir,deletefile,pbias) = arg
         if checked:
-            m_first = str(int(first) - 1)
+            #m_first = str(int(first) - 1)
+            m_first = first
         else:
             m_first = first
 

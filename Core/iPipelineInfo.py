@@ -86,15 +86,12 @@ class iPipelineInfo(object):
             return depth
         
     def getFileName(self, tab, level1, level2, level3, mode, offset=0, archive=0, selFile=""):
-        depth = self.getDepth(level1, level2, level3)
-        
+        depth = self.getDepth(level1, level2, level3)        
         fileName = ""
         devFolder = 'dev'
         pubFolder = 'pub'
         previewFileName = '.preview.jpg'
-        scenesFolder = 'scenes'
-        
-        
+        scenesFolder = 'scenes'        
         if mode=="parentFolder":
             if depth==3:
                 self.getFileName(tab, level1, level2, "", "folder")
@@ -111,47 +108,36 @@ class iPipelineInfo(object):
                 fileName += self.shotPath
             else:
                 return ""
-
             if archive:
                 projectPath = self.showPath + "/" + self.currOpenProjectName + "/"
-                fileName = fileName.replace(self.currProjectPath, projectPath)
-            
+                fileName = fileName.replace(self.currProjectPath, projectPath)            
             if len(level1):
                 fileName += level1+"/"                
                 if len(level2):
-                    fileName += level2+"/"                    
-
+                    fileName += level2+"/" 
                     if len(level3):
-                        fileName += level3+"/"                       
-                    
+                        fileName += level3+"/"                    
                     if mode=="devFolder":
                         fileName += devFolder
-
                     elif mode=="pubFolder":
                         fileName += pubFolder
-
                     elif mode=="sceneFolder":
-                        fileName += devFolder+"/"+scenesFolder+"/"                        
-
+                        fileName += devFolder+"/"+scenesFolder+"/"
                     elif mode=="previewFile":
                         fileName = self.getFileName(tab, level1, level2, level3, "sceneFolder", offset, archive)
                         if len(fileName):
                             pass
                         fileName += previewFileName
-
                     elif mode=="playblastFile":
                         fileName = self.getFileName(tab, level1, level2, level3, "sceneFolder", offset, archive)
-                        if sys.platform == "linux2":
+                        if 'linux' in sys.platform :
                             ext = "mv"
-                        elif sys.platform == "darwin":
-                            ext = "mov"
-                        elif sys.platform == "win32":
+                        elif 'win' in sys.platform:
                             ext = "avi"
                         else:
                             return
                         playblastFileName = ".playblast."+ext
                         fileName += playblastFileName
-
                     elif mode=="playblastFile2":
                         develFile = str(self.getFileName(tab, level1, level2, level3, "devel", offset, archive))
                         devFolder = os.path.dirname(develFile).replace("/dev/scenes", "/dev/preview")
@@ -159,7 +145,6 @@ class iPipelineInfo(object):
                         basename = os.path.splitext(basename)[0]
                         playblastFileName = os.path.join(devFolder, basename, basename)
                         fileName = playblastFileName
-
                     elif mode=="devel":
                         sceneFolder = str(self.getFileName(tab, level1, level2, level3, "sceneFolder", offset, archive))
                         develFiles = glob.glob(sceneFolder+"*.mb")
@@ -174,7 +159,6 @@ class iPipelineInfo(object):
                         else:
                             fileName = ""
                             devel = ""
-
                     elif mode=="subject":
                         sceneFolder = self.getFileName(tab, level1, level2, level3, "sceneFolder", offset, archive)
                         develFiles = glob.glob(sceneFolder)
@@ -189,7 +173,6 @@ class iPipelineInfo(object):
                         else:
                             fileName = ""
                             devel = ""
-
                     elif mode=="nextDevel":
                         fileName = self.getFileName(tab, level1, level2, level3, "sceneFolder", offset, archive)
                         sceneFolder = str(fileName+'/*.mb')
@@ -206,7 +189,6 @@ class iPipelineInfo(object):
                             ver ='v01'
                             wip ='w01'
                         fileName = fileName+'/'+level2+'_'+level3+'_'+ver+'_'+wip+'.mb'
-
                     elif mode=="nextVersion":
                         fileName = self.getFileName(tab, level1, level2, level3, "sceneFolder", offset, archive)
                         pubFolder = self.getFileName(tab, level1, level2, level3, "pubFolder", offset, archive)
@@ -221,26 +203,20 @@ class iPipelineInfo(object):
                             ver = 'v'+str(ver).zfill(2)
                         else:
                             ver ='v01'
-                        fileName = pubFolder+'/scenes/'+level2+'_'+level3+'_'+ver+'.mb'
-                    
+                        fileName = pubFolder+'/scenes/'+level2+'_'+level3+'_'+ver+'.mb'                    
                     elif mode=="historyFile":                        
                         fileName = self.getFileName(tab, level1, level2, level3, "sceneFolder", offset, archive)                        
                         if len(level3):
-                            fileName += level2+"_"+level3+"_ComponentNote.xml"                            
-                            
+                            fileName += level2+"_"+level3+"_ComponentNote.xml"  
                     elif mode=="childFolder":
                         if depth == 2:
                             pass
                         elif depth == 3:
                             fileName = ""
-
                     elif mode=="folderTest":
-                        fileName = QString(str(fileName).split('dev/scenes/')[0])
-               
-                
-
-        
+                        fileName = QString(str(fileName).split('dev/scenes/')[0])                        
         return fileName
+    
 
     def getCategory(self, tab, level1, level2, level3):
         if tab == 1:
@@ -264,8 +240,7 @@ class iPipelineInfo(object):
         return fileName
 
     def getCurrentlySelectedItem(self, tab, depth):
-        """
-        
+        """        
         :param tab: ( Integer )
         :param depth: ( Integer )
         :return: ( List )

@@ -23,10 +23,11 @@ from PyQt4.QtGui import *
 try:    
     import maya.cmds as cmds
     import maya.mel as mel
-    standAlone = False
+    MAYA = True
 except ImportError:
-    standAlone = True
+    MAYA = False
 from conndb import *    
+import logging    
     
 from components.addons.information.information import Information
 
@@ -44,9 +45,7 @@ WIP_RE = re.compile("_w[0-9]{2}")
 #***    Module classes and definitions.
 #***********************************************************************************************
 class iPipelineActions(object):
-    """
-    This class is the **iPipelineActions** class.
-    """
+
     def activateProject(self, projName):
         self.currProjectName = projName
         self.currProjectPath = self.showPath + "/" + projName + "/"
@@ -56,16 +55,23 @@ class iPipelineActions(object):
         
         return True
 
-#    def openSaveAs(self):
-#        theFile = cmds.fileDialog2(dialogStyle=2)[0]
-#        cmds.file(rename = theFile )
-#        cmds.file( save = 1  )
-           
-    def openItem(self, type, newProject, devel):
+    def checkItem(self):
+        try:
+            return cmds.file(query=True, modified=True)
+        except:
+            return
+
+    def findIndexlistWidget( self , lwidget , txt ):        
+        try : 
+            result = [ lwidget.item(x).text() for x in xrange( lwidget.count()) ].index(txt)
+        except :
+            result = -1
+        return result
         
+
+    def openItem(self, type, newProject, devel):        
         if self.checkItem():
-            """check modified current file or not"""
-            
+            logging.warning( 'checkItem' )         
             messageBox = QMessageBox(self)
             messageBox.setText('Would you like to Save Dev before editing Asset?')
             messageBox.setWindowModality(Qt.WindowModal)
@@ -83,80 +89,19 @@ class iPipelineActions(object):
                     self.openSaveAs()
                     return
                 self.openSaveAs()
-#                level1 ,level2 , level3 = currOpendFilename[3:6]                
-#                tab = 'Asset' if currOpendFilename[2] == 'assets' else 'Shot'
-#                sceneFileName = currOpendFilename[-1]                
-#                subjectName = str(self.currOpenSubjectField.text())
-#                ver_wip = VER_WIP_RE.findall( sceneFileName )[0] # return v01_w02
-#                currVer = int(ver_wip[1:3])
-#                currWip = int(ver_wip[-2:])
-#                sceneFolder = str(self.getFileName(tab, level1, level2, level3, "sceneFolder", 0, 1))   
-#                sceneFiles = glob.glob(sceneFolder+"*.mb")                 
-#                curLatestVersion = os.path.join(sceneFolder, sceneFileName.replace(ver_wip, ver_wip[:-2]+str(currWip).zfill(2)))
-#                
-#                if len(subjectName):
-#                    subjectLists = {}
-#                    subjectFiles = filter(SCENEFILE_WITH_SUBJECT_RE.search, sceneFiles)
-#                    for i in subjectFiles:
-#                        _fileName = os.path.basename(i)
-#                        _ver_wip = VER_WIP_RE.findall(_fileName)[0]
-#                        fileName = _fileName.split(_ver_wip)[-1][1:] # remove underscore
-#                        basename = os.path.splitext(fileName)[0]
-#                        if subjectLists.get(basename) is None:
-#                            subjectLists[basename] = []
-#                        subjectLists[basename].append( i )
-#        
-#                    for subject in subjectLists.keys():
-#                        subjectLists[subject] = sorted(subjectLists[subject])
-#        
-#                    if len(subjectLists):
-#                        #try:
-#                        subjects = subjectLists[subjectName]
-#                        subjects = sorted(subjects, reverse=True)
-#                        destinationFile = subjects[0]
-#                        ver = VER_WIP_RE.findall( os.path.basename(str(destinationFile)))[0]
-#                        nVer = ver[:-2]+str(int(ver[-2:])+1).zfill(2)
-#                        destinationFile = destinationFile.replace(ver, nVer)
-#                        #except KeyError:
-#                        #    destinationFile = os.path.join(sceneFolder, "%s_%s_v01_w01_%s.mb" % (level2, level3, str(self.currOpenSubjectField.text())))
-#                    else:
-#                        # 초기화 버전
-#                        destinationFile = os.path.join(sceneFolder, "%s_%s_v01_w01_%s.mb" % (level2, level3, str(self.currOpenSubjectField.text())))
-#        
-#                # 서브젝트가 존재하지 않을 때
-#                else:
-#                    defaultFiles = filter(SCENEFILE_RE.search, sceneFiles)
-#                    if len(defaultFiles):
-#                        destinationFile = defaultFiles[-1]
-#                        ver = VER_WIP_RE.findall( os.path.basename(str(destinationFile)))[0]
-#                        nVer = ver[:-2]+str(int(ver[-2:])+1).zfill(2)
-#                        destinationFile = destinationFile.replace(ver, nVer)
-#                    else:
-#                        # 초기화 버전
-#                        destinationFile = os.path.join(sceneFolder, "%s_%s_v01_w01.mb" % (level2, level3))
-                
-#                info = Information("Save Devel", level2, level3, currVer, currWip, subjectName, curLatestVersion, destinationFile, self)
-#                self.connect( info , SIGNAL("save"), self.saveDevel)
-#                info.show()                
-                
-    #                self.saveDevel( devel , "saved before opening new item", "WIP", 50, 1, "iMaya" , "" )
             elif messageBox.clickedButton() == messageBox.button(QMessageBox.Cancel):
-                return False
-            
-        
-            # set the current project
+                return False    
         try:
             if 'win' in sys.platform: 
                 newProject = '/' + newProject
             mel.eval('setProject "%s"' % newProject)
-        except:
+        except:                        
             return True
-
-        print 'devel : ' ,devel
         if QFileInfo(devel).isFile():
-            cmds.file(devel, open=True, force=True)
-            print 'theFile is exist'
-            
+            if MAYA:
+                cmds.file(devel, open=True, force=True)
+            else :
+                logging.warning( 'Devel file exist : %s' % devel )
         elif type=="devel" and not QFileInfo(devel).isFile():
             messageBox = QMessageBox(self)
             messageBox.setText("You are about to edit an item for the first time. Would you like to start with an new scene, or the currently open scene?")
@@ -176,7 +121,7 @@ class iPipelineActions(object):
                     createJob( self.projNameCombo.currentText() , self.currOpenLevel1 , self.currOpenLevel2 , self.currOpenLevel3)
                     self.mssg( '샷이 Database 서버에 최초 등록 하였습니다.\n' ) 
             elif messageBox.clickedButton() == messageBox.button(QMessageBox.Cancel):
-                return False
+                return False        
         else:
             QMessageBox.warning(self, "openItem", "OpenItem: File Not Found \n")
             return False
@@ -346,7 +291,7 @@ class iPipelineActions(object):
         cmds.setAttr("defaultRenderGlobals.imageFormat", format)
         return fileName
 
-    def recordPlayblastForSequenceN(self, tab, level1, level2, level3, fileName , previewScale  , folder = 'devFolder' ):
+    def recordPlayblastForSequenceN(self, tab, level1, level2, level3, width , height , fileName , previewScale  , folder = 'devFolder' ):
         # "/Users/higgsdecay/test"
         playblastFile = os.path.join(str(self.getFileName(tab, level1, level2, level3, folder , 0, 1)), "preview", os.path.splitext(str(fileName))[0], str(fileName))
         # create the preview folder
@@ -358,21 +303,24 @@ class iPipelineActions(object):
         endFrame = cmds.getAttr("defaultRenderGlobals.endFrame")
         format = cmds.getAttr("defaultRenderGlobals.imageFormat")
         
-        width = cmds.getAttr("defaultResolution.width")
-        height = cmds.getAttr("defaultResolution.height")
+#        width = cmds.getAttr("defaultResolution.width")
+#        height = cmds.getAttr("defaultResolution.height")
         ratio = cmds.getAttr("defaultResolution.deviceAspectRatio")
-        
+        cams = [ x for x in cmds.ls(typ='camera') if cmds.getAttr(x+'.renderable')]
+        thecam = cmds.listRelatives( cams[0] , p = 1) if cams != [] else None
+
         cmds.setAttr("defaultRenderGlobals.imageFormat", 8)
         # playblast -startTime 1 -endTime 10  -format iff -filename "/Users/higgsdecay/output/ACR_rig_v02_w03" 
         #-forceOverwrite  -sequenceTime 0 -clearCache 0 -viewer 1 -showOrnaments 1 -fp 4 -percent 50 -widthHeight 1920 1080;
         cmds.playblast(startTime=startFrame, endTime=endFrame, format="image",
                        filename=os.path.splitext(str(playblastFile))[0], showOrnaments=False, viewer=False, percent= previewScale , os=1,
                        sequenceTime=False, forceOverwrite=True,
-                       widthHeight=[int(width), int(height)])
+                       widthHeight=[int(width), int(height)]  )
+        
         for x in glob.glob( previewFolder+os.sep+'*.*' ):
             os.chmod(x , 0777)
         cmds.setAttr("defaultRenderGlobals.imageFormat", format)
-        return (playblastFile, int(startFrame), int(endFrame), int(width), int(height), ratio)
+        return (playblastFile, int(startFrame), int(endFrame), ratio)
         #return (playblastFile+".####.jpg", int(startFrame), int(endFrame), int(width), int(height), ratio)
 
     def createThumbnailN(self, tab, level1, level2, level3, fileName):
@@ -406,6 +354,14 @@ class iPipelineActions(object):
             return 0
 
         return True
+    
+    def mssg(self, msg):
+        messageBox = QMessageBox(self)
+        messageBox.setText(unicode(msg))
+        messageBox.setWindowModality(Qt.WindowModal)
+        messageBox.setIcon(QMessageBox.Information)
+        closeButton = messageBox.addButton('Close', QMessageBox.AcceptRole)
+        messageBox.exec_()
     
     
 if __name__ == '__main__' :

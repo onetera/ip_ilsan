@@ -1,40 +1,25 @@
 # -*- coding: utf-8 -*-
 
-"""
-**iPipelineInit.py**
-
-**Platform:**
-    Linux, Mac Os X.
-
-**Description:**
-    iPipelineInit Framework Module
-
-**Others:**
-
-"""
 
 #***********************************************************************************************
 #***    External imports.
 #***********************************************************************************************
 import sys
 import os
+import re
+
+
 
 #***********************************************************************************************
 #***    Module classes and definitions.
 #***********************************************************************************************
 class iPipelineInit(object):
-    """
-    This class is the **iPipelineInit** class.
-    """
 
-    def initialize(self):
-        if sys.platform == "win32":
-            self.userName = os.getenv('USERNAME')
-        else:
-            self.userName = os.getenv('USER')
+    def initialize(self):       
+        self.userName = re.search('d\d{5}' , os.getenv('USERNAME') ).group() if 'DIGITALIDEA' in os.getenv('USERNAME')  else os.getenv('USERNAME')        
         self.currProjectName = ""
         self.currentUser = "default"
-        superUserList = ['higgsdecay', 'utd', 'wondermc', 'Administrator']
+        superUserList = ['d10021', 'd10230', 'd10060', 'd10165' , 'd10058' , 'd10068' , 'd10166' , 'd10218' ]
         self.isSuperUser = True if self.userName in superUserList else False
         if self.currProjectName == "":
             self.currOpenType = ""
@@ -64,3 +49,5 @@ class iPipelineInit(object):
     def reset(self):
         self.currProjectName = ""
         self.initialize()
+        
+        
