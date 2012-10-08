@@ -18,6 +18,7 @@
 #***********************************************************************************************
 import re
 import glob , os , sys
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 try:
@@ -26,6 +27,7 @@ try:
     standAlone = False
 except ImportError:
     standAlone = True
+from xsend import Message
 
 #***********************************************************************************************
 #***    Module classes and definitions.
@@ -106,7 +108,7 @@ class iPipelineUtility(object):
         return buffer
 
     def getFiles(self, path, mode, reverse=False):
-        searchMayaFile = str(path+"/scenes/*.mb")
+        searchMayaFile = str(path+"/scenes/*.mb") if 'linux' in sys.platform else str(path+"\\scenes\\*.mb") 
         children = glob.glob(searchMayaFile)
         if mode == "devel":
             pattern_re = re.compile('v[\d]{2}_w[\d]{2}(.|_[\w]+.)mb')
@@ -116,6 +118,31 @@ class iPipelineUtility(object):
             return sorted(filter(pattern_re.search, children), reverse=True)
         else:
             return sorted(filter(pattern_re.search, children))
+
+    def checkLevel2InFilename(self , thefile , level2 ):
+        basename = os.path.basename(thefile)[:len(level2)]
+        return basename == level2
+
+
+    def reportError(self,dept,username,tab,showname,level1 ,level2,level3):
+        msg = u'''
+**************************************************************        
+iPiline Error Report
+**************************************************************
+부서 : %(dept)s
+이름 : %(username)s
+tab : %(tab)s
+show : %(showname)s
+level1 : %(level1)s
+level2 : %(level2)s
+level3 : %(level3)s
+**************************************************************
+''' % { 'dept':dept , 'username':username , 'tab':tab , 
+       'showname':showname,'level1':level1 , 'level2':level2,'level3':level3}
+
+        Message('d10218',msg )
+        
+                
 
 if __name__ == "__main__":
     thePath = QDir('/show').entryList(QDir.Dirs|QDir.NoDotAndDotDot)

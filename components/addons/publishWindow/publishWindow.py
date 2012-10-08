@@ -127,7 +127,7 @@ class PublishWindow(QDialog):
         ''' [ dxxxxxx , dxxxxx , dxxxxx ] '''
         thetxt = str( self.tojid_lineEdit.text() ) 
         if thetxt == '' : return
-        return [ re.search( 'd\d{5}' , x).group() for x in thetxt.split(',') ] if re.search( 'd\d{5}' , x) != None else []
+        return [ re.search( 'd\d{5}' , x).group() for x in thetxt.split(',') ] if re.search( 'd\d{5}' , thetxt.split(',')[0] ) != None else []
 
     def accept(self):       
 #        if self.level3 == 'model':      

@@ -34,7 +34,7 @@ except :
     
     
 class Tractor(object):
-    def __init__(self, userName, shot, workcode, playblastFile, startFrame, endFrame, width, height, ratio , pbias ):        
+    def __init__(self, userName, shot, workcode, playblastFile, startFrame, endFrame, width, height, ratio , pbias  , previewScale):        
         self.userName = userName
         self.shot = shot
         self.workcode = workcode
@@ -45,7 +45,9 @@ class Tractor(object):
         self.height = height
         self.ratio = ratio
         self.pbias = pbias
+        self.previewscale = previewScale /100 
         self.process()
+        
 
     def process(self):
         dirPath = self.playblastFile.rsplit('/', 1)[0] # mov 파일이 저장될 폴더
@@ -78,9 +80,10 @@ class Tractor(object):
         nk.set_quality("High")
         nk.set_opacity("0.7")
         nk.set_aspect_ratio(self.ratio)
-        nk.set_format(str(self.width/2), str(self.height/2), "1", "Custom")
+        nk.set_format(str(self.width), str(self.height), "1", "Custom")
         nk.set_frame_range("%s-%s" % (self.startFrame, self.endFrame))
         nk.set_fps("24")
+        nk.set_scale( self.previewscale )
         # output
         nk.set_proxy_file(self.playblastFile)
         nk.set_destination(local_mov_file)

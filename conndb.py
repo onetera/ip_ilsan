@@ -11,8 +11,9 @@ except ImportError:
 import time
 import re
 
-
-if 'd10218' in os.getenv('LOGNAME'):
+DEV=0
+#if 'd10218' in os.getenv('LOGNAME'):
+if DEV == 1:
     mysqlhost = 'localhost'
 else :
     mysqlhost = '10.0.201.15'
@@ -22,7 +23,7 @@ theLogFile = '/lustre/INHouse/INI/'
 
 class DBhandler:
     def dbConn(self):
-        if 'd10218' in os.getenv('LOGNAME'):     
+        if DEV == 1 :     
             self.db = MySQLdb.connect(host = mysqlhost , user = 'root' , passwd='studio77' , db= 'wd' , charset='utf8')
         else :
             self.db = MySQLdb.connect(host = mysqlhost , user = 'idea' , passwd='idea' ,port=3366, db= 'wd' , charset='utf8')

@@ -11,8 +11,7 @@ import re
 
 class WIPmodel:
     def __init__( self , filename ):
-        self.filename = filename
-        
+        self.filename = filename        
         self.created = ''
         self.latest = ''
         self.final = ''
@@ -21,18 +20,34 @@ class WIPmodel:
         
         
     def fileparse(self):
-        self.parsed = self.filename.split( os.sep )
         self.basename = os.path.basename( self.filename )
+        if 'linux' in sys.platform:
+            self.parsed = self.filename.split( os.sep )
+            self.fileinfo = {}
+            self.fileinfo['showname']   = self.parsed[2]
+            self.fileinfo['prod']       = self.parsed[3]        
+            self.fileinfo['level1']     = self.parsed[4]
+            self.fileinfo['level2']     = self.parsed[5]
+            self.fileinfo['level3']     = self.parsed[6]
+            self.fileinfo['type']       = self.parsed[7]
+            self.fileinfo['ver']        = re.search( '(?<=_v)\d{2}' , self.basename ).group() if re.search( '(?<=_v)\d{2}' , self.basename ) else ''
+            self.fileinfo['wip']        = re.search( '(?<=_w)\d{2}' , self.basename ).group() if re.search( '(?<=_w)\d{2}' , self.basename ) else ''
+            
+        else :
+            self.filename = self.filename.replace('/','\\')
+            self.parsed = [ x for x in self.filename.split( '\\' ) if x !='' ]            
+            self.fileinfo = {}
+            self.fileinfo['showname']   = self.parsed[1].split('_')[1]
+            self.fileinfo['prod']       = self.parsed[2]        
+            self.fileinfo['level1']     = self.parsed[3]
+            self.fileinfo['level2']     = self.parsed[4]
+            self.fileinfo['level3']     = self.parsed[5]
+            self.fileinfo['type']       = self.parsed[6]
+            self.fileinfo['ver']        = re.search( '(?<=_v)\d{2}' , self.basename ).group() if re.search( '(?<=_v)\d{2}' , self.basename ) else ''
+            self.fileinfo['wip']        = re.search( '(?<=_w)\d{2}' , self.basename ).group() if re.search( '(?<=_w)\d{2}' , self.basename ) else ''
+            
         
-        self.fileinfo = {}
-        self.fileinfo['showname']   = self.parsed[2]
-        self.fileinfo['prod']       = self.parsed[3]        
-        self.fileinfo['level1']     = self.parsed[4]
-        self.fileinfo['level2']     = self.parsed[5]
-        self.fileinfo['level3']     = self.parsed[6]
-        self.fileinfo['type']       = self.parsed[7]
-        self.fileinfo['ver']        = re.search( '(?<=_v)\d{2}' , self.basename ).group() if re.search( '(?<=_v)\d{2}' , self.basename ) else ''
-        self.fileinfo['wip']        = re.search( '(?<=_w)\d{2}' , self.basename ).group() if re.search( '(?<=_w)\d{2}' , self.basename ) else ''
+        
         
     def dbcon(self):
         self.db = MySQLdb.connect(host = '10.0.201.15' , user = 'idea' , passwd='idea' ,port=3366, db= 'wd' , charset='utf8')
@@ -51,7 +66,7 @@ class WIPmodel:
         result = [x[0] for x in self.cr.fetchall()]
         self.cr.close()
         self.db.close()        
-        return result[0] if type( result ) == type( [] ) else None 
+        return result[0] if type( result ) == type( [] ) and result != [] else None 
         
     
     def getLatestDate(self):
@@ -79,7 +94,7 @@ class WIPmodel:
         pass
     
     def getElapsedTime(self):        
-        return self.getLatestDate() - self.getCreatedDate()
+        return self.getLatestDate() - self.getCreatedDate() if self.getLatestDate() and self.getCreatedDate() else None
     
     
         

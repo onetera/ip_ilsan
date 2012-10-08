@@ -120,8 +120,8 @@ def getCurrentIP():
 
 if __name__ == '__main__':    
 #    print findUserName('d10221')[0]
-    print findUserName('d10221')[2]
-#    print findUserNum('박기도')
+#    print findUserName('d10218')[0]
+    print findUserNum('김수종')
 
     
 #    for x in result[0][1]:   

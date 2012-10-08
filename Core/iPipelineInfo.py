@@ -26,7 +26,11 @@ from PyQt4.QtGui import *
 #***********************************************************************************************
 #***    Internal imports.
 #***********************************************************************************************
-from Core.Note.Note import NoteContainer
+try : 
+    from Core.Note.Note import NoteContainer
+except:
+    sys.path.append('/home/d10218/work/ipipeline')
+    from Core.Note.Note import NoteContainer
 
 #***********************************************************************************************
 #***    Global variables.
@@ -86,6 +90,7 @@ class iPipelineInfo(object):
             return depth
         
     def getFileName(self, tab, level1, level2, level3, mode, offset=0, archive=0, selFile=""):
+        
         depth = self.getDepth(level1, level2, level3)        
         fileName = ""
         devFolder = 'dev'
@@ -103,7 +108,7 @@ class iPipelineInfo(object):
                 fileName=""
         else:
             if tab==1:                
-                fileName += self.libPath                
+                fileName += self.libPath
             elif tab==2:
                 fileName += self.shotPath
             else:
@@ -214,7 +219,9 @@ class iPipelineInfo(object):
                         elif depth == 3:
                             fileName = ""
                     elif mode=="folderTest":
-                        fileName = QString(str(fileName).split('dev/scenes/')[0])                        
+                        fileName = QString(str(fileName).split('dev/scenes/')[0])  
+        if 'win' in sys.platform :
+            fileName = fileName.replace('/' , '\\')                       
         return fileName
     
 
@@ -282,15 +289,40 @@ class iPipelineInfo(object):
     
     def getEventNotes(self, tab, level1, level2, level3, offset=0, archive=0):
         historyFile = self.getFileName(tab, level1, level2, level3, "historyFile", offset, archive)
-        
+     
         #outString = ""
         nc = []
         if QFileInfo(historyFile).isFile():
             nc = NoteContainer()
             nc.importSAX(str(historyFile))
-            #outString = n.readXML()
+            #outString = n.readXML()            
             nc = nc.getNotes(True)
         return nc
+    
+    def finduser_nc(self , historyFile , ver , wip ='' ):
+        if QFileInfo(historyFile).isFile():
+            nc = NoteContainer()
+            nc.importSAX(str(historyFile))                        
+            nc = nc.getNotes(True) 
+        else :
+            return False
+        
+        
+#        print 'ver:',str(int(ver))
+#        print 'wip:',str(int(wip))
+        temp= [ x.author for x in nc if x.version == int(ver) and x.wipversion == int(wip) ]
+
+#        for x in nc:
+#            print 'author : ' , x.author
+#            print 'ver :' ,type(x.version)
+#            print 'wipver :' ,x.wipversion
+             
+
+
+#        print 'temp : ' , temp
+#        return '_'+temp[0] if temp != [] else ''
+        return temp[0] if temp != [] else ''
+        
 
     def getChildren(self, tab, level1, level2, level3):
         childPath = self.getFileName(tab, level1, level2, level3, "childFolder")
@@ -304,7 +336,9 @@ if __name__ == '__main__' :
         if test.libPath:
             pass
     except:
-        test.libPath = '/home/idea/temp/Show/awesome/assets/'
+        test.libPath = '/show/tower/assets/'
          
-    kk =  test.getFileName( 1 , 'cha', 'humanA', 'rig', 'historyFile',)
-    print kk
+    kk =  test.getEventNotes( 2 , '085', '085_1400', 'matchmove')
+#    print  kk[0].location
+    for x in dir(kk[0]): 
+        if x[0]!='_':print x

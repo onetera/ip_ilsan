@@ -79,6 +79,7 @@ idea_slate {
  plate_task TASK
  plate_artist "Jungwook Seo"
  plate_status Custom...
+ scale 1
  CustomStatus TEMP
  plate_description1 NOTE1
  plate_description2 ""

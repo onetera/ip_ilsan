@@ -13,7 +13,7 @@ try :
 	standAlone = False
 except :
 	standAlone = True
-	print 'Module import error'
+	
 import os
 import re
 from xml.dom import minidom

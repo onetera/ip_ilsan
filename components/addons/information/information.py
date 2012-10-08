@@ -35,7 +35,7 @@ except ImportError:
 #***********************************************************************************************
 #***    Internal imports.
 #***********************************************************************************************
-if os.getenv('LOGNAME') == 'DIGITALIDEA\\d10218':
+if 'd10218' in os.getenv('USERNAME'):
     import sys
     sys.path.append( '/home/d10218/work/ipipeline' )
     from foundations.globals.constants import Constants

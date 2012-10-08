@@ -128,6 +128,9 @@ class Nuke:
 
     def set_proxy_file(self, filename):
         self._proxy_file = filename
+        
+    def set_scale(self ,scale):
+        self._scale = scale
 
     def script_test(self):
         lines = self._template.readlines()
@@ -226,6 +229,8 @@ class Nuke:
         lines[idx] = ' MaskOpacity %s\n' % self._opacity
         idx = buf['idea_slate']['ver']
         lines[idx] = ' ver %s\n' % self._cgi_version
+        idx = buf['idea_slate']['scale']
+        lines[idx] = ' scale %s\n' % self._scale
         #idx = buf['idea_slate']['TypeSize']
         #lines[idx] = ' TypeSize %s\n' % 
         # hide overlay

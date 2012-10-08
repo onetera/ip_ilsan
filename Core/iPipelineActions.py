@@ -48,7 +48,10 @@ class iPipelineActions(object):
 
     def activateProject(self, projName):
         self.currProjectName = projName
-        self.currProjectPath = self.showPath + "/" + projName + "/"
+        if 'win' in  sys.platform:
+            self.currProjectPath = self.showPath + "\\" + projName + "/"
+        else :
+            self.currProjectPath = self.showPath + "/" + projName + "/"
         self.shotPath = self.currProjectPath + "seq/"
         self.libPath =  self.currProjectPath + "assets/"
         self.deletePath = self.currProjectPath + "deleted" + "/"
@@ -69,7 +72,7 @@ class iPipelineActions(object):
         return result
         
 
-    def openItem(self, type, newProject, devel):        
+    def openItem(self, type, newProject, devel):              
         if self.checkItem():
             logging.warning( 'checkItem' )         
             messageBox = QMessageBox(self)
@@ -85,20 +88,26 @@ class iPipelineActions(object):
             currOpendFilename = currOpendFilename.split('/')[1:]
             
             if messageBox.clickedButton() == saveButton:
-                if 'show' not in currOpendFilename or 'untitled' in currOpendFilename:
-                    self.openSaveAs()
-                    return
-                self.openSaveAs()
+#                if 'show' not in currOpendFilename or 'untitled' in currOpendFilename:                    
+#                    cmds.file( s=1 )
+#                    self.openSaveAs()
+#                    return
+                print currOpendFilename
+                cmds.file( rename=cmds.file(q=1,l=1)[0] )
+                cmds.file( s=1 )
+#                self.openSaveAs()
             elif messageBox.clickedButton() == messageBox.button(QMessageBox.Cancel):
                 return False    
-        try:
-            if 'win' in sys.platform: 
-                newProject = '/' + newProject
-            mel.eval('setProject "%s"' % newProject)
-        except:                        
-            return True
+#        try:
+        if 'win' in sys.platform:                
+            newProject = newProject.replace( '\\' , '\\\\' )
+            newProject = '\\' + newProject                        
+        mel.eval('setProject "%s"' % newProject)
+#        except:                        
+#            return True
         if QFileInfo(devel).isFile():
             if MAYA:
+                print 'devel : ' , devel
                 cmds.file(devel, open=True, force=True)
             else :
                 logging.warning( 'Devel file exist : %s' % devel )
@@ -116,10 +125,10 @@ class iPipelineActions(object):
                 cmds.file(new=True, force=True)
                 if self.tabWidget.currentIndex() ==1 :                    
                     createAssetJob(self.projNameCombo.currentText() , self.currOpenLevel1 , self.currOpenLevel2 , self.currOpenLevel3)
-                    self.mssg( '어셋이 Database 서버에 최초 등록 하였습니다.\n' )
+                    self.mssg( u'어셋이 Database 서버에 최초 등록 하였습니다.\n' )
                 elif self.tabWidget.currentIndex() ==2:
                     createJob( self.projNameCombo.currentText() , self.currOpenLevel1 , self.currOpenLevel2 , self.currOpenLevel3)
-                    self.mssg( '샷이 Database 서버에 최초 등록 하였습니다.\n' ) 
+                    self.mssg( u'샷이 Database 서버에 최초 등록 하였습니다.\n' ) 
             elif messageBox.clickedButton() == messageBox.button(QMessageBox.Cancel):
                 return False        
         else:
@@ -291,7 +300,7 @@ class iPipelineActions(object):
         cmds.setAttr("defaultRenderGlobals.imageFormat", format)
         return fileName
 
-    def recordPlayblastForSequenceN(self, tab, level1, level2, level3, width , height , fileName , previewScale  , folder = 'devFolder' ):
+    def recordPlayblastForSequenceN(self, tab, level1, level2, level3, width , height , fileName , folder = 'devFolder' ):
         # "/Users/higgsdecay/test"
         playblastFile = os.path.join(str(self.getFileName(tab, level1, level2, level3, folder , 0, 1)), "preview", os.path.splitext(str(fileName))[0], str(fileName))
         # create the preview folder
@@ -312,8 +321,8 @@ class iPipelineActions(object):
         cmds.setAttr("defaultRenderGlobals.imageFormat", 8)
         # playblast -startTime 1 -endTime 10  -format iff -filename "/Users/higgsdecay/output/ACR_rig_v02_w03" 
         #-forceOverwrite  -sequenceTime 0 -clearCache 0 -viewer 1 -showOrnaments 1 -fp 4 -percent 50 -widthHeight 1920 1080;
-        cmds.playblast(startTime=startFrame, endTime=endFrame, format="image",
-                       filename=os.path.splitext(str(playblastFile))[0], showOrnaments=False, viewer=False, percent= previewScale , os=1,
+        cmds.playblast(startTime=startFrame, endTime=endFrame, format="image",percent = 100 , qlt = 100,
+                       filename=os.path.splitext(str(playblastFile))[0], showOrnaments=False, viewer=False, os=1,
                        sequenceTime=False, forceOverwrite=True,
                        widthHeight=[int(width), int(height)]  )
         

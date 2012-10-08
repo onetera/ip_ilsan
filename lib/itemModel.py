@@ -3,11 +3,13 @@
 import os
 import datetime
 import re
+import sys
+
 try :
     import conndb
 except :
     import sys
-    if 'd10218' in os.getenv('LOGNAME'):
+    if 'd10218' in os.getenv('USERNAME'):
         sys.path.append( '/home/d10218/work/ipipeline' )
     else:
         sys.path.append( '/lustre/INHouse/Tool/ipipeline/pub' )
@@ -16,17 +18,31 @@ except :
 
 
 
-def fileParser( thefile ):
+def fileParser( thefile ):    
     basename = os.path.basename( thefile )
     basepath = os.path.dirname( thefile )
     basenamesplit = basename.split('_')
-    basepathsplit = basepath.split( os.path.sep )
-    tab = 1 if basepathsplit[3] == 'assets' else 2    
-    mode = basepathsplit[7]
-    prj = basepathsplit[2]
-    level1 = basepathsplit[4]
-    level2 = basepathsplit[5]
-    level3 = basepathsplit[6]
+    if 'linux' in sys.platform:
+        basepathsplit = basepath.split( os.path.sep )
+        tab = 1 if basepathsplit[3] == 'assets' else 2
+        mode = basepathsplit[7]
+        prj = basepathsplit[2]
+        level1 = basepathsplit[4]
+        level2 = basepathsplit[5]
+        level3 = basepathsplit[6]
+    else :
+        basepath = basepath.replace('/','\\')
+        basepathsplit = [ x for x in basepath.split( '\\' ) if x!='']                       
+        tab = 1 if basepathsplit[2] == 'assets' else 2
+        mode = basepathsplit[6]
+        prj = basepathsplit[1]
+        level1 = basepathsplit[3]
+        level2 = basepathsplit[4]
+        level3 = basepathsplit[5]
+    
+    
+                
+    
     ver  =  re.search( '(?<=v)\d{2}' , basename ).group()
     wip = re.search( '(?<=w)\d{2}' , basename ).group() if re.search( '(?<=w)\d{2}' , basename ) != None else '0'
     
@@ -62,8 +78,16 @@ def findOwner( thefile  ):
             
     db = conndb.DBhandler()
     db.dbConn()
-    result = db.getFetch(query % theDic ) 
+    result = db.getFetch(query % theDic )
+
     result = result[0][0] if result != [] else ''
+    
+#    currSelected = self.getCurrentlySelectedItem(1, 3)
+#    historyObj = self.getEventNotes(1, currSelected[0], currSelected[1], currSelected[2])      
+#   
+#        for row, note in enumerate(historyObj):
+#            author = QTableWidgetItem(note.author)
+            
     return result           
 
 
@@ -146,8 +170,6 @@ def getitemfilename( mode , level2 , level3 , ver , wip ):
         filename = '_'.join( [ level2 , level3 , ver ]  )
         if mode != 'pub':
             filename = '_'.join([filename , wip ])
-#        if subject != None:
-#            filename = '_'.join( [filename , subject ] )
         return filename    
     
 
@@ -156,11 +178,13 @@ def getitemfilename( mode , level2 , level3 , ver , wip ):
 
 
 if __name__ == '__main__':
-#    print findOwner('/show/CZ12/assets/prop/chute/rig/dev/scenes/chute_rig_v01_w21_spreadTest.mb')
+    print findOwner('/show/tower/seq/056/056_0085/matchmove/dev/scenes/056_0085_matchmove_v01.mb')
 #    print findOwner('/show/CZ12/seq/R7/R7_115/ani/dev/scenes/R7_115_ani_v02_w03.mb' ,
 #                     1 , 'dev' , 'CZ12' , 'R7' , 'R7_115' , 'ani' , '02' , '03' , subject='' )
-    for x in  tableitem( 1 , 'CZ12' , 'prop' , 'chute' , 'rig' , 'dev' ):
-        print x  
+
+
+#    for x in  tableitem( 1 , 'CZ12' , 'prop' , 'chute' , 'rig' , 'dev' ):
+#        print x  
 #    for x in  tableitem( 2 , 'CZ12' , 'R7' , 'R7_115' , 'ani' , 'dev' ):
 #        print x
         
