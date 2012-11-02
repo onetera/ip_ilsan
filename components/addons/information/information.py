@@ -35,7 +35,7 @@ except ImportError:
 #***********************************************************************************************
 #***    Internal imports.
 #***********************************************************************************************
-if os.getenv('LOGNAME') == 'DIGITALIDEA\\d10218':
+if 'd10218' in os.getenv('USERNAME'):
     import sys
     sys.path.append( '/home/d10218/work/ipipeline' )
     from foundations.globals.constants import Constants
@@ -58,9 +58,6 @@ class Information(QDialog):
         QDialog.__init__(self, parent) 
         uifile = sorted(glob.glob(Constants.applicationDirectory+"components/addons/information/ui/*.ui"))[-1]     
         uic.loadUi( uifile , self)
-#        uic.loadUi(Constants.applicationDirectory+"components/addons/information/ui/information06.ui", self)
-#        print 'latestFilename = ' , latestFilename
-#        self.showname = currentlyFilename.split( os.sep )[1] if currentlyFilename.split( os.sep ) != [''] else 'TEMP'
         self.tab = tab
         self.userinfo = UserInformation()
         self.level1 = level1
@@ -68,16 +65,10 @@ class Information(QDialog):
         self.level3 = level3
         self.subjectName = subjectName
         self.ver = ver
-        self.wip = wip
-        # default button
-        #self.Currently_radioButton.setChecked(True)
-        #self.Wip_radioButton.setChecked(True)
-        #self.Maya_radioButton.setChecked(True)
+        self.wip = wip      
         
         self.sceneFolder = os.path.dirname(str(currentlyFilename))
-        self.Currently_lineEdit.setText(os.path.basename(currentlyFilename))
-        #self.Status_comboBox.addItems(["TEMP", "WIP", "FINISH"])
-        #self.applicationComboBox.addItems(['iMaya', 'iQualoth', 'iRman'])
+        self.Currently_lineEdit.setText(os.path.basename(currentlyFilename))        
         
         if not QFileInfo(currentlyFilename).isFile():
             self.Devel1_label.setText('OK')
@@ -172,16 +163,12 @@ class Information(QDialog):
             status = "FINISH"
             progress = 100
 
-        if self.Maya_radioButton.isChecked():
-            application = "iMaya"
-        elif self.Rman_radioButton.isChecked():
-            application = "iRman"
-        elif self.Qualoth_radioButton.isChecked():
-            application = "iQualoth"
+     
 
         ctime = 1
         self.result = 1
-        self.emit(SIGNAL("save"), filename, self.commentTextEdit.toPlainText(), status, progress, ctime, application, self.subjectName , self.tab)
+        self.emit(SIGNAL("save"), filename, self.commentTextEdit.toPlainText(), status, progress, ctime,  self.subjectName , self.tab )
+         
         if self.tojid_lineEdit.text() != '' and self.sendMsg_gbox.isChecked() :
 #            Message( 'd10218' , self.msg_textedit.toPlainText() )
             for x in self.parseUserList():

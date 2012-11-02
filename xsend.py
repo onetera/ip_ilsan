@@ -13,8 +13,11 @@ def Message( tojid  , message ):
     tojid = [ x+'@10.0.99.25' for x in tojid ]
     
       
-
-    myid = re.search( 'd\d{5}' , os.getenv('LOGNAME') ).group() if re.search( 'd\d{5}' , os.getenv('LOGNAME') ).group() != None else 'd00000'
+    if re.search( 'd\d{5}' , os.getenv('USERNAME') ) != None:
+        myid = re.search( 'd\d{5}' , os.getenv('USERNAME') ).group()  
+    else :
+        myid = 'd20001'
+        
     myid += '@10.0.99.25'    
     jid=xmpp.protocol.JID( myid )    
     cl=xmpp.Client(jid.getDomain(),debug=[])    
@@ -43,6 +46,6 @@ def Message( tojid  , message ):
     
 
 if __name__ == '__main__':    
-    Message('d10200','마야에서 보네는 메시지 입니다.')
+    Message('d10218','마야에서 보네는 메시지 입니다.')
     
     

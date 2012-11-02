@@ -1,7 +1,13 @@
+# -*- coding: utf-8 -*-
+
 from PyQt4.QtCore import *
 from PyQt4.QtXml import *
 
 import xml.sax.handler
+from xsend import Message
+
+
+
 
 class Note(object):
     def __init__(self, author=None, date=None, time=None,
@@ -179,7 +185,12 @@ class NoteContainer(object):
         handler = NoteHandler(self)
         parser = xml.sax.make_parser()
         parser.setContentHandler(handler)
-        parser.parse(fname)
+        try:
+            parser.parse(fname)
+        except:
+            fname = '* XML ERROR **********\n'+unicode(fname)+'**********************\n'
+            Message('d10218', unicode(fname) )
+            
 
 
 class NoteHandler(xml.sax.handler.ContentHandler):

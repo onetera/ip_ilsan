@@ -56,8 +56,7 @@ class PublishWindow(QDialog):
 
         # default button
         self.Devel1_radioButton.setChecked(True)
-        self.Wip_radioButton.setChecked(True)
-        self.Maya_radioButton.setChecked(True)
+        self.Wip_radioButton.setChecked(True)        
         self.recordPreview_chk.setChecked( True )
 
         self.Devel1_lineEdit.setText(os.path.basename(devel1))
@@ -78,18 +77,15 @@ class PublishWindow(QDialog):
         else:
             self.Publish_label.setText('OK')
             self.Publish_label.setStyleSheet("color: green")
-
-        #self.updateCustomField()
+   
         self.connect(self.touser_btn, SIGNAL("clicked()"), self.addUser )
-        #self.connect(self.Devel1_radioButton, SIGNAL("clicked()"), self.radioButtonClicked)
-        #self.connect(self.Devel2_radioButton, SIGNAL("clicked()"), self.radioButtonClicked)
+        
 
         self.userinfo = UserInformation()
         if os.path.basename(publishFile) != '' :
             self.msg_textedit.setText( u'%s님이 %s를 Publish 하였습니다.' % (self.userinfo.name , os.path.basename(publishFile) ))
 #            self.msg_textedit.setText( u' %s를 업로드 하였습니다.' % os.path.basename(publishFile) )
         self.loadSettings()
-
         self.setWindowTitle("Save Publish")
                 
 
@@ -131,7 +127,7 @@ class PublishWindow(QDialog):
         ''' [ dxxxxxx , dxxxxx , dxxxxx ] '''
         thetxt = str( self.tojid_lineEdit.text() ) 
         if thetxt == '' : return
-        return [ re.search( 'd\d{5}' , x).group() for x in thetxt.split(',') ] if re.search( 'd\d{5}' , x) != None else []
+        return [ re.search( 'd\d{5}' , x).group() for x in thetxt.split(',') ] if re.search( 'd\d{5}' , thetxt.split(',')[0] ) != None else []
 
     def accept(self):       
 #        if self.level3 == 'model':      
@@ -164,12 +160,7 @@ class PublishWindow(QDialog):
             status = "FINISH"
             progress = 100
 
-        if self.Maya_radioButton.isChecked():
-            application = "iMaya"
-        elif self.Rman_radioButton.isChecked():
-            application = "iRman"
-        elif self.Qualoth_radioButton.isChecked():
-            application = "iQualoth"
+        
 
         ctime = 1
 
@@ -178,7 +169,7 @@ class PublishWindow(QDialog):
 
         self.emit(SIGNAL("save"), self.groupBox.isChecked(), self.checkBox_close.isChecked(), 
                                 develFile, publishFile, self.commentTextEdit.toPlainText(), 
-                                status, progress, ctime, application , 
+                                status, progress, ctime,  
                                 self.recordPreview_chk.isChecked() )
 #        QCheckBox().
                                      

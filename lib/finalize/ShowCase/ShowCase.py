@@ -18,7 +18,7 @@ try :
 	standAlone = False
 except ImportError :
 	standAlone = True
-	print 'Module Import Error.'
+
 		
 import os, sys
 import string, json, fnmatch
