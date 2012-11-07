@@ -72,9 +72,8 @@ DEV_SHOW = 0
 
 
 
-class iPipeline(QMainWindow,
-                iPipelineInit, iPipelineActions, iPipelineInfo,iPipelineUtility,
-                assistantFunctions):
+class iPipeline( QMainWindow , iPipelineInit , iPipelineActions, iPipelineInfo,
+                iPipelineUtility , assistantFunctions ):
     
     def __init__(self, parent=None):
 
@@ -143,7 +142,11 @@ class iPipeline(QMainWindow,
         self.setWindowTitle(APPLICATION_NAME) 
         self.setStyleSheet("font-size: 11px")
         
-
+        self.dev_assetTable.setDragEnabled( True )
+        self.pub_assetTable.setDragEnabled( True )
+        self.dev_shotTable.setDragEnabled( True )
+        self.pub_shotTable.setDragEnabled( True )
+        
         
         self.projNameCombo.addItems(self.getDirectoryList(self.showPath))
         self.loadSettings()
@@ -382,29 +385,7 @@ class iPipeline(QMainWindow,
         selectedItem = self.getCurrentlySelectedItem(tab, 3)
         self.openLocation(tab, selectedItem[0], selectedItem[1], selectedItem[2])
 
-#    def updateComment(self , tab ):
-#        level1 , level2 , level3 = self.getCurrentlySelectedItem(tab, 3)
-#        project = str( self.projNameCombo.currentText() )
-#        db = DBhandler()
-#        db.dbConn()
-#        if tab ==1: 
-#            if level1 != '' and level2!='' and level3!='':            
-#                self.asset_comment = db.getFetch( "call getcomment('%s','%s','%s','%s',1)" %(project,level1,level2,level3) )
-#                self.asset_cmmtList.clear()                
-#                self.asset_cmmtList.addItems( [ x[1] for x in self.asset_comment] )
-#                self.asset_cmmtList.setAlternatingRowColors(True)
-                
-#        elif tab == 2:
-#            
-#            if level1 != '' and level2!='' and level3!='':
-#                self.shot_comment = db.getFetch( "call getcomment('%s','%s','%s','%s',2)" %(project,level1,level2,level3) )
-#                self.shot_cmmtList.clear()              
-#                for i , y in enumerate( [ x[1] for x in self.shot_comment] ):
-#                    item = QListWidgetItem( y )
-#                    if i %2 == 0 :
-#                        item.setBackground(Qt.gray)                    
-#                    self.shot_cmmtList.addItem( item )
-#                                    
+                  
 
     def componentDoubleClicked(self, mode, item=None):           
         selected = 1        

@@ -24,25 +24,22 @@ def fileParser( thefile ):
     basenamesplit = basename.split('_')
     if 'linux' in sys.platform:
         basepathsplit = basepath.split( os.path.sep )
-        tab = 1 if basepathsplit[3] == 'assets' else 2
-        mode = basepathsplit[7]
-        prj = basepathsplit[2]
-        level1 = basepathsplit[4]
-        level2 = basepathsplit[5]
-        level3 = basepathsplit[6]
+        tab           = 1 if basepathsplit[3] == 'assets' else 2
+        mode          = basepathsplit[7]
+        prj           = basepathsplit[2]
+        level1        = basepathsplit[4]
+        level2        = basepathsplit[5]
+        level3        = basepathsplit[6]
     else :
-        basepath = basepath.replace('/','\\')
+        basepath      = basepath.replace('/','\\')
         basepathsplit = [ x for x in basepath.split( '\\' ) if x!='']                       
-        tab = 1 if basepathsplit[2] == 'assets' else 2
-        mode = basepathsplit[6]
-        prj = basepathsplit[1]
-        level1 = basepathsplit[3]
-        level2 = basepathsplit[4]
-        level3 = basepathsplit[5]
-    
-    
-                
-    
+        tab           = 1 if basepathsplit[2] == 'assets' else 2
+        mode          = basepathsplit[6]
+        prj           = basepathsplit[1]
+        level1        = basepathsplit[3]
+        level2        = basepathsplit[4]
+        level3        = basepathsplit[5]
+
     ver  =  re.search( '(?<=v)\d{2}' , basename ).group()
     wip = re.search( '(?<=w)\d{2}' , basename ).group() if re.search( '(?<=w)\d{2}' , basename ) != None else '0'
     
@@ -178,7 +175,7 @@ def getitemfilename( mode , level2 , level3 , ver , wip ):
 
 
 if __name__ == '__main__':
-    print findOwner('/show/tower/seq/056/056_0085/matchmove/dev/scenes/056_0085_matchmove_v01.mb')
+    print fileParser('/show/show/tower/seq/059A/059A_0020/matchmove/dev/scenes/059A_0020_matchmove_v01_w01.mb')
 #    print findOwner('/show/CZ12/seq/R7/R7_115/ani/dev/scenes/R7_115_ani_v02_w03.mb' ,
 #                     1 , 'dev' , 'CZ12' , 'R7' , 'R7_115' , 'ani' , '02' , '03' , subject='' )
 
